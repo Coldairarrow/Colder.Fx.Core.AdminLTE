@@ -1,0 +1,50 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout_List.cshtml";
+}
+
+<form id="dataForm" enctype="multipart/form-data" class="easyui-form" method="post" data-options="novalidate:true">
+    <table class="table_base">
+        <colgroup>
+            <col style="width:80px;" />
+        </colgroup>
+        <tbody>
+            <tr>
+                <th>原密码</th>
+                <td>
+                    <input name="oldPwd" class="easyui-passwordbox" data-options="width:'200px',required:true">
+                </td>
+            </tr>
+            <tr>
+                <th>新密码</th>
+                <td>
+                    <input name="newPwd" class="easyui-passwordbox" data-options="width:'200px',required:true">
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+
+@section foottoolbar{
+    <a id="saveForm" href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-save'">保存</a>
+}
+
+<script>
+    var rootUrl = '@Url.Content("~/")';
+    $(function () {
+        $('#saveForm').click(function () {
+            if (!$('#dataForm').form('enableValidation').form('validate'))
+                return;
+
+            var formValues = $('#dataForm').getValues();
+            $.postJSON(rootUrl + 'Base_SysManage/Base_User/ChangePwd', formValues, function (resJson) {
+                if (resJson.Success) {
+                    parent.dialogMsg('修改成功!');
+                    parent.dialogClose('changePwdForm');
+                }
+                else {
+                    dialogError(resJson.Msg);
+                }
+            });
+        });
+    });
+</script>

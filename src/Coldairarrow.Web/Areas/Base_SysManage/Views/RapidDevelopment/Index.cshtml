@@ -1,0 +1,84 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout_List.cshtml";
+}
+
+@section search{
+    <div class="search_wrapper">
+        <div class="search_item">
+            <label class="search_label">选择数据库</label>
+            <input id="linkId" class="easyui-combobox" data-options="
+                width:250,
+                valueField: 'Id',
+                textField: 'LinkName',
+                url: '@Url.Content("~/")Base_SysManage/RapidDevelopment/GetAllDbLink',
+                onSelect: function(rec){
+                   var param={linkId:rec.Id};
+                   $('#dataTable').datagrid('load',param);
+            }">
+        </div>
+        <div class="search_submit">
+            <a id="buildCode" href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-add'">生成代码</a>
+        </div>
+    </div>
+}
+<div id="dataTable">
+
+</div>
+
+<script>
+    var rootUrl = '@Url.Content("~/")';
+
+    function initTable() {
+        $('#dataTable').datagrid({
+            url: rootUrl + 'Base_SysManage/RapidDevelopment/GetDbTableList',
+            method: 'POST',
+            //queryParams: { 'id': id },
+            idField: 'Id',
+            fit: true,
+            fitColumns: true,
+            singleSelect: false,
+            selectOnCheck: false,
+            checkOnSelect: false,
+            //rownumbers: true,
+            //pagination: true,
+            pageSize: 30,
+            //nowrap: false,
+            //pageList: [10, 20, 30, 50, 100, 150, 200],
+            //showFooter: true,
+            columns: [[
+                { title: 'ck', field: 'ck', checkbox: true },
+                { title: '表名', field: 'TableName', width: 200, fixed: true },
+                { title: '描述', field: 'Description', width: 200, fixed: true }
+            ]],
+            onBeforeSelect: function () {
+                return false;
+            }
+        });
+    }
+
+    $(function () {
+        initTable();
+
+        //生成代码
+        $('#buildCode').click(function () {
+            var selected = $("#dataTable").datagrid("getChecked");
+            if (!selected || !selected.length) {
+                dialogError('请选择需要生成的表!');
+                return;
+            }
+            var tableNames = $.map(selected, function (item) {
+                return item['TableName'];
+            });
+
+            var tables = encodeURI(JSON.stringify(tableNames));
+            var linkId = $('#linkId').combobox('getValue');
+            dialogOpen({
+                id: 'form',
+                title: '生成选项',
+                width: 500,
+                height: 270,
+                url: rootUrl + 'Base_SysManage/RapidDevelopment/Form?linkId={0}&tables={1}'.format(linkId, tables),
+            });
+        });
+    });
+</script>

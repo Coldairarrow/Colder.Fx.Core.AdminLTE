@@ -1,0 +1,164 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <AssemblyName>Coldairarrow.Web</AssemblyName>
+    <RootNamespace>Coldairarrow.Web</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>TRACE;RELEASE;NETSTANDARD2_0</DefineConstants>
+    <Optimize>false</Optimize>
+    <PlatformTarget></PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="wwwroot\Scripts\vendor\umeditor\net\upload\**" />
+    <Content Remove="wwwroot\Scripts\vendor\umeditor\net\upload\**" />
+    <EmbeddedResource Remove="wwwroot\Scripts\vendor\umeditor\net\upload\**" />
+    <None Remove="wwwroot\Scripts\vendor\umeditor\net\upload\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="wwwroot\Scripts\vendor\umeditor\net\getContent.ashx" />
+    <Content Remove="wwwroot\Scripts\vendor\umeditor\net\imageUp.ashx" />
+    <Content Remove="wwwroot\Scripts\vendor\umeditor\net\Uploader.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Areas\Base_SysManage\Views\Base_SysLog\Index.cshtml" />
+    <None Include="wwwroot\Scripts\vendor\exif\exif.min.js" />
+    <None Include="wwwroot\Scripts\vendor\html5Uploader\html5Uploader.js" />
+    <None Include="wwwroot\Scripts\vendor\umeditor\dialogs\emotion\emotion.js" />
+    <None Include="wwwroot\Scripts\vendor\umeditor\dialogs\formula\formula.js" />
+    <None Include="wwwroot\Scripts\vendor\umeditor\dialogs\image\image.js" />
+    <None Include="wwwroot\Scripts\vendor\umeditor\dialogs\link\link.js" />
+    <None Include="wwwroot\Scripts\vendor\umeditor\dialogs\map\map.js" />
+    <None Include="wwwroot\Scripts\vendor\umeditor\dialogs\video\video.js" />
+    <None Include="wwwroot\Scripts\vendor\umeditor\lang\en\en.js" />
+    <None Include="wwwroot\Scripts\vendor\umeditor\lang\zh-cn\zh-cn.js" />
+    <None Include="wwwroot\Scripts\vendor\umeditor\third-party\jquery.min.js" />
+    <None Include="wwwroot\Scripts\vendor\umeditor\third-party\mathquill\font\stixgeneral-bundle\stixgeneral-webfont.svg" />
+    <None Include="wwwroot\Scripts\vendor\umeditor\third-party\mathquill\font\stixgeneral-bundle\stixgeneralbol-webfont.svg" />
+    <None Include="wwwroot\Scripts\vendor\umeditor\third-party\mathquill\font\stixgeneral-bundle\stixgeneralbolita-webfont.svg" />
+    <None Include="wwwroot\Scripts\vendor\umeditor\third-party\mathquill\font\stixgeneral-bundle\stixgeneralitalic-webfont.svg" />
+    <None Include="wwwroot\Scripts\vendor\umeditor\third-party\mathquill\font\Symbola.svg" />
+    <None Include="wwwroot\Scripts\vendor\umeditor\third-party\mathquill\mathquill.js" />
+    <None Include="wwwroot\Scripts\vendor\umeditor\third-party\mathquill\mathquill.min.js" />
+    <None Include="wwwroot\Scripts\vendor\umeditor\umeditor.config.js" />
+    <None Include="wwwroot\Scripts\vendor\umeditor\umeditor.js" />
+    <None Include="wwwroot\Scripts\vendor\umeditor\umeditor.min.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="4.8.1" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.3" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.4" />
+    <PackageReference Include="Npgsql" Version="4.0.3" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.1.2" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Coldairarrow.Business\04.Coldairarrow.Business.csproj" />
+    <ProjectReference Include="..\Coldairarrow.DataRepository\02.Coldairarrow.DataRepository.csproj" />
+    <ProjectReference Include="..\Coldairarrow.Entity\03.Coldairarrow.Entity.csproj" />
+    <ProjectReference Include="..\Coldairarrow.Util\01.Coldairarrow.Util.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Areas\Base_SysManage\Views\Base_AppSecret\Form.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Areas\Base_SysManage\Views\Base_AppSecret\Index.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Areas\Base_SysManage\Views\Base_AppSecret\PermissionForm.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Areas\Base_SysManage\Views\Base_DatabaseLink\Form.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Areas\Base_SysManage\Views\Base_DatabaseLink\Index.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Areas\Base_SysManage\Views\Base_SysRole\Form.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Areas\Base_SysManage\Views\Base_SysRole\Index.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Areas\Base_SysManage\Views\Base_SysRole\PermissionForm.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Areas\Base_SysManage\Views\Base_User\ChangePwdForm.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Areas\Base_SysManage\Views\Base_User\Form.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Areas\Base_SysManage\Views\Base_User\Index.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Areas\Base_SysManage\Views\Base_User\PermissionForm.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Areas\Base_SysManage\Views\RapidDevelopment\Form.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Areas\Base_SysManage\Views\RapidDevelopment\Index.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Home\Desktop.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Home\Index.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Home\Login.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Home\Statis.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Shared\_Layout_List.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Test\Index.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Test\RequestDemo.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="wwwroot\Download\_1.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Upload\File\_.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Upload\Img\_.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Dockerfile">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="startdocker.sh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\Scripts\vendor\umeditor\net\" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,142 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout_List.cshtml";
+}
+
+@section toolbar{
+    <a id="add" class="easyui-linkbutton" data-options="iconCls:'icon-add'">添加</a>
+    <a id="edit" class="easyui-linkbutton" data-options="iconCls:'icon-edit'">修改</a>
+    <a id="delete" class="easyui-linkbutton" data-options="iconCls:'icon-remove'">删除</a>
+}
+
+@section search{
+    <div class="search_wrapper">
+        <div class="search_item">
+            <label class="search_label">查询类别</label>
+            <select name="condition" class="easyui-combobox" data-options="width:100">
+                <option value="">请选择</option>
+
+                <option value="AppName">应用名</option>
+                <option value="AppId">应用Id</option>
+                <option value="AppSecret">应用密钥</option>
+            </select>
+            <input name="keyword" class="easyui-textbox" style="width:150px" />
+        </div>
+        <div class="search_submit">
+            <a href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="searchGrid(this,'#dataTable')">查询</a>
+        </div>
+    </div>
+}
+<div id="dataTable">
+
+</div>
+
+<script>
+    var rootUrl = '@Url.Content("~/")';
+
+    function initTable() {
+        $('#dataTable').datagrid({
+            url: rootUrl + 'Base_SysManage/Base_AppSecret/GetDataList',
+            method: 'POST',
+            //queryParams: { 'id': id },
+            idField: 'Id',
+            fit: true,
+            fitColumns: true,
+            singleSelect: false,
+            selectOnCheck: false,
+            checkOnSelect: false,
+            //rownumbers: true,
+            pagination: true,
+            pageSize: 30,
+            //nowrap: false,
+            pageList: [10, 20, 30, 50, 100, 150, 200],
+            //showFooter: true,
+            columns: [[
+                { title: 'ck', field: 'ck', checkbox: true },
+                { title: '应用Id', field: 'AppId', width: 200, fixed: true },
+                { title: '应用密钥', field: 'AppSecret', width: 300, fixed: true },
+                { title: '应用名', field: 'AppName', width: 200, fixed: true },
+                {
+                    title: '操作', field: '_', width: 200, fixed: true, formatter: function (value, row) {
+                        var html = '';
+                        html += '<a href="javascript:;" onclick="setPermission(\'{0}\')">设置权限</a>'.format(row['AppId']);
+
+                        return html;
+                    }
+                }
+            ]],
+            onBeforeSelect: function () {
+                return false;
+            }
+        });
+    }
+
+    $(function () {
+        initTable();
+
+        //添加数据
+        $('#add').click(function () {
+            dialogOpen({
+                id: 'form',
+                title: '添加数据',
+                width: 500,
+                height: 270,
+                url: rootUrl + 'Base_SysManage/Base_AppSecret/Form',
+            });
+        });
+
+        //修改数据
+        $('#edit').click(function () {
+            var selected = $("#dataTable").datagrid("getChecked");
+            if (!selected || !selected.length) {
+                dialogError('请选择要修改的记录!');
+                return;
+            }
+            var id = selected[0].Id;
+
+            dialogOpen({
+                id: 'form',
+                title: '修改数据',
+                width: 500,
+                height: 270,
+                url: rootUrl + 'Base_SysManage/Base_AppSecret/Form?id=' + id,
+            });
+        });
+
+        //删除数据
+        $('#delete').click(function () {
+            var checked = $("#dataTable").datagrid("getChecked");
+            if (!checked || !checked.length) {
+                dialogError('请选择要删除的记录!');
+                return;
+            }
+            var ids = $.map(checked, function (item) {
+                return item['Id'];
+            });
+
+            dialogComfirm('确认删除吗？', function () {
+                $.postJSON(rootUrl + 'Base_SysManage/Base_AppSecret/DeleteData', { ids: JSON.stringify(ids) }, function (resJson) {
+                    if (resJson.Success) {
+                        $('#dataTable').datagrid('clearSelections').datagrid('clearChecked');
+                        $('#dataTable').datagrid('reload');
+                        dialogMsg('删除成功!');
+                    }
+                    else {
+                        dialogError(resJson.Msg);
+                    }
+                });
+            });
+        });
+    });
+
+    //设置权限
+    function setPermission(appId) {
+        dialogOpen({
+            id: 'permissionForm',
+            title: '设置AppId【{0}】权限'.format(appId),
+            width: '80%',
+            height: '80%',
+            url: rootUrl + 'Base_SysManage/Base_AppSecret/PermissionForm?appId={0}'.format(appId),
+        });
+    }
+
+</script>

@@ -1,0 +1,56 @@
+﻿<html>
+<head>
+    <meta charset="utf-8" />
+    <link href="@Url.Scrpit("~/Scripts/easyui/themes/bootstrap/easyui.css")" rel="stylesheet" />
+    <link href="@Url.Scrpit("~/Scripts/easyui/themes/icon.css")" rel="stylesheet" />
+    <link href="@Url.Scrpit("~/Scripts/easyui/themes/color.css")" rel="stylesheet" />
+    <link href="@Url.Scrpit("~/Skin/global.css")" rel="stylesheet" />
+
+    <script src="@Url.Scrpit("~/Scripts/jquery.min.js")"></script>
+    <script src="@Url.Scrpit("~/Scripts/easyui/jquery.easyui.min.js")"></script>
+    <script src="@Url.Scrpit("~/Scripts/easyui/locale/easyui-lang-zh_CN.js")"></script>
+    <script src="@Url.Scrpit("~/Scripts/util/util.js")"></script>
+    <script src="@Url.Scrpit("~/Scripts/config.js")"></script>
+    <script src="@Url.Scrpit("~/Scripts/util/easyui-extend.js")"></script>
+    <script src="@Url.Scrpit("~/Scripts/util/framework-util.js")"></script>
+    <script src="@Url.Scrpit("~/Scripts/vendor/md5/md5.min.js")"></script>
+    <script src="@Url.Scrpit("~/Scripts/business/requestbusiness.js")"></script>
+    <script src="@Url.Scrpit("~/Scripts/vendor/exif/exif.min.js")"></script>
+    <script src="@Url.Scrpit("~/Scripts/vendor/html5Uploader/html5Uploader.js")"></script>
+</head>
+<body>
+    <div id="loadingMask" class="datagrid-mask" style="position: absolute;display: block; z-index: 998; width: 100%; height: 100%;text-align:center;opacity:1;background:white;">
+        @*<div class="datagrid-mask-msg" style="display: block; z-index: 999; top:45%; position:relative;width:179px;margin:0 auto;opacity:1">加载中，请稍候。。。</div>*@
+        <div class="panel-loading" style="position: absolute;left: 0;z-index: 999;">Loading...</div>
+    </div>
+    <div class="easyui-layout" data-options="fit:true">
+        <div data-options="region:'center',split:false,border:false" style="padding:10px;">
+            @RenderBody()
+        </div>
+        @if (IsSectionDefined("toolbar") || IsSectionDefined("search"))
+        {
+            <div data-options="region:'north',border:false" style="padding:10px 10px 0 10px;">
+                @if (IsSectionDefined("toolbar"))
+                {
+                    <div class="toolbar">
+                        @RenderSection("toolbar", false)
+                    </div>
+                }
+                @RenderSection("search", false)
+            </div>
+        }
+        @if (IsSectionDefined("foottoolbar"))
+        {
+            <div data-options="region:'south',border:false" style="text-align:right;padding:10px 0 5px 0;">
+                @RenderSection("foottoolbar", false)
+            </div>
+        }
+    </div>
+    <script type="text/javascript">
+        $.parser.onComplete = function () {
+            $('#loadingMask').remove();
+        }
+    </script>
+</body>
+</html>
+

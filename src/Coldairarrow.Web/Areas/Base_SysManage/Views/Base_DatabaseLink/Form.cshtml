@@ -1,0 +1,78 @@
+﻿@using Coldairarrow.Entity.Base_SysManage;
+@using Coldairarrow.Util;
+
+@{
+    Layout = "~/Views/Shared/_Layout_List.cshtml";
+
+    var obj = (Base_DatabaseLink)Model;
+    var objStr = Html.Raw(obj.ToJson());
+}
+
+<form id="dataForm" enctype="multipart/form-data" class="easyui-form" method="post" data-options="novalidate:true">
+    <table class="table_base">
+        <colgroup>
+            <col style="width:80px;" />
+        </colgroup>
+        <tbody>
+            
+            <tr>
+                <th>连接名</th>
+                <td>
+                    <input name="LinkName" value="@obj.LinkName" class="easyui-textbox" data-options="width:'200px',required:true">
+                </td>
+            </tr>
+            <tr>
+                <th>连接字符串</th>
+                <td>
+                    <input name="ConnectionStr" value="@obj.ConnectionStr" class="easyui-textbox" data-options="width:'200px',required:true">
+                </td>
+            </tr>
+            <tr>
+                <th>数据库类型</th>
+                <td>
+                    <select name="DbType" class="easyui-combobox" data-options="width:200,value:'@obj.DbType',required:true">
+                        <option value="SqlServer">SqlServer</option>
+                        <option value="MySql">MySql</option>
+                        <option value="Oracle">Oracle</option>
+                        <option value="PostgreSql">PostgreSql</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>排序编号</th>
+                <td>
+                    <input name="SortNum" value="@obj.SortNum" class="easyui-textbox" data-options="width:'200px',required:false">
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+
+@section foottoolbar{
+    <a id="saveForm" href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-save'">保存</a>
+}
+
+<script>
+    var rootUrl = '@Url.Content("~/")';
+    var theEntity = @objStr;
+
+    $(function () {
+        $('#saveForm').click(function () {
+            if (!$('#dataForm').form('enableValidation').form('validate'))
+                return;
+
+            var formValues = $('#dataForm').getValues();
+            $.extend(theEntity, formValues);
+            $.postJSON(rootUrl + 'Base_SysManage/Base_DatabaseLink/SaveData', theEntity, function (resJson) {
+                if (resJson.Success) {
+                    parent.dialogMsg('保存成功!');
+                    parent.dialogClose('form');
+                    parent.$('#dataTable').datagrid('clearChecked').datagrid('reload');
+                }
+                else {
+                    dialogError(resJson.Msg);
+                }
+            });
+        });
+    });
+</script>

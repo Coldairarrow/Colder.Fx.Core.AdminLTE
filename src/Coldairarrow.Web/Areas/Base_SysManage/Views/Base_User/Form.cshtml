@@ -1,0 +1,98 @@
+﻿@using Coldairarrow.Entity.Base_SysManage;
+@using Coldairarrow.Util;
+@using Coldairarrow.Business.Base_SysManage;
+
+@{
+    Layout = "~/Views/Shared/_Layout_List.cshtml";
+    var obj = (Base_User)Model;
+    string roleIdList = Base_UserBusiness.GetUserRoleIds(obj.UserId).ToJson().Replace("\"", "'");
+    string str = obj.ToJson();
+    var objStr = Html.Raw(obj.ToJson());
+}
+
+<form id="dataForm" enctype="multipart/form-data" class="easyui-form" method="post" data-options="novalidate:true">
+    <table class="table_base">
+        <colgroup>
+            <col style="width:80px;" />
+        </colgroup>
+        <tbody>
+            <tr>
+                <th>用户名</th>
+                <td>
+                    <input name="UserName" value="@obj.UserName" class="easyui-textbox" data-options="width:'200px',required:true">
+                </td>
+            </tr>
+            <tr>
+                <th>密码</th>
+                <td>
+                    <input name="Pwd" class="easyui-passwordbox" data-options="width:'200px'">
+                </td>
+            </tr>
+            <tr>
+                <th>真实姓名</th>
+                <td>
+                    <input name="RealName" value="@obj.RealName" class="easyui-textbox" data-options="width:'200px',required:true">
+                </td>
+            </tr>
+            <tr>
+                <th>性别</th>
+                <td>
+                    <select name="Sex" class="easyui-combobox" data-options="width:200,value:'@obj.Sex',required:true">
+                        <option value="1">男</option>
+                        <option value="0">女</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>出生日期</th>
+                <td>
+                    <input name="Birthday" type="text" class="easyui-datebox" data-options="width:'200',required:false,value:'@(obj.Birthday?.ToString("yyyy-MM-dd"))'">
+                </td>
+            </tr>
+            <tr>
+                <th>所属角色</th>
+                <td>
+                    <input id="RoleId" class="easyui-combobox" data-options="
+                        width:200,
+                        valueField: 'RoleId',
+                        textField: 'RoleName',
+                        multiple:true,
+                        value:@roleIdList,
+                        url: '@Url.Content("~/")Base_SysManage/Base_SysRole/GetDataList_NoPagin'
+                    ">
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+
+@section foottoolbar{
+    <a id="saveForm" href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-save'">保存</a>
+}
+
+<script>
+    var rootUrl = '@Url.Content("~/")';
+    var theEntity = @objStr;
+
+    $(function () {
+        $('#saveForm').click(function () {
+            if (!$('#dataForm').form('enableValidation').form('validate'))
+                return;
+
+            var formValues = $('#dataForm').getValues();
+            $.extend(theEntity, formValues);
+            var roleIds = $('#RoleId').combobox('getValues');
+            theEntity['RoleIdList'] = JSON.stringify(roleIds);
+            $.postJSON(rootUrl + 'Base_SysManage/Base_User/SaveData', theEntity, function (resJson) {
+                if (resJson.Success) {
+                    parent.dialogMsg('保存成功!');
+                    parent.dialogClose('form');
+                    parent.$('#dataTable').datagrid('clearChecked').datagrid('reload');
+                }
+                else {
+                    dialogError(resJson.Msg);
+                }
+            });
+        });
+    });
+</script>

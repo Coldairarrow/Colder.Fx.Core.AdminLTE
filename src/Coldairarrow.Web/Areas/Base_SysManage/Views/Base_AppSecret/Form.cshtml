@@ -1,0 +1,66 @@
+﻿@using Coldairarrow.Entity.Base_SysManage;
+@using Coldairarrow.Util;
+
+@{
+    Layout = "~/Views/Shared/_Layout_List.cshtml";
+
+    var obj = (Base_AppSecret)Model;
+    var objStr = Html.Raw(obj.ToJson());
+}
+
+<form id="dataForm" enctype="multipart/form-data" class="easyui-form" method="post" data-options="novalidate:true">
+    <table class="table_base">
+        <colgroup>
+            <col style="width:80px;" />
+        </colgroup>
+        <tbody>
+            <tr>
+                <th>应用Id</th>
+                <td>
+                    <input name="AppId" value="@obj.AppId" class="easyui-textbox" data-options="width:'200px',required:true">
+                </td>
+            </tr>
+            <tr>
+                <th>应用密钥</th>
+                <td>
+                    <input name="AppSecret" value="@obj.AppSecret" class="easyui-textbox" data-options="width:'200px',required:true">
+                </td>
+            </tr>
+            <tr>
+                <th>应用名</th>
+                <td>
+                    <input name="AppName" value="@obj.AppName" class="easyui-textbox" data-options="width:'200px',required:false">
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+
+@section foottoolbar{
+    <a id="saveForm" href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-save'">保存</a>
+}
+
+<script>
+    var rootUrl = '@Url.Content("~/")';
+    var theEntity = @objStr;
+
+    $(function () {
+        $('#saveForm').click(function () {
+            if (!$('#dataForm').form('enableValidation').form('validate'))
+                return;
+
+            var formValues = $('#dataForm').getValues();
+            $.extend(theEntity, formValues);
+            $.postJSON(rootUrl + 'Base_SysManage/Base_AppSecret/SaveData', theEntity, function (resJson) {
+                if (resJson.Success) {
+                    parent.dialogMsg('保存成功!');
+                    parent.dialogClose('form');
+                    parent.$('#dataTable').datagrid('clearChecked').datagrid('reload');
+                }
+                else {
+                    dialogError(resJson.Msg);
+                }
+            });
+        });
+    });
+</script>

@@ -1,0 +1,44 @@
+﻿@import "compass/css3";
+@import "compass/utilities/";
+@import "compass/utilities/sprites";
+
+.detail_panel{
+    margin-bottom:20px;
+}
+.detail_panel_title{
+    border-bottom:2px solid #d12a3e;
+    padding:0;
+    margin:0;
+    line-height:0;
+    height:26px;
+    overflow:hidden;
+    span{
+        display:block;
+        vertical-align:top;
+        background-color:#d12a3e;
+        font-size:14px;
+        padding:0 10px;
+        width:160px;
+        position:relative;
+        line-height:27px;
+        color:#fff;
+        font-weight:400;
+    }
+    span:after{
+        content: " ";
+        position: absolute;
+        top: 0;
+        right:28px;
+        width: 0;
+        height: 0;
+        border-top: 28px solid transparent;
+        border-bottom: 28px solid transparent;
+        border-left: 28px solid #d12a3e;
+    }
+}
+.detail_panel_content{
+    padding-top:10px;
+    img{
+        max-width:100%;
+    }
+}

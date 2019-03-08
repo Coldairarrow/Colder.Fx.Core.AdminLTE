@@ -1,0 +1,135 @@
+﻿@using Coldairarrow.Business.Base_SysManage;
+@using Coldairarrow.Web;
+
+@{
+    var menus = SystemMenuManage.GetOperatorMenu();
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>管理后台</title>
+    <link href="@Url.Scrpit("~/Scripts/easyui/themes/bootstrap/easyui.css")" rel="stylesheet" />
+    <link href="@Url.Scrpit("~/Scripts/easyui/themes/icon.css")" rel="stylesheet" />
+    <link href="@Url.Scrpit("~/Scripts/easyui/themes/color.css")" rel="stylesheet" />
+    <link href="@Url.Scrpit("~/Skin/global.css")" rel="stylesheet" />
+</head>
+<body>
+    <div id="header">
+        <div class="logo">管理后台</div>
+        <div class="top">
+            <div class="user_wrp">
+                <i class="icon icon_top_user"></i>
+                <a id="changePwd" href="javascript:;">@Base_UserBusiness.GetCurrentUser()?.RealName</a>
+            </div>
+            <div class="topbar">
+                <div class="topbar-item" id="topbar_innermsg">
+                    @*<a href="javascript:;" class="topbar-btn" onclick="Desktop.tabs.add('_panel_innermsg_unread','未读消息','/innermsg/__/listunread')">
+                            <span>消息</span><span class="topbar-btn-msg-num"></span>
+                        </a>*@
+                    <div class="topbar-msg-panel">
+                        <div class="topbar-msg-arrow"></div>
+                        <ul class="topbar-msg"></ul>
+                    </div>
+                </div>
+                <div class="topbar-item">
+                    <a id="logout" href="javascript:;" class="topbar-btn"><i class="icon icon_top_logout"></i><span>退出</span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="menu">
+        <div class="menu_main" id="system_menu">
+            <h2><i class="icon icon_menu_catalog"></i></h2>
+
+            @foreach (var firstMenu in menus)
+            {
+                if (firstMenu.IsShow)
+                {
+                    <a class="main_item" href="javascript:void(0)" title="@firstMenu.Name"><i class="icon @firstMenu.Icon"></i><span>@firstMenu.Name.Substring(0, 2)</span></a>
+                    <div class="menu_sub">
+                        <dl>
+                            @foreach (var secondMenu in firstMenu.SubMenus)
+                            {
+                                if (secondMenu.IsShow)
+                                {
+                                    <dt><span>@secondMenu.Name</span></dt>
+                                    <dd>
+                                        @foreach (var item in secondMenu.SubMenus)
+                                        {
+                                            if (item.IsShow)
+                                            {
+                                                <a href="javascript:;" onclick="Desktop.tabs.add('_panel_@(item.Id)','@(item.Name)','@item.Url')" class="sub_item">@item.Name</a>
+                                            }
+                                        }
+                                    </dd>
+                                }
+                            }
+                        </dl>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+    <div id="main">
+        <div id="page">
+            <div id="global_tabs" data-options="tabHeight:30"></div>
+        </div>
+    </div>
+
+    <script src="@Url.Scrpit("~/Scripts/jquery.min.js")"></script>
+    <script src="@Url.Scrpit("~/Scripts/easyui/easyloader.js")"></script>
+    <script src="@Url.Scrpit("~/Scripts/easyui/jquery.easyui.min.js")"></script>
+    <script src="@Url.Scrpit("~/Scripts/easyui/locale/easyui-lang-zh_CN.js")"></script>
+    <script src="@Url.Scrpit("~/Scripts/easyui/jquery.easyui.extend.js")"></script>
+    <script src="@Url.Scrpit("~/Scripts/easyui/datagrid-cellediting.js")"></script>
+    <script src="@Url.Scrpit("~/Scripts/util/util.js")"></script>
+    <script src="@Url.Scrpit("~/Scripts/config.js")"></script>
+    <script src="@Url.Scrpit("~/Scripts/jsrender.min.js")"></script>
+    <script src="@Url.Scrpit("~/Scripts/global.js")"></script>
+    <script src="@Url.Scrpit("~/Scripts/util/easyui-extend.js")"></script>
+    <script src="@Url.Scrpit("~/Scripts/util/framework-util.js")"></script>
+
+    <script>
+        var rootUrl = '@Url.Content("~/")';
+
+        (function () {
+            var $container = $("#system_menu");
+            $container.on("click", "a.main_item", function () {
+                $container.find("a.main_item_active").removeClass("main_item_active");
+                $container.find("a.sub_item_active").removeClass("sub_item_active");
+                $(this).addClass("main_item_active");
+            });
+            $container.on("click", "a.sub_item", function () {
+                $container.find("a.sub_item_active").removeClass("sub_item_active");
+                $(this).addClass("sub_item_active");
+            });
+
+            $container.find("a.main_item:eq(0)").trigger("click");
+
+            $('#logout').click(function () {
+                dialogComfirm('确认要注销吗？', function () {
+                    $.postJSON(rootUrl + 'Home/Logout', {}, function (resJson) {
+                        if (resJson.Success)
+                            top.location.href = rootUrl + 'Home/Login';
+                    });
+                });
+            });
+
+            //更改密码
+            $('#changePwd').click(function () {
+                dialogOpen({
+                    id: 'changePwdForm',
+                    title: '更改密码',
+                    width: 500,
+                    height: 300,
+                    url: rootUrl + 'Base_SysManage/Base_User/ChangePwdForm',
+                });
+            });
+
+            Desktop.tabs.add('_panel_0110000', '框架介绍', rootUrl + 'Home/Desktop');
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout_List.cshtml";
+}
+
+<form id="dataForm" enctype="multipart/form-data" class="easyui-form" method="post" data-options="novalidate:true">
+    <table class="table_base">
+        <colgroup>
+            <col style="width:80px;" />
+        </colgroup>
+        <tbody>
+            <tr>
+                <th>生成选项</th>
+                <td>
+                    <select id="buildType" name="buildType" class="easyui-combobox" data-options="width:200,value:['entity','business','controller','view'],multiple:true">
+                        <option value="entity">实体层</option>
+                        <option value="business">业务逻辑层</option>
+                        <option value="controller">控制器</option>
+                        <option value="view">视图</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>生成区域</th>
+                <td>
+                    <input id="areaName" name="areaName" class="easyui-textbox" data-options="width:'200px',required:true">
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+
+@section foottoolbar{
+    <a id="saveForm" href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-save'">生成</a>
+}
+
+<script>
+    var rootUrl = '@Url.Content("~/")';
+    var linkId = request('linkId');
+    var tables = request('tables');
+
+    $(function () {
+        $('#saveForm').click(function () {
+            if (!$('#dataForm').form('enableValidation').form('validate'))
+                return;
+
+            var areaName = $('#areaName').textbox('getValue');
+            var buildType = $('#buildType').combobox('getValues');
+            loading();
+            $.postJSON(rootUrl + 'Base_SysManage/RapidDevelopment/BuildCode', {
+                linkId: linkId,
+                areaName: areaName,
+                tables: tables,
+                buildType: JSON.stringify(buildType)
+            }, function (resJson) {
+                loading(false);
+                if (resJson.Success) {
+                    parent.dialogMsg('生成成功!');
+                    parent.dialogClose('form');
+                }
+                else {
+                    dialogError(resJson.Msg);
+                }
+            });
+        });
+    });
+</script>

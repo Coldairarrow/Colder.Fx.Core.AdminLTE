@@ -1,0 +1,5 @@
+﻿@mixin sprite-background($map, $name){
+    background-position:sprite-position($map, $name);
+    height:image-height(sprite-file($map, $name));
+    width: image-width(sprite-file($map, $name));
+}

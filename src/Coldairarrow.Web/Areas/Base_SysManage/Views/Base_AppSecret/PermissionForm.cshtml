@@ -1,0 +1,81 @@
+﻿@using Coldairarrow.Business.Base_SysManage;
+
+@{
+    Layout = "~/Views/Shared/_Layout_List.cshtml";
+
+    var permissions = PermissionManage.GetAppIdPermissionModules((string)ViewData["appId"]);
+}
+
+<div class="easyui-panel" data-options="fit:true,footer:'#ft_role_permission'">
+    <table id="db_role_permission" class="table_base table_grid" style="width:100%;border-width:0;">
+        <thead>
+            <tr>
+                <th style="width:100px;">模块</th>
+                <th>权限项</th>
+                <th style="width:80px;">操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var aModule in permissions)
+            {
+                <tr data-module="@aModule.Value">
+                    <td>@aModule.Name</td>
+                    <td class="pretty-checkbox-mutiline">
+                        @foreach (var item in aModule.Items)
+                        {
+                            <label class="pretty-checkbox">
+                                <input type="checkbox" value="@item.Value" @(item.IsChecked ? "checked=\"checked\"" : "") />
+                                <i></i><span class="text">@item.Name</span>
+                            </label>
+                        }
+                    </td>
+                    <td>
+                        <a href="javascript:void(0);" class="operate" onclick="role_permission_checkall.call(this)">全选</a>
+                        <a href="javascript:void(0);" class="operate" onclick="role_permission_uncheckall.call(this)">全消</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div id="ft_role_permission" style="text-align:right;padding:5px;">
+    <a href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-save'" onclick="savePermission()">保存</a>
+</div>
+<script>
+    var rootUrl = '@Url.Content("~/")';
+    var appId = request('appId');
+
+    function role_permission_checkall() {
+        $(this).closest('tr').find('input:checkbox').prop("checked", true);
+    }
+    function role_permission_uncheckall() {
+        $(this).closest('tr').find('input:checkbox').prop("checked", false);
+    }
+
+    function savePermission() {
+        var permissions = [];
+        $("#db_role_permission>tbody>tr").each(function () {
+            var moduleValue = $(this).data("module");
+            var checked = $(this).find("input:checked");
+            if (checked.length) {
+                checked.each(function () {
+                    var itemValue = this.value;
+
+                    permissions.push(moduleValue + '.' + itemValue);
+                });
+            }
+        });
+
+        $.postJSON(rootUrl + 'Base_SysManage/Base_AppSecret/SavePermission', {
+            appId: appId,
+            permissions: JSON.stringify(permissions)
+        }, function (resJson) {
+            if (resJson.Success) {
+                parent.dialogMsg('保存成功!');
+            }
+            else {
+                dialogError(resJson.Msg);
+            }
+        });
+    }
+</script>

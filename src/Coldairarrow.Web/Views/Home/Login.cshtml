@@ -1,0 +1,91 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>后台管理登录</title>
+    <link href="@Url.Scrpit("~/Skin/login.css")" rel="stylesheet" />
+</head>
+<body>
+    <div class="wrapper">
+        <div class="title">
+            @*<div class="logo"><img src="/images/logo_93x47.png" width="93" height="47" /></div>*@
+            <b class="text">管理后台</b>
+        </div>
+        <div class="box">
+            <form method="post">
+                <div class="field_panel">
+                    <div class="field_wrap">
+                        <i class="icon icon_un"></i>
+                        <input type="text" id="username" name="username" maxlength="50" class="text" placeholder="帐号" />
+                    </div>
+                    <div class="field_wrap">
+                        <i class="icon icon_pw"></i>
+                        <input type="password" id="password" name="password" maxlength="50" class="text" placeholder="密码" />
+                    </div>
+                </div>
+                <div class="tip" id="tip"></div>
+                <div class="btn_panel">
+                    <a href="javascript:" id="btnSubmit" title="点击登录" class="btn">登录</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <input type="hidden" id="return_url" value="/" />
+
+    <script src="@Url.Scrpit("~/Scripts/jquery.min.js")"></script>
+    <script src="@Url.Scrpit("~/Scripts/util/util.js")"></script>
+
+    <script type="text/javascript">
+        var rootUrl = '@Url.Content("~/")';
+
+        var Login = function () {
+            var o = {
+                tip: $('#tip'),
+                account: $("#username"),
+                pwd: $("#password")
+            };
+
+            function init() {
+                o.pwd.keydown(function (e) {
+                    var n = "which" in e ? e.which : e.keyCode;
+                    13 == n && $("#btnSubmit").trigger("click");
+                });
+
+                $("#btnSubmit").click(function () {
+                    var n = $.trim(o.account.val()) || "",
+                        t = $.trim(o.pwd.val()) || "";
+                    return 0 == n.length ? (tip("你还没有输入帐号！"), void o.account.focus()) : 0 == t.length ? (tip("你还没有输入密码！"),
+                        void o.pwd.focus()) : void submit(n, t);
+                });
+            }
+
+            function tip(msg) {
+                o.tip.text(msg);
+            }
+
+            function submit(username, pwd) {
+                $.postJSON(rootUrl + 'Home/SubmitLogin', { userName: username, password: pwd }, function (resJson) {
+                    if (resJson.Success)
+                        window.location.href = rootUrl;
+                    else
+                        tip(resJson.Msg);
+                });
+            }
+
+            return o.account.focus(), {
+                "init": init
+            };
+        }();
+
+        $(function () {
+            Login.init();
+        });
+    </script>
+</body>
+</html>

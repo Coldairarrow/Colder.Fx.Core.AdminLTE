@@ -1,0 +1,20 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>接口请求Demo</title>
+</head>
+<body>
+    <button id="btn">发起请求</button>
+
+    <script src="~/Scripts/jquery.min.js"></script>
+    <script>
+        $('#btn').click(function () {
+            $.getJSON('/Test/Interface/GetData.ashx?_=' + new Date().getTime(), {}, function (resJson) {
+                alert(resJson.Msg);
+            });
+        });
+    </script>
+</body>
+</html>

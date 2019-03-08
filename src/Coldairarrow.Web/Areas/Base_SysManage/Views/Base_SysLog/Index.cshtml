@@ -1,0 +1,82 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout_List.cshtml";
+}
+
+@section search{
+<div class="search_wrapper">
+    <div class="search_item">
+        <label class="search_label">日志内容</label>
+        <input name="logContent" class="easyui-textbox" style="width:150px" />
+    </div>
+    <div class="search_item">
+        <label class="search_label">日志类别</label>
+        <input name="logType" class="easyui-combobox" data-options="
+            width:150,
+            valueField: 'Value',
+            textField: 'Name',
+            url: '@Url.Content("~/")Base_SysManage/Base_SysLog/GetLogTypeList',
+            mode:'remote'
+        ">
+    </div>
+    <div class="search_item">
+        <label class="search_label">用户名</label>
+        <input name="opUserName" class="easyui-textbox" style="width:150px" />
+    </div>
+    <br />
+    <div class="search_item">
+        <label class="search_label">开始时间</label>
+        <input name="startTime" class="easyui-datebox" style="width:150px" />
+    </div>
+    <div class="search_item">
+        <label class="search_label">结束时间</label>
+        <input name="endTime" class="easyui-datebox" style="width:150px" />
+    </div>
+    <div class="search_submit">
+        <a href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="searchGrid(this,'#dataTable')">查询</a>
+    </div>
+</div>
+}
+<div id="dataTable">
+
+</div>
+
+<script>
+    var rootUrl = '@Url.Content("~/")';
+
+    function initTable() {
+        $('#dataTable').datagrid({
+            url: rootUrl + 'Base_SysManage/Base_SysLog/GetLogList',
+            method: 'POST',
+            //queryParams: { 'id': id },
+            idField: 'Id',
+            fit: true,
+            fitColumns: true,
+            singleSelect: false,
+            selectOnCheck: false,
+            checkOnSelect: false,
+            //rownumbers: true,
+            pagination: true,
+            pageSize: 30,
+            nowrap: false,
+            pageList: [10, 20, 30, 50, 100, 150, 200],
+            //showFooter: true,
+            columns: [[
+                { title: '日志类型', field: 'LogType', width: 150, fixed: true },
+                { title: '日志内容', field: 'LogContent', width: 800 },
+                { title: '操作员用户名', field: 'OpUserName', width: 100, fixed: true },
+                { title: '日志记录时间', field: 'OpTime', width: 200, fixed: true }
+            ]],
+            onBeforeLoad: function (param) {
+                param['sort'] = 'OpTime';
+                param['order'] = 'desc';
+            },
+            onBeforeSelect: function () {
+                return false;
+            }
+        });
+    }
+
+    $(function () {
+        initTable();
+    });
+</script>
