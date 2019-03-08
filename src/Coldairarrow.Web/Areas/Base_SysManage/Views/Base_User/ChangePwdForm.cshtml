@@ -1,50 +1,59 @@
 ﻿@{
-    Layout = "~/Views/Shared/_Layout_List.cshtml";
+    Layout = "~/Views/Shared/_Layout_Form.cshtml";
 }
-
-<form id="dataForm" enctype="multipart/form-data" class="easyui-form" method="post" data-options="novalidate:true">
-    <table class="table_base">
-        <colgroup>
-            <col style="width:80px;" />
-        </colgroup>
-        <tbody>
-            <tr>
-                <th>原密码</th>
-                <td>
-                    <input name="oldPwd" class="easyui-passwordbox" data-options="width:'200px',required:true">
-                </td>
-            </tr>
-            <tr>
-                <th>新密码</th>
-                <td>
-                    <input name="newPwd" class="easyui-passwordbox" data-options="width:'200px',required:true">
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</form>
-
-@section foottoolbar{
-    <a id="saveForm" href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-save'">保存</a>
-}
-
+<div style="padding:15px;padding-right:45px;">
+    <form id="form" class="form-horizontal" role="form">
+        <div class="form-group form-group-sm">
+            <label class="col-sm-2 control-label">原密码</label>
+            <div class="col-sm-5">
+                <input name="oldPwd" type="password" class="form-control" required>
+                <div class="help-block with-errors"></div>
+            </div>
+        </div>
+        <div class="form-group form-group-sm">
+            <label class="col-sm-2 control-label">新密码</label>
+            <div class="col-sm-5">
+                <input name="newPwd" type="password" class="form-control" required>
+                <div class="help-block with-errors"></div>
+            </div>
+        </div>
+        <div class="form-group">
+            <button id="submit" type="submit" class="hidden">提交</button>
+        </div>
+    </form>
+</div>
 <script>
-    var rootUrl = '@Url.Content("~/")';
-    $(function () {
-        $('#saveForm').click(function () {
-            if (!$('#dataForm').form('enableValidation').form('validate'))
-                return;
-
-            var formValues = $('#dataForm').getValues();
-            $.postJSON(rootUrl + 'Base_SysManage/Base_User/ChangePwd', formValues, function (resJson) {
-                if (resJson.Success) {
-                    parent.dialogMsg('修改成功!');
-                    parent.dialogClose('changePwdForm');
-                }
-                else {
-                    dialogError(resJson.Msg);
-                }
-            });
+        $(function () {
+            initEvent();
         });
-    });
+
+        //事件绑定
+        function initEvent() {
+            //表单校验
+            $('#form').validator().on('submit', function (e) {
+                //校验成功
+                if (!e.isDefaultPrevented()) {
+                    e.preventDefault();
+
+                    var values = $('#form').getValues();
+                    loading();
+                    $.postJSON(rootUrl + 'Base_SysManage/Base_User/ChangePwd', values, function (resJson) {
+                        loading(false);
+
+                        if (resJson.Success) {
+                            parent.dialogSuccess('修改成功!');
+                            parent.dialogClose('changePwdForm');
+                        }
+                        else {
+                            dialogError(resJson.Msg);
+                        }
+                    });
+                }
+            })
+        }
+
+        //提交表单
+        function submitForm() {
+            $('#submit').trigger('click');
+        }
 </script>

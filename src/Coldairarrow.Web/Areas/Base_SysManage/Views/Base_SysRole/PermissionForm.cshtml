@@ -1,80 +1,91 @@
 ﻿@using Coldairarrow.Business.Base_SysManage;
 
 @{
-    Layout = "~/Views/Shared/_Layout_List.cshtml";
-
     var permissions = PermissionManage.GetRolePermissionModules((string)ViewData["roleId"]);
 }
-<div class="easyui-panel" data-options="fit:true,footer:'#ft_role_permission'">
-    <table id="db_role_permission" class="table_base table_grid" style="width:100%;border-width:0;">
-        <thead>
-            <tr>
-                <th style="width:100px;">模块</th>
-                <th>权限项</th>
-                <th style="width:80px;">操作</th>
-            </tr>
-        </thead>
-        <tbody>
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>PermissionForm3</title>
+    <link rel="stylesheet" type="text/css" href="@Url.Scrpit("~/Scripts/vendor/bootstrap/css/bootstrap.min.css")">
+    <link rel="stylesheet" type="text/css" href="@Url.Scrpit("~/Scripts/vendor/font-awesome/css/font-awesome.min.css")">
+    <link rel="stylesheet" type="text/css" href="@Url.Scrpit("~/css/fx/permisson-form.css")" />
+
+    <script src="~/Scripts/vendor/jQuery/jquery-2.2.3.min.js"></script>
+    <script src="~/Scripts/util/util.js"></script>
+    <script src="~/Scripts/vendor/layer/layer.js"></script>
+    <script src="~/Scripts/vendor/layer/layer-extends.js"></script>
+</head>
+<body>
+    <div style="padding:15px;padding-right:45px;">
+        <form id="form" class="form-horizontal" role="form">
+            <div class="form-group form-group-sm">
+                <label class="col-sm-1 control-label">模块</label>
+                <label class="col-sm-10 control-label" style="text-align:left">权限项</label>
+            </div>
             @foreach (var aModule in permissions)
             {
-                <tr data-module="@aModule.Value">
-                    <td>@aModule.Name</td>
-                    <td class="pretty-checkbox-mutiline">
+                <div class="form-group form-group-sm">
+                    <label class="col-sm-1 control-label">@aModule.Name</label>
+                    <div class="col-sm-9">
                         @foreach (var item in aModule.Items)
                         {
-                            <label class="pretty-checkbox">
-                                <input type="checkbox" value="@item.Value" @(item.IsChecked ? "checked=\"checked\"" : "") />
-                                <i></i><span class="text">@item.Name</span>
-                            </label>
+                            <div class="checkbox checkbox-success checkbox-inline">
+                                <input type="checkbox" class="styled" id="@item.Id" @(item.IsChecked ? "checked" : "") value="@item.Value">
+                                <label for="@item.Id">@item.Name</label>
+                            </div>
                         }
-                    </td>
-                    <td>
-                        <a href="javascript:void(0);" class="operate" onclick="role_permission_checkall.call(this)">全选</a>
-                        <a href="javascript:void(0);" class="operate" onclick="role_permission_uncheckall.call(this)">全消</a>
-                    </td>
-                </tr>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="btn-group btn-group-sm">
+                            <button onclick="selectAll(this);" type="button" class="btn btn-success">全选</button>
+                            <button onclick="unSelectAll(this);" type="button" class="btn btn-default">取消</button>
+                        </div>
+                    </div>
+                </div>
             }
-        </tbody>
-    </table>
-</div>
-<div id="ft_role_permission" style="text-align:right;padding:5px;">
-    <a href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-save'" onclick="savePermission()">保存</a>
-</div>
-<script>
-    var rootUrl = '@Url.Content("~/")';
-    var roleId = request('roleId');
+        </form>
+    </div>
 
-    function role_permission_checkall() {
-        $(this).closest('tr').find('input:checkbox').prop("checked", true);
-    }
-    function role_permission_uncheckall() {
-        $(this).closest('tr').find('input:checkbox').prop("checked", false);
-    }
+    <script>
+        var roleId = request('roleId');
 
-    function savePermission() {
-        var permissions = [];
-        $("#db_role_permission>tbody>tr").each(function () {
-            var moduleValue = $(this).data("module");
-            var checked = $(this).find("input:checked");
-            if (checked.length) {
-                checked.each(function () {
-                    var itemValue = this.value;
+        function selectAll(btnObj) {
+            $(btnObj).parent().parent().parent().find('input').each(function (index, item) {
+                $(item).prop('checked', 'checked');
+            });
+        }
 
-                    permissions.push(moduleValue + '.' + itemValue);
-                });
-            }
-        });
+        function unSelectAll(btnObj) {
+            $(btnObj).parent().parent().parent().find('input').each(function (index, item) {
+                $(item).removeAttr('checked');
+            });
+        }
 
-        $.postJSON(rootUrl + 'Base_SysManage/Base_SysRole/SavePermission', {
-            roleId: roleId,
-            permissions: JSON.stringify(permissions)
-        }, function (resJson) {
-            if (resJson.Success) {
-                parent.dialogMsg('保存成功!');
-            }
-            else {
-                dialogError(resJson.Msg);
-            }
-        });
-    }
-</script>
+        function savePermission() {
+            var permissions = [];
+            $('input:checked').each(function (index, item) {
+                permissions.push($(item).attr('value'));
+            });
+
+            loading();
+            $.postJSON('/Base_SysManage/Base_SysRole/SavePermission', {
+                roleId: roleId,
+                permissions: JSON.stringify(permissions)
+            }, function (resJson) {
+                loading(false);
+
+                if (resJson.Success) {
+                    dialogSuccess('保存成功!');
+                }
+                else {
+                    dialogError(resJson.Msg);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

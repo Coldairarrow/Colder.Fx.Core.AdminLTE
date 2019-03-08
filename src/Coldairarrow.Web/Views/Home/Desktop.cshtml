@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <title></title>
     <link rel="stylesheet" href="@Url.Scrpit("~/Scripts/vendor/layui/css/layui.css")" />
-    <link rel="stylesheet" href="@Url.Scrpit("~/Skin/home/desktop.css")" />
+    <link rel="stylesheet" href="@Url.Scrpit("~/css/fx/desktop.css")" />
 </head>
 
 <body>
@@ -14,12 +14,12 @@
             <p>本框架旨在极大的提高开发效率</p>
             <p>
                 使用技术栈：<br />
-                后端：采用.NET Core平台，ASP.NET Core，C#语言（使用反射等高级技术），Entity Framework Core（数据库ORM框架）。<br />
+                后端：采用.NET平台，ASP.NET MVC，C#语言（使用反射等高级技术），Entity Framework（数据库ORM框架）。<br />
                 使用数据仓储模式，抽象化数据库操作(CRUD等)、支持事务处理以及分布式事务处理（跨库）<br />
                 禁用系统Session,使用自定义Session，提高系统性能<br />
                 集成多种工具类库以及操作拓展<br />
                 数据库：SqlServer（框架使用简单工厂，工厂方法，抽象工厂，可轻松更换数据库）,Redis作为分布式缓存<br />
-                前端：HTML5,JS,JQuery,Easyui（主要前端框架），其中集成多种JS插件，力求方便项目开发。
+                前端：HTML5,JS,JQuery,Bootstrap（主要前端框架）,AdminLTE（后台模板），其中集成多种JS插件，力求方便项目开发。
                 <br />
                 <br />
                 具体技术实施：<br />
@@ -34,14 +34,26 @@
                 权限管理：提供健全的权限管理功能，支持给系统用户、系统角色和对外接口AppId分配权限
                 <br />
                 <br />
-                相关技术文档:<br />
-                Easyui:<a href="http://www.jeasyui.net/" target="_blank">http://www.jeasyui.net/</a>
+                相关链接:<br />
+                Bootstrap:<a href="http://www.bootcss.com/" target="_blank">http://www.bootcss.com/</a><br />
+                AdminLTE:<a href="https://github.com/almasaeed2010/AdminLTE" target="_blank">https://github.com/almasaeed2010/AdminLTE</a><br />
+                个人GitHub,欢迎点星支持:<a href="https://github.com/Coldairarrow" target="_blank">https://github.com/Coldairarrow</a><br />
+                个人博客:<a href="https://www.cnblogs.com/coldairarrow/" target="_blank">https://www.cnblogs.com/coldairarrow/</a><br />
+                QQ技术交流群:373144077
             </p>
             <br />
         </blockquote>
         <fieldset class="layui-elem-field">
             <legend>更新日志</legend>
             <div class="layui-field-box">
+                <fieldset class="layui-elem-field layui-field-title">
+                    <legend>2019-03-05</legend>
+                    <div class="layui-field-box">
+                        <p>
+                            框架移植整合到AdminLTE
+                        </p>
+                    </div>
+                </fieldset>
                 <fieldset class="layui-elem-field layui-field-title">
                     <legend>2018-01-08</legend>
                     <div class="layui-field-box">

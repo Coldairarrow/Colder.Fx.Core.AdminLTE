@@ -1,142 +1,156 @@
-ï»¿@{
+@{
     Layout = "~/Views/Shared/_Layout_List.cshtml";
 }
 
-@section toolbar{
-    <a id="add" class="easyui-linkbutton" data-options="iconCls:'icon-add'">æ·»åŠ </a>
-    <a id="edit" class="easyui-linkbutton" data-options="iconCls:'icon-edit'">ä¿®æ”¹</a>
-    <a id="delete" class="easyui-linkbutton" data-options="iconCls:'icon-remove'">åˆ é™¤</a>
-}
-
-@section search{
-    <div class="search_wrapper">
-        <div class="search_item">
-            <label class="search_label">æŸ¥è¯¢ç±»åˆ«</label>
-            <select name="condition" class="easyui-combobox" data-options="width:100">
-                <option value="">è¯·é€‰æ‹©</option>
-
-                <option value="AppName">åº”ç”¨å</option>
-                <option value="AppId">åº”ç”¨Id</option>
-                <option value="AppSecret">åº”ç”¨å¯†é’¥</option>
-            </select>
-            <input name="keyword" class="easyui-textbox" style="width:150px" />
-        </div>
-        <div class="search_submit">
-            <a href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="searchGrid(this,'#dataTable')">æŸ¥è¯¢</a>
+<div class="fx-content">
+    <div id="toobar">
+        <div class="btn-group btn-group-sm">
+            <button onclick="openForm('', 'Ìí¼ÓÊı¾İ');" type="button" class="btn btn-default" aria-label="Left Align">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                Ìí¼Ó
+            </button>
+            <button onclick="deleteData();" type="button" class="btn btn-default" aria-label="Right Align">
+                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                É¾³ı
+            </button>
+            <button type="button" class="btn btn-default" aria-label="Right Align" onclick="javascript: location.reload();">
+                <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                Ë¢ĞÂ
+            </button>
         </div>
     </div>
-}
-<div id="dataTable">
-
+    <div class="fx-wrapper">
+        <form class="form-inline" id="searchForm">
+            <div class="form-group">
+                <label>²éÑ¯Àà±ğ</label>
+                <select class="selectpicker" name="condition" data-style="btn-default btn-sm" data-width="100px">
+                    <option value="">ÇëÑ¡Ôñ</option>
+                    <option value="AppId">AppId</option>
+                </select>
+                <input type="text" class="form-control input-sm" name="keyword" placeholder="ÇëÊäÈë¹Ø¼ü×Ö">
+            </div>
+            <div class="form-group">
+                <button type="button" class="btn btn-default btn-sm" onclick="javascript: $('#dataTable').bootstrapTable('refresh', { silent: true });">
+                    <i class="glyphicon glyphicon-search"></i>
+                    ²éÑ¯
+                </button>
+            </div>
+        </form>
+    </div>
+    <div class="fx-wrapper">
+        <table id="dataTable" class="table-bordered"></table>
+    </div>
 </div>
 
 <script>
-    var rootUrl = '@Url.Content("~/")';
-
-    function initTable() {
-        $('#dataTable').datagrid({
-            url: rootUrl + 'Base_SysManage/Base_AppSecret/GetDataList',
-            method: 'POST',
-            //queryParams: { 'id': id },
-            idField: 'Id',
-            fit: true,
-            fitColumns: true,
-            singleSelect: false,
-            selectOnCheck: false,
-            checkOnSelect: false,
-            //rownumbers: true,
-            pagination: true,
-            pageSize: 30,
-            //nowrap: false,
-            pageList: [10, 20, 30, 50, 100, 150, 200],
-            //showFooter: true,
-            columns: [[
-                { title: 'ck', field: 'ck', checkbox: true },
-                { title: 'åº”ç”¨Id', field: 'AppId', width: 200, fixed: true },
-                { title: 'åº”ç”¨å¯†é’¥', field: 'AppSecret', width: 300, fixed: true },
-                { title: 'åº”ç”¨å', field: 'AppName', width: 200, fixed: true },
-                {
-                    title: 'æ“ä½œ', field: '_', width: 200, fixed: true, formatter: function (value, row) {
-                        var html = '';
-                        html += '<a href="javascript:;" onclick="setPermission(\'{0}\')">è®¾ç½®æƒé™</a>'.format(row['AppId']);
-
-                        return html;
-                    }
-                }
-            ]],
-            onBeforeSelect: function () {
-                return false;
-            }
-        });
-    }
+    var $table = $('#dataTable');
 
     $(function () {
         initTable();
-
-        //æ·»åŠ æ•°æ®
-        $('#add').click(function () {
-            dialogOpen({
-                id: 'form',
-                title: 'æ·»åŠ æ•°æ®',
-                width: 500,
-                height: 270,
-                url: rootUrl + 'Base_SysManage/Base_AppSecret/Form',
-            });
-        });
-
-        //ä¿®æ”¹æ•°æ®
-        $('#edit').click(function () {
-            var selected = $("#dataTable").datagrid("getChecked");
-            if (!selected || !selected.length) {
-                dialogError('è¯·é€‰æ‹©è¦ä¿®æ”¹çš„è®°å½•!');
-                return;
-            }
-            var id = selected[0].Id;
-
-            dialogOpen({
-                id: 'form',
-                title: 'ä¿®æ”¹æ•°æ®',
-                width: 500,
-                height: 270,
-                url: rootUrl + 'Base_SysManage/Base_AppSecret/Form?id=' + id,
-            });
-        });
-
-        //åˆ é™¤æ•°æ®
-        $('#delete').click(function () {
-            var checked = $("#dataTable").datagrid("getChecked");
-            if (!checked || !checked.length) {
-                dialogError('è¯·é€‰æ‹©è¦åˆ é™¤çš„è®°å½•!');
-                return;
-            }
-            var ids = $.map(checked, function (item) {
-                return item['Id'];
-            });
-
-            dialogComfirm('ç¡®è®¤åˆ é™¤å—ï¼Ÿ', function () {
-                $.postJSON(rootUrl + 'Base_SysManage/Base_AppSecret/DeleteData', { ids: JSON.stringify(ids) }, function (resJson) {
-                    if (resJson.Success) {
-                        $('#dataTable').datagrid('clearSelections').datagrid('clearChecked');
-                        $('#dataTable').datagrid('reload');
-                        dialogMsg('åˆ é™¤æˆåŠŸ!');
-                    }
-                    else {
-                        dialogError(resJson.Msg);
-                    }
-                });
-            });
-        });
+        bindEvent();
     });
 
-    //è®¾ç½®æƒé™
-    function setPermission(appId) {
-        dialogOpen({
-            id: 'permissionForm',
-            title: 'è®¾ç½®AppIdã€{0}ã€‘æƒé™'.format(appId),
-            width: '80%',
-            height: '80%',
-            url: rootUrl + 'Base_SysManage/Base_AppSecret/PermissionForm?appId={0}'.format(appId),
+    //³õÊ¼»¯±í¸ñ
+    function initTable() {
+        $table.bootstrapTable({
+            url: '/Base_SysManage/Base_AppSecret/GetDataList',
+            idField: 'Id',
+            pagination: true,
+            method: 'post',
+            clickToSelect: false,
+            sidePagination: "server",
+            pageNumber: 1,
+            pageSize: 30,
+            pageList: [10, 30, 60, 100],
+            columns: [
+                { title: 'ck', field: 'ck', checkbox: true, width: '3%' },
+                { title: 'Ó¦ÓÃId', field: 'AppId', width: '10%' },
+                { title: 'ÃÜÔ¿', field: 'AppSecret', width: '30%' },
+                {
+                    title: '²Ù×÷', field: '_', width: '', formatter: function (value, row) {
+                        var builder = new BtnBuilder();
+                        builder.AddBtn({ icon: 'glyphicon-edit', function: 'openForm', param: [row['Id']] });
+                        builder.AddBtn({ icon: 'glyphicon-trash', function: 'deleteData', param: [row['Id']] });
+                        builder.AddBtn({ name: 'È¨ÏŞ·ÖÅä', icon: 'glyphicon-edit', function: 'setPermission', param: [row['appId']] });
+
+                        return builder.build();
+                    }
+                }
+            ],
+            queryParams: function (params) {
+                var searchParams = $('#searchForm').getValues();
+                $.extend(params, searchParams);
+
+                return params;
+            }
         });
     }
 
+    //°ó¶¨ÊÂ¼ş
+    function bindEvent() {
+
+    }
+
+    //´ò¿ª±íµ¥
+    function openForm(id, title) {
+        dialogOpen({
+            id: 'form',
+            title: title,
+            height: '40%',
+            btn: ['È·¶¨', 'È¡Ïû'],
+            url: '/Base_SysManage/Base_AppSecret/Form?id={0}'.format(id || ''),
+            yes: function (window, body) {
+                window.submitForm();
+            }
+        });
+    }
+
+    //É¾³ıÊı¾İ
+    function deleteData(id) {
+        dialogComfirm('È·ÈÏÉ¾³ıÂğ£¿', function () {
+            var ids = [];
+
+            if (typeof (id) == 'string') {//µ¥ÌõÊı¾İ
+                ids.push(id);
+            } else {//¶àÌõÊı¾İ
+                var rows = $table.bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    dialogError('ÇëÑ¡ÔñĞèÒªÉ¾³ıµÄÊı¾İ£¡');
+                    return;
+                } else {
+                    $.each(rows, function (index, value) {
+                        ids.push(value['Id']);
+                    })
+                }
+            }
+
+            loading();
+            $.postJSON('/Base_SysManage/Base_AppSecret/DeleteData', { ids: JSON.stringify(ids) }, function (resJson) {
+                loading(false);
+
+                if (resJson.Success) {
+                    $table.bootstrapTable('refresh');
+                    dialogSuccess('É¾³ı³É¹¦!');
+                }
+                else {
+                    dialogError(resJson.Msg);
+                }
+            });
+        });
+    }
+
+    //ÉèÖÃÈ¨ÏŞ
+    function setPermission(appId) {
+        dialogOpen({
+            id: 'permissionForm',
+            title: 'ÉèÖÃÓ¦ÓÃId¡¾{0}¡¿È¨ÏŞ'.format(appId),
+            width: '80.5%',
+            height: '80.5%',
+            btn: ['È·¶¨', 'È¡Ïû'],
+            url: '/Base_SysManage/Base_AppSecret/PermissionForm?appId={0}'.format(appId),
+            yes: function (iframeWin) {
+                iframeWin.savePermission();
+            }
+        });
+    }
 </script>

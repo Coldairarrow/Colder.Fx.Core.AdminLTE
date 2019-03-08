@@ -1,66 +1,69 @@
-Ôªø@using Coldairarrow.Entity.Base_SysManage;
+@using Coldairarrow.Entity.Base_SysManage;
 @using Coldairarrow.Util;
 
 @{
-    Layout = "~/Views/Shared/_Layout_List.cshtml";
+    Layout = "~/Views/Shared/_Layout_Form.cshtml";
 
     var obj = (Base_AppSecret)Model;
     var objStr = Html.Raw(obj.ToJson());
 }
-
-<form id="dataForm" enctype="multipart/form-data" class="easyui-form" method="post" data-options="novalidate:true">
-    <table class="table_base">
-        <colgroup>
-            <col style="width:80px;" />
-        </colgroup>
-        <tbody>
-            <tr>
-                <th>Â∫îÁî®Id</th>
-                <td>
-                    <input name="AppId" value="@obj.AppId" class="easyui-textbox" data-options="width:'200px',required:true">
-                </td>
-            </tr>
-            <tr>
-                <th>Â∫îÁî®ÂØÜÈí•</th>
-                <td>
-                    <input name="AppSecret" value="@obj.AppSecret" class="easyui-textbox" data-options="width:'200px',required:true">
-                </td>
-            </tr>
-            <tr>
-                <th>Â∫îÁî®Âêç</th>
-                <td>
-                    <input name="AppName" value="@obj.AppName" class="easyui-textbox" data-options="width:'200px',required:false">
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</form>
-
-@section foottoolbar{
-    <a id="saveForm" href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-save'">‰øùÂ≠ò</a>
-}
-
+<div style="padding:15px;padding-right:45px;">
+    <form id="form" class="form-horizontal" role="form">
+        <div class="form-group form-group-sm">
+            <label class="col-sm-2 control-label">”¶”√Id</label>
+            <div class="col-sm-5">
+                <input name="AppId" value="@obj.AppId" type="text" class="form-control" required>
+                <div class="help-block with-errors"></div>
+            </div>
+        </div>
+        <div class="form-group form-group-sm">
+            <label class="col-sm-2 control-label">√‹‘ø</label>
+            <div class="col-sm-5">
+                <input name="AppSecret" value="@obj.AppSecret" type="text" class="form-control" required>
+                <div class="help-block with-errors"></div>
+            </div>
+        </div>
+        <div class="form-group">
+            <button id="submit" type="submit" class="hidden">Ã·Ωª</button>
+        </div>
+    </form>
+</div>
 <script>
-    var rootUrl = '@Url.Content("~/")';
-    var theEntity = @objStr;
+        var theEntity = @objStr;
 
-    $(function () {
-        $('#saveForm').click(function () {
-            if (!$('#dataForm').form('enableValidation').form('validate'))
-                return;
-
-            var formValues = $('#dataForm').getValues();
-            $.extend(theEntity, formValues);
-            $.postJSON(rootUrl + 'Base_SysManage/Base_AppSecret/SaveData', theEntity, function (resJson) {
-                if (resJson.Success) {
-                    parent.dialogMsg('‰øùÂ≠òÊàêÂäü!');
-                    parent.dialogClose('form');
-                    parent.$('#dataTable').datagrid('clearChecked').datagrid('reload');
-                }
-                else {
-                    dialogError(resJson.Msg);
-                }
-            });
+        $(function () {
+            initEvent();
         });
-    });
+
+        // ¬º˛∞Û∂®
+        function initEvent() {
+            //±Ìµ•–£—È
+            $('#form').validator().on('submit', function (e) {
+                //–£—È≥…π¶
+                if (!e.isDefaultPrevented()) {
+                    e.preventDefault();
+
+                    var values = $('#form').getValues();
+                    $.extend(theEntity, values);
+                    loading();
+                    $.postJSON('/Base_SysManage/Base_AppSecret/SaveData', theEntity, function (resJson) {
+                        loading(false);
+
+                        if (resJson.Success) {
+                            parent.$('#dataTable').bootstrapTable('refresh');
+                            parent.dialogSuccess();
+                            dialogClose();
+                        }
+                        else {
+                            dialogError(resJson.Msg);
+                        }
+                    });
+                }
+            })
+        }
+
+        //Ã·Ωª±Ìµ•
+        function submitForm() {
+            $('#submit').trigger('click');
+        }
 </script>

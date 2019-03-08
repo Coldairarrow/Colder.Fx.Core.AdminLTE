@@ -361,6 +361,7 @@
     };
 })();
 
+//$.fn.getValues
 //取表单域的所有值
 (function ($) {
     if ($.fn.getValues)

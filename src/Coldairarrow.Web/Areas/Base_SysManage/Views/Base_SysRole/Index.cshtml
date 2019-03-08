@@ -2,135 +2,154 @@
     Layout = "~/Views/Shared/_Layout_List.cshtml";
 }
 
-@section toolbar{
-    <a id="add" class="easyui-linkbutton" data-options="iconCls:'icon-add'">添加</a>
-    <a id="edit" class="easyui-linkbutton" data-options="iconCls:'icon-edit'">修改</a>
-    <a id="delete" class="easyui-linkbutton" data-options="iconCls:'icon-remove'">删除</a>
-}
-
-@section search{
-    <div class="search_wrapper">
-        <div class="search_item">
-            <label class="search_label">查询类别</label>
-            <select name="condition" class="easyui-combobox" data-options="width:100">
-                <option value="">请选择</option>
-                <option value="RoleName">角色名</option>
-            </select>
-            <input name="keyword" class="easyui-textbox" style="width:150px" />
-        </div>
-        <div class="search_submit">
-            <a href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="searchGrid(this,'#dataTable')">查询</a>
+<div class="fx-content">
+    <div id="toobar">
+        <div class="btn-group btn-group-sm">
+            <button onclick="openForm('', '添加数据');" type="button" class="btn btn-default" aria-label="Left Align">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                添加
+            </button>
+            <button onclick="deleteData();" type="button" class="btn btn-default" aria-label="Right Align">
+                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                删除
+            </button>
+            <button type="button" class="btn btn-default" aria-label="Right Align" onclick="javascript: location.reload();">
+                <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                刷新
+            </button>
         </div>
     </div>
-}
-<div id="dataTable">
-
+    <div class="fx-wrapper">
+        <form class="form-inline" id="searchForm">
+            <div class="form-group">
+                <label>查询类别</label>
+                <select class="selectpicker" name="condition" data-style="btn-default btn-sm" data-width="100px">
+                    <option value="">请选择</option>
+                    <option value="RoleName">角色名</option>
+                </select>
+                <input type="text" class="form-control input-sm" name="keyword" placeholder="请输入关键字">
+            </div>
+            <div class="form-group">
+                <button type="button" class="btn btn-default btn-sm" onclick="javascript: $('#dataTable').bootstrapTable('refresh', { silent: true });">
+                    <i class="glyphicon glyphicon-search"></i>
+                    查询
+                </button>
+            </div>
+        </form>
+    </div>
+    <div class="fx-wrapper">
+        <table id="dataTable" class="table-bordered"></table>
+    </div>
 </div>
 
 <script>
-    var rootUrl = '@Url.Content("~/")';
+    var $table = $('#dataTable');
 
+    $(function () {
+        initTable();
+        bindEvent();
+    });
+
+    //初始化表格
     function initTable() {
-        $('#dataTable').datagrid({
-            url: rootUrl + 'Base_SysManage/Base_SysRole/GetDataList',
-            method: 'POST',
-            //queryParams: { 'id': id },
+        $table.bootstrapTable({
+            url: '/Base_SysManage/Base_SysRole/GetDataList',
             idField: 'Id',
-            fit: true,
-            fitColumns: true,
-            singleSelect: false,
-            selectOnCheck: false,
-            checkOnSelect: false,
-            //rownumbers: true,
             pagination: true,
+            method: 'post',
+            clickToSelect: false,
+            sidePagination: "server",
+            pageNumber: 1,
             pageSize: 30,
-            //nowrap: false,
-            pageList: [10, 20, 30, 50, 100, 150, 200],
-            //showFooter: true,
-            columns: [[
-                { title: 'ck', field: 'ck', checkbox: true },
-                { title: '角色名', field: 'RoleName', width: 300, fixed: true },
+            pageList: [10, 30, 60, 100],
+            columns: [
+                { title: 'ck', field: 'ck', checkbox: true, width: '3%' },
+                { title: '角色名', field: 'RoleName', width: '10%' },
                 {
-                    title: '操作', field: '_', width: 200, fixed: true, formatter: function (value,row) {
-                        var html = '';
-                        html += '<a href="javascript:;" onclick="setPermission(\'{0}\',\'{1}\')">设置权限</a>'.format(row['RoleId'], row['RoleName']);
+                    title: '操作', field: '_', width: '80%', formatter: function (value, row) {
+                        var builder = new BtnBuilder();
+                        builder.AddBtn({ icon: 'glyphicon-edit', function: 'openForm', param: [row['Id']] });
+                        builder.AddBtn({ icon: 'glyphicon-trash', function: 'deleteData', param: [row['Id']] });
+                        builder.AddBtn({ name: '权限分配', icon: 'glyphicon-edit', function: 'setPermission', param: [row['RoleId'], row['RoleName']] });
 
-                        return html;
+                        return builder.build();
                     }
                 }
-            ]],
-            onBeforeSelect: function () {
-                return false;
+            ],
+            queryParams: function (params) {
+                var searchParams = $('#searchForm').getValues();
+                $.extend(params, searchParams);
+
+                return params;
             }
         });
     }
 
-    $(function () {
-        initTable();
+    //绑定事件
+    function bindEvent() {
 
-        //添加数据
-        $('#add').click(function () {
-            dialogOpen({
-                id: 'form',
-                title: '添加数据',
-                width: 500,
-                height: 200,
-                url: rootUrl + 'Base_SysManage/Base_SysRole/Form',
-            });
-        });
+    }
 
-        //修改数据
-        $('#edit').click(function () {
-            var selected = $("#dataTable").datagrid("getChecked");
-            if (!selected || !selected.length) {
-                dialogError('请选择要修改的记录!');
-                return;
+    //打开表单
+    function openForm(id, title) {
+        dialogOpen({
+            id: 'form',
+            title: title,
+            height:'30%',
+            btn: ['确定', '取消'],
+            url: '/Base_SysManage/Base_SysRole/Form?id={0}'.format(id || ''),
+            yes: function (window, body) {
+                window.submitForm();
             }
-            var id = selected[0].Id;
-
-            dialogOpen({
-                id: 'form',
-                title: '修改数据',
-                width: 500,
-                height: 200,
-                url: rootUrl + 'Base_SysManage/Base_SysRole/Form?id=' + id,
-            });
         });
+    }
 
-        //删除数据
-        $('#delete').click(function () {
-            var checked = $("#dataTable").datagrid("getChecked");
-            if (!checked || !checked.length) {
-                dialogError('请选择要删除的记录!');
-                return;
+    //删除数据
+    function deleteData(id) {
+        dialogComfirm('确认删除吗？', function () {
+            var ids = [];
+
+            if (typeof (id) == 'string') {//单条数据
+                ids.push(id);
+            } else {//多条数据
+                var rows = $table.bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    dialogError('请选择需要删除的数据！');
+                    return;
+                } else {
+                    $.each(rows, function (index, value) {
+                        ids.push(value['Id']);
+                    })
+                }
             }
-            var ids = $.map(checked, function (item) {
-                return item['Id'];
-            });
 
-            dialogComfirm('确认删除吗？', function () {
-                $.postJSON(rootUrl + 'Base_SysManage/Base_SysRole/DeleteData', { ids: JSON.stringify(ids) }, function (resJson) {
-                    if (resJson.Success) {
-                        $('#dataTable').datagrid('clearSelections').datagrid('clearChecked');
-                        $('#dataTable').datagrid('reload');
-                        dialogMsg('删除成功!');
-                    }
-                    else {
-                        dialogError(resJson.Msg);
-                    }
-                });
+            loading();
+            $.postJSON('/Base_SysManage/Base_SysRole/DeleteData', { ids: JSON.stringify(ids) }, function (resJson) {
+                loading(false);
+
+                if (resJson.Success) {
+                    $table.bootstrapTable('refresh');
+                    dialogSuccess('删除成功!');
+                }
+                else {
+                    dialogError(resJson.Msg);
+                }
             });
         });
-    });
+    }
 
     //设置权限
-    function setPermission(roleId,roleName) {
+    function setPermission(roleId, roleName) {
         dialogOpen({
             id: 'permissionForm',
             title: '设置角色【{0}】权限'.format(roleName),
-            width: '80%',
-            height: '80%',
-            url: rootUrl + 'Base_SysManage/Base_SysRole/PermissionForm?roleId={0}'.format(roleId),
+            width: '80.5%',
+            height: '80.5%',
+            btn: ['确定', '取消'],
+            url: '/Base_SysManage/Base_SysRole/PermissionForm?roleId={0}'.format(roleId),
+            yes: function (iframeWin) {
+                iframeWin.savePermission();
+            }
         });
     }
 </script>

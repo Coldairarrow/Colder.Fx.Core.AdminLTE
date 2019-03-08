@@ -1,125 +1,140 @@
-ï»¿@{
+@{
     Layout = "~/Views/Shared/_Layout_List.cshtml";
 }
 
-@section toolbar{
-    <a id="add" class="easyui-linkbutton" data-options="iconCls:'icon-add'">æ·»åŠ </a>
-    <a id="edit" class="easyui-linkbutton" data-options="iconCls:'icon-edit'">ä¿®æ”¹</a>
-    <a id="delete" class="easyui-linkbutton" data-options="iconCls:'icon-remove'">åˆ é™¤</a>
-}
-
-@section search{
-    <div class="search_wrapper">
-        <div class="search_item">
-            <label class="search_label">æŸ¥è¯¢ç±»åˆ«</label>
-            <select name="condition" class="easyui-combobox" data-options="width:100">
-                <option value="">è¯·é€‰æ‹©</option>
-                
-                <option value="LinkName">è¿æ¥å</option>
-                <option value="ConnectionStr">è¿æ¥å­—ç¬¦ä¸²</option>
-                <option value="DbType">æ•°æ®åº“ç±»å‹</option>
-                <option value="SortNum">æ’åºç¼–å·</option>
-            </select>
-            <input name="keyword" class="easyui-textbox" style="width:150px" />
-        </div>
-        <div class="search_submit">
-            <a href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="searchGrid(this,'#dataTable')">æŸ¥è¯¢</a>
+<div class="fx-content">
+    <div id="toobar">
+        <div class="btn-group btn-group-sm">
+            <button onclick="openForm('', 'Ìí¼ÓÊı¾İ');" type="button" class="btn btn-default" aria-label="Left Align">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                Ìí¼Ó
+            </button>
+            <button onclick="deleteData();" type="button" class="btn btn-default" aria-label="Right Align">
+                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                É¾³ı
+            </button>
+            <button type="button" class="btn btn-default" aria-label="Right Align" onclick="javascript: location.reload();">
+                <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                Ë¢ĞÂ
+            </button>
         </div>
     </div>
-}
-<div id="dataTable">
-
+    <div class="fx-wrapper">
+        <form class="form-inline" id="searchForm">
+            <div class="form-group">
+                <label>²éÑ¯Àà±ğ</label>
+                <select class="selectpicker" name="condition" data-style="btn-default btn-sm" data-width="100px">
+                    <option value="">ÇëÑ¡Ôñ</option>
+                    <option value="LinkName">Á¬½ÓÃû</option>
+                </select>
+                <input type="text" class="form-control input-sm" name="keyword" placeholder="ÇëÊäÈë¹Ø¼ü×Ö">
+            </div>
+            <div class="form-group">
+                <button type="button" class="btn btn-default btn-sm" onclick="javascript: $('#dataTable').bootstrapTable('refresh', { silent: true });">
+                    <i class="glyphicon glyphicon-search"></i>
+                    ²éÑ¯
+                </button>
+            </div>
+        </form>
+    </div>
+    <div class="fx-wrapper">
+        <table id="dataTable" class="table-bordered"></table>
+    </div>
 </div>
 
 <script>
-    var rootUrl = '@Url.Content("~/")';
+    var $table = $('#dataTable');
 
+    $(function () {
+        initTable();
+        bindEvent();
+    });
+
+    //³õÊ¼»¯±í¸ñ
     function initTable() {
-        $('#dataTable').datagrid({
-            url: rootUrl + 'Base_SysManage/Base_DatabaseLink/GetDataList',
-            method: 'POST',
-            //queryParams: { 'id': id },
+        $table.bootstrapTable({
+            url: '/Base_SysManage/Base_DatabaseLink/GetDataList',
             idField: 'Id',
-            fit: true,
-            fitColumns: true,
-            singleSelect: false,
-            selectOnCheck: false,
-            checkOnSelect: false,
-            //rownumbers: true,
             pagination: true,
+            method: 'post',
+            clickToSelect: false,
+            sidePagination: "server",
+            pageNumber: 1,
             pageSize: 30,
-            //nowrap: false,
-            pageList: [10, 20, 30, 50, 100, 150, 200],
-            //showFooter: true,
-            columns: [[
-                { title: 'ck', field: 'ck', checkbox: true },
-                
-                { title: 'è¿æ¥å', field: 'LinkName', width: 300 },
-                { title: 'è¿æ¥å­—ç¬¦ä¸²', field: 'ConnectionStr', width: 1000 },
-                { title: 'æ•°æ®åº“ç±»å‹', field: 'DbType', width: 200 },
-                { title: 'æ’åºç¼–å·', field: 'SortNum', width: 200 }
-            ]],
-            onBeforeSelect: function () {
-                return false;
+            pageList: [10, 30, 60, 100],
+            columns: [
+                { title: 'ck', field: 'ck', checkbox: true, width: '3%' },
+                { title: 'Á¬½ÓÃû', field: 'LinkName', width: '10%' },
+                { title: 'Á¬½Ó×Ö·û´®', field: 'ConnectionStr', width: '50%' },
+                { title: 'Êı¾İ¿âÀàĞÍ', field: 'DbType', width: '10%' },
+                {
+                    title: '²Ù×÷', field: '_', width: '27%', formatter: function (value, row) {
+                        var builder = new BtnBuilder();
+                        builder.AddBtn({ icon: 'glyphicon-edit', function: 'openForm', param: [row['Id']] });
+                        builder.AddBtn({ icon: 'glyphicon-trash', function: 'deleteData', param: [row['Id']] });
+
+                        return builder.build();
+                    }
+                }
+            ],
+            queryParams: function (params) {
+                var searchParams = $('#searchForm').getValues();
+                $.extend(params, searchParams);
+
+                return params;
             }
         });
     }
 
-    $(function () {
-        initTable();
+    //°ó¶¨ÊÂ¼ş
+    function bindEvent() {
 
-        //æ·»åŠ æ•°æ®
-        $('#add').click(function () {
-            dialogOpen({
-                id: 'form',
-                title: 'æ·»åŠ æ•°æ®',
-                width: 500,
-                height: 340,
-                url: rootUrl + 'Base_SysManage/Base_DatabaseLink/Form',
-            });
-        });
+    }
 
-        //ä¿®æ”¹æ•°æ®
-        $('#edit').click(function () {
-            var selected = $("#dataTable").datagrid("getChecked");
-            if (!selected || !selected.length) {
-                dialogError('è¯·é€‰æ‹©è¦ä¿®æ”¹çš„è®°å½•!');
-                return;
+    //´ò¿ª±íµ¥
+    function openForm(id, title) {
+        dialogOpen({
+            id: 'form',
+            title: title,
+            btn: ['È·¶¨', 'È¡Ïû'],
+            url: '/Base_SysManage/Base_DatabaseLink/Form?id={0}'.format(id || ''),
+            yes: function (window, body) {
+                window.submitForm();
             }
-            var id = selected[0].Id;
-
-            dialogOpen({
-                id: 'form',
-                title: 'ä¿®æ”¹æ•°æ®',
-                width: 500,
-                height: 340,
-                url: rootUrl + 'Base_SysManage/Base_DatabaseLink/Form?id=' + id,
-            });
         });
+    }
 
-        //åˆ é™¤æ•°æ®
-        $('#delete').click(function () {
-            var checked = $("#dataTable").datagrid("getChecked");
-            if (!checked || !checked.length) {
-                dialogError('è¯·é€‰æ‹©è¦åˆ é™¤çš„è®°å½•!');
-                return;
+    //É¾³ıÊı¾İ
+    function deleteData(id) {
+        dialogComfirm('È·ÈÏÉ¾³ıÂğ£¿', function () {
+            var ids = [];
+
+            if (typeof (id) == 'string') {//µ¥ÌõÊı¾İ
+                ids.push(id);
+            } else {//¶àÌõÊı¾İ
+                var rows = $table.bootstrapTable('getSelections');
+                if (rows.length == 0) {
+                    dialogError('ÇëÑ¡ÔñĞèÒªÉ¾³ıµÄÊı¾İ£¡');
+                    return;
+                } else {
+                    $.each(rows, function (index, value) {
+                        ids.push(value['Id']);
+                    })
+                }
             }
-            var ids = $.map(checked, function (item) {
-                return item['Id'];
-            });
 
-            dialogComfirm('ç¡®è®¤åˆ é™¤å—ï¼Ÿ', function () {
-                $.postJSON(rootUrl + 'Base_SysManage/Base_DatabaseLink/DeleteData', { ids: JSON.stringify(ids) }, function (resJson) {
-                    if (resJson.Success) {
-                        $('#dataTable').datagrid('clearSelections').datagrid('clearChecked');
-                        $('#dataTable').datagrid('reload');
-                        dialogMsg('åˆ é™¤æˆåŠŸ!');
-                    }
-                    else {
-                        dialogError(resJson.Msg);
-                    }
-                });
+            loading();
+            $.postJSON('/Base_SysManage/Base_DatabaseLink/DeleteData', { ids: JSON.stringify(ids) }, function (resJson) {
+                loading(false);
+
+                if (resJson.Success) {
+                    $table.bootstrapTable('refresh');
+                    dialogSuccess('É¾³ı³É¹¦!');
+                }
+                else {
+                    dialogError(resJson.Msg);
+                }
             });
         });
-    });
+    }
 </script>

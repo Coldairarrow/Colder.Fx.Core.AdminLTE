@@ -1,113 +1,641 @@
-﻿@using Coldairarrow.Business.Base_SysManage;
-@using Coldairarrow.Web;
+﻿@using Coldairarrow.Web;
+@using Coldairarrow.Util;
+@using Coldairarrow.Business.Common;
 
 @{
     var menus = SystemMenuManage.GetOperatorMenu();
+    var menusJson = Html.Raw(menus.ToJson());
 }
+
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <title>管理后台</title>
-    <link href="@Url.Scrpit("~/Scripts/easyui/themes/bootstrap/easyui.css")" rel="stylesheet" />
-    <link href="@Url.Scrpit("~/Scripts/easyui/themes/icon.css")" rel="stylesheet" />
-    <link href="@Url.Scrpit("~/Scripts/easyui/themes/color.css")" rel="stylesheet" />
-    <link href="@Url.Scrpit("~/Skin/global.css")" rel="stylesheet" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Colder快速开发框架</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!-- Bootstrap 3.3.6 -->
+    <link rel="stylesheet" href="@Url.Scrpit("~/Scripts/vendor/bootstrap/css/bootstrap.min.css")">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="@Url.Scrpit("~/Scripts/vendor/adminlte/dist/css/font-awesome.min.css")">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="@Url.Scrpit("~/Scripts/vendor/adminlte/dist/css/ionicons.min.css")">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="@Url.Scrpit("~/Scripts/vendor/adminlte/dist/css/AdminLTE.min.css")">
+    <!-- AdminLTE Skins. Choose a skin from the css/skins
+         folder instead of downloading all of them to reduce the load. -->
+    <link rel="stylesheet" href="~/Scripts/vendor/adminlte/dist/css/skins/all-skins.min.css">
+
+
+    <!--http://aimodu.org:7777/admin/index_iframe.html?q=audio&search=#-->
+    <style type="text/css">
+
+        html {
+            overflow: hidden;
+        }
+    </style>
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="~/Scripts/vendor/ie9/html5shiv.min.js"></script>
+    <script src="~/Scripts/vendor/ie9/respond.min.js"></script>
+    <![endif]-->
 </head>
-<body>
-    <div id="header">
-        <div class="logo">管理后台</div>
-        <div class="top">
-            <div class="user_wrp">
-                <i class="icon icon_top_user"></i>
-                <a id="changePwd" href="javascript:;">@Base_UserBusiness.GetCurrentUser()?.RealName</a>
-            </div>
-            <div class="topbar">
-                <div class="topbar-item" id="topbar_innermsg">
-                    @*<a href="javascript:;" class="topbar-btn" onclick="Desktop.tabs.add('_panel_innermsg_unread','未读消息','/innermsg/__/listunread')">
-                            <span>消息</span><span class="topbar-btn-msg-num"></span>
-                        </a>*@
-                    <div class="topbar-msg-panel">
-                        <div class="topbar-msg-arrow"></div>
-                        <ul class="topbar-msg"></ul>
+<body class="hold-transition skin-blue sidebar-mini fixed">
+    <div class="wrapper">
+        <header class="main-header">
+            <!-- Logo -->
+            <a href="https://github.com/Coldairarrow/Colder.Fx.Net.AdminLTE" class="logo">
+                <!-- mini logo for sidebar mini 50x50 pixels -->
+                <span class="logo-mini"><b>Colder</b></span>
+                <!-- logo for regular state and mobile devices -->
+                <span class="logo-lg"><b>Colder</b>快速开发框架</span>
+            </a>
+            <!-- Header Navbar: style can be found in header.less -->
+            <nav class="navbar navbar-static-top">
+                <!-- Sidebar toggle button-->
+                <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </a>
+                <div class="navbar-custom-menu">
+                    <ul class="nav navbar-nav">
+                        <!-- Messages: style can be found in dropdown.less-->
+                        <li class="dropdown messages-menu">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <i class="fa fa-envelope-o"></i>
+                                <span class="label label-success">4</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="header">You have 4 messages</li>
+                                <li>
+                                    <!-- inner menu: contains the actual data -->
+                                    <ul class="menu">
+                                        <li>
+                                            <!-- start message -->
+                                            <a href="#">
+                                                <div class="pull-left">
+                                                    <img src="~/Scripts/vendor/adminlte/dist/img/user2-160x160.jpg" class="img-circle"
+                                                         alt="User Image">
+                                                </div>
+                                                <h4>
+                                                    Support Team
+                                                    <small><i class="fa fa-clock-o"></i> 5 mins</small>
+                                                </h4>
+                                                <p>Why not buy a new awesome theme?</p>
+                                            </a>
+                                        </li>
+                                        <!-- end message -->
+                                        <li>
+                                            <a href="#">
+                                                <div class="pull-left">
+                                                    <img src="~/Scripts/vendor/adminlte/dist/img/user3-128x128.jpg" class="img-circle"
+                                                         alt="User Image">
+                                                </div>
+                                                <h4>
+                                                    AdminLTE Design Team
+                                                    <small><i class="fa fa-clock-o"></i> 2 hours</small>
+                                                </h4>
+                                                <p>Why not buy a new awesome theme?</p>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <div class="pull-left">
+                                                    <img src="~/Scripts/vendor/adminlte/dist/img/user4-128x128.jpg" class="img-circle"
+                                                         alt="User Image">
+                                                </div>
+                                                <h4>
+                                                    Developers
+                                                    <small><i class="fa fa-clock-o"></i> Today</small>
+                                                </h4>
+                                                <p>Why not buy a new awesome theme?</p>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <div class="pull-left">
+                                                    <img src="~/Scripts/vendor/adminlte/dist/img/user3-128x128.jpg" class="img-circle"
+                                                         alt="User Image">
+                                                </div>
+                                                <h4>
+                                                    Sales Department
+                                                    <small><i class="fa fa-clock-o"></i> Yesterday</small>
+                                                </h4>
+                                                <p>Why not buy a new awesome theme?</p>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <div class="pull-left">
+                                                    <img src="~/Scripts/vendor/adminlte/dist/img/user4-128x128.jpg" class="img-circle"
+                                                         alt="User Image">
+                                                </div>
+                                                <h4>
+                                                    Reviewers
+                                                    <small><i class="fa fa-clock-o"></i> 2 days</small>
+                                                </h4>
+                                                <p>Why not buy a new awesome theme?</p>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="footer"><a href="#">See All Messages</a></li>
+                            </ul>
+                        </li>
+                        <!-- Notifications: style can be found in dropdown.less -->
+                        <li class="dropdown notifications-menu">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <i class="fa fa-bell-o"></i>
+                                <span class="label label-warning">10</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="header">You have 10 notifications</li>
+                                <li>
+                                    <!-- inner menu: contains the actual data -->
+                                    <ul class="menu">
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-users text-aqua"></i> 5 new members joined today
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-warning text-yellow"></i> Very long description here that
+                                                may not fit into the
+                                                page and may cause design problems
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-users text-red"></i> 5 new members joined
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-shopping-cart text-green"></i> 25 sales made
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-user text-light-blue"></i> You changed your username
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="footer"><a href="#">View all</a></li>
+                            </ul>
+                        </li>
+                        <!-- Tasks: style can be found in dropdown.less -->
+                        <li class="dropdown tasks-menu">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <i class="fa fa-flag-o"></i>
+                                <span class="label label-danger">9</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="header">You have 9 tasks</li>
+                                <li>
+                                    <!-- inner menu: contains the actual data -->
+                                    <ul class="menu">
+                                        <li>
+                                            <!-- Task item -->
+                                            <a href="#">
+                                                <h3>
+                                                    Design some buttons
+                                                    <small class="pull-right">20%</small>
+                                                </h3>
+                                                <div class="progress xs">
+                                                    <div class="progress-bar progress-bar-aqua" style="width: 20%"
+                                                         role="progressbar" aria-valuenow="20" aria-valuemin="0"
+                                                         aria-valuemax="100">
+                                                        <span class="sr-only">20% Complete</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <!-- end task item -->
+                                        <li>
+                                            <!-- Task item -->
+                                            <a href="#">
+                                                <h3>
+                                                    Create a nice theme
+                                                    <small class="pull-right">40%</small>
+                                                </h3>
+                                                <div class="progress xs">
+                                                    <div class="progress-bar progress-bar-green" style="width: 40%"
+                                                         role="progressbar" aria-valuenow="20" aria-valuemin="0"
+                                                         aria-valuemax="100">
+                                                        <span class="sr-only">40% Complete</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <!-- end task item -->
+                                        <li>
+                                            <!-- Task item -->
+                                            <a href="#">
+                                                <h3>
+                                                    Some task I need to do
+                                                    <small class="pull-right">60%</small>
+                                                </h3>
+                                                <div class="progress xs">
+                                                    <div class="progress-bar progress-bar-red" style="width: 60%"
+                                                         role="progressbar" aria-valuenow="20" aria-valuemin="0"
+                                                         aria-valuemax="100">
+                                                        <span class="sr-only">60% Complete</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <!-- end task item -->
+                                        <li>
+                                            <!-- Task item -->
+                                            <a href="#">
+                                                <h3>
+                                                    Make beautiful transitions
+                                                    <small class="pull-right">80%</small>
+                                                </h3>
+                                                <div class="progress xs">
+                                                    <div class="progress-bar progress-bar-yellow" style="width: 80%"
+                                                         role="progressbar" aria-valuenow="20" aria-valuemin="0"
+                                                         aria-valuemax="100">
+                                                        <span class="sr-only">80% Complete</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <!-- end task item -->
+                                    </ul>
+                                </li>
+                                <li class="footer">
+                                    <a href="#">View all tasks</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <!-- User Account: style can be found in dropdown.less -->
+                        <li class="dropdown user user-menu">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <img src="~/Scripts/vendor/adminlte/dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
+                                <span class="hidden-xs">@Operator.Property.UserName</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <!-- User image -->
+                                <li class="user-header">
+                                    <img src="~/Scripts/vendor/adminlte/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+                                    <p>
+                                        @Operator.Property.UserName
+                                    </p>
+                                </li>
+                                <!-- Menu Body -->
+                                @*<li class="user-body">
+                                        <div class="row">
+                                            <div class="col-xs-4 text-center">
+                                                <a href="#">Followers</a>
+                                            </div>
+                                            <div class="col-xs-4 text-center">
+                                                <a href="#">Sales</a>
+                                            </div>
+                                            <div class="col-xs-4 text-center">
+                                                <a href="#">Friends</a>
+                                            </div>
+                                        </div>
+                                    </li>*@
+                                <!-- Menu Footer-->
+                                <li class="user-footer">
+                                    <div class="pull-left">
+                                        <button id="changePwd" class="btn btn-default btn-flat">修改密码</button>
+                                    </div>
+                                    <div class="pull-right">
+                                        <button id="logout" type="button" class="btn btn-default btn-flat">注销</button>
+                                    </div>
+                                    @*</li>*@
+                            </ul>
+                        </li>
+                        <!-- Control Sidebar Toggle Button -->
+                        <li>
+                            <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        <!-- Left side column. contains the logo and sidebar -->
+        <aside class="main-sidebar">
+            <!-- sidebar: style can be found in sidebar.less -->
+            <section class="sidebar">
+                <!-- Sidebar user panel -->
+                <div class="user-panel">
+                    <div class="pull-left image">
+                        <img src="~/Scripts/vendor/adminlte/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+                    </div>
+                    <div class="pull-left info">
+                        <p>@Operator.Property.UserName</p>
+                        <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
                     </div>
                 </div>
-                <div class="topbar-item">
-                    <a id="logout" href="javascript:;" class="topbar-btn"><i class="icon icon_top_logout"></i><span>退出</span></a>
+                <!-- search form -->
+                <form action="#" method="get" class="sidebar-form">
+                    <div class="input-group">
+                        <input type="text" name="q" class="form-control">
+                        <span class="input-group-btn">
+                            <button type="button" name="search" id="search-btn" class="btn btn-flat" onclick="search_menu()">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </span>
+                    </div>
+                </form>
+                <!-- /.search form -->
+                <!-- sidebar menu: : style can be found in sidebar.less -->
+                <ul class="sidebar-menu"></ul>
+            </section>
+            <!-- /.sidebar -->
+        </aside>
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper" id="content-wrapper" style="min-height: 421px;">
+            <!--bootstrap tab风格 多标签页-->
+            <div class="content-tabs">
+                <button class="roll-nav roll-left tabLeft" onclick="scrollTabLeft()">
+                    <i class="fa fa-backward"></i>
+                </button>
+                <nav class="page-tabs menuTabs tab-ui-menu" id="tab-menu">
+                    <div class="page-tabs-content" style="margin-left: 0px;">
+                    </div>
+                </nav>
+                <button class="roll-nav roll-right tabRight" onclick="scrollTabRight()">
+                    <i class="fa fa-forward" style="margin-left: 3px;"></i>
+                </button>
+                <div class="btn-group roll-nav roll-right">
+                    <button class="dropdown tabClose" data-toggle="dropdown">
+                        页签操作<i class="fa fa-caret-down" style="padding-left: 3px;"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-right" style="min-width: 128px;">
+                        <li><a class="tabReload" href="javascript:refreshTab();">刷新当前</a></li>
+                        <li><a class="tabCloseCurrent" href="javascript:closeCurrentTab();">关闭当前</a></li>
+                        <li><a class="tabCloseAll" href="javascript:closeOtherTabs(true);">全部关闭</a></li>
+                        <li><a class="tabCloseOther" href="javascript:closeOtherTabs();">除此之外全部关闭</a></li>
+                    </ul>
+                </div>
+                <button class="roll-nav roll-right fullscreen" onclick="App.handleFullScreen()">
+                    <i class="fa fa-arrows-alt"></i>
+                </button>
+            </div>
+            <div class="content-iframe " style="background-color: #ffffff; ">
+                <div class="tab-content " id="tab-content">
                 </div>
             </div>
         </div>
+        <!-- /.content-wrapper -->
+        @*<footer class="main-footer">
+                <div class="pull-right hidden-xs">
+                    <b>Version</b> 2.3.8
+                </div>
+                <strong>Copyright &copy; 2014-2016 <a href="http://almsaeedstudio.com">Almsaeed Studio</a>.</strong> All rights
+                reserved.
+            </footer>*@
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Create the tabs -->
+            <ul class="nav nav-tabs nav-justified control-sidebar-tabs">
+                <li><a href="#control-sidebar-home-tab" data-toggle="tab"><i class="fa fa-home"></i></a></li>
+                <li><a href="#control-sidebar-settings-tab" data-toggle="tab"><i class="fa fa-gears"></i></a></li>
+            </ul>
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <!-- Home tab content -->
+                <div class="tab-pane" id="control-sidebar-home-tab">
+                    <h3 class="control-sidebar-heading">Recent Activity</h3>
+                    <ul class="control-sidebar-menu">
+                        <li>
+                            <a href="javascript:void(0)">
+                                <i class="menu-icon fa fa-birthday-cake bg-red"></i>
+                                <div class="menu-info">
+                                    <h4 class="control-sidebar-subheading">Langdon's Birthday</h4>
+                                    <p>Will be 23 on April 24th</p>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)">
+                                <i class="menu-icon fa fa-user bg-yellow"></i>
+                                <div class="menu-info">
+                                    <h4 class="control-sidebar-subheading">Frodo Updated His Profile</h4>
+                                    <p>New phone +1(800)555-1234</p>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)">
+                                <i class="menu-icon fa fa-envelope-o bg-light-blue"></i>
+                                <div class="menu-info">
+                                    <h4 class="control-sidebar-subheading">Nora Joined Mailing List</h4>
+                                    <p>nora@example.com</p>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)">
+                                <i class="menu-icon fa fa-file-code-o bg-green"></i>
+                                <div class="menu-info">
+                                    <h4 class="control-sidebar-subheading">Cron Job 254 Executed</h4>
+                                    <p>Execution time 5 seconds</p>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- /.control-sidebar-menu -->
+                    <h3 class="control-sidebar-heading">Tasks Progress</h3>
+                    <ul class="control-sidebar-menu">
+                        <li>
+                            <a href="javascript:void(0)">
+                                <h4 class="control-sidebar-subheading">
+                                    Custom Template Design
+                                    <span class="label label-danger pull-right">70%</span>
+                                </h4>
+                                <div class="progress progress-xxs">
+                                    <div class="progress-bar progress-bar-danger" style="width: 70%"></div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)">
+                                <h4 class="control-sidebar-subheading">
+                                    Update Resume
+                                    <span class="label label-success pull-right">95%</span>
+                                </h4>
+                                <div class="progress progress-xxs">
+                                    <div class="progress-bar progress-bar-success" style="width: 95%"></div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)">
+                                <h4 class="control-sidebar-subheading">
+                                    Laravel Integration
+                                    <span class="label label-warning pull-right">50%</span>
+                                </h4>
+                                <div class="progress progress-xxs">
+                                    <div class="progress-bar progress-bar-warning" style="width: 50%"></div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)">
+                                <h4 class="control-sidebar-subheading">
+                                    Back End Framework
+                                    <span class="label label-primary pull-right">68%</span>
+                                </h4>
+                                <div class="progress progress-xxs">
+                                    <div class="progress-bar progress-bar-primary" style="width: 68%"></div>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- /.control-sidebar-menu -->
+                </div>
+                <!-- /.tab-pane -->
+                <!-- Stats tab content -->
+                <div class="tab-pane" id="control-sidebar-stats-tab">Stats Tab Content</div>
+                <!-- /.tab-pane -->
+                <!-- Settings tab content -->
+                <div class="tab-pane" id="control-sidebar-settings-tab">
+                    <form method="post">
+                        <h3 class="control-sidebar-heading">General Settings</h3>
+                        <div class="form-group">
+                            <label class="control-sidebar-subheading">
+                                Report panel usage
+                                <input type="checkbox" class="pull-right" checked>
+                            </label>
+                            <p>
+                                Some information about this general settings option
+                            </p>
+                        </div>
+                        <!-- /.form-group -->
+                        <div class="form-group">
+                            <label class="control-sidebar-subheading">
+                                Allow mail redirect
+                                <input type="checkbox" class="pull-right" checked>
+                            </label>
+                            <p>
+                                Other sets of options are available
+                            </p>
+                        </div>
+                        <!-- /.form-group -->
+                        <div class="form-group">
+                            <label class="control-sidebar-subheading">
+                                Expose author name in posts
+                                <input type="checkbox" class="pull-right" checked>
+                            </label>
+                            <p>
+                                Allow the user to show his name in blog posts
+                            </p>
+                        </div>
+                        <!-- /.form-group -->
+                        <h3 class="control-sidebar-heading">Chat Settings</h3>
+                        <div class="form-group">
+                            <label class="control-sidebar-subheading">
+                                Show me as online
+                                <input type="checkbox" class="pull-right" checked>
+                            </label>
+                        </div>
+                        <!-- /.form-group -->
+                        <div class="form-group">
+                            <label class="control-sidebar-subheading">
+                                Turn off notifications
+                                <input type="checkbox" class="pull-right">
+                            </label>
+                        </div>
+                        <!-- /.form-group -->
+                        <div class="form-group">
+                            <label class="control-sidebar-subheading">
+                                Delete chat history
+                                <a href="javascript:void(0)" class="text-red pull-right"><i class="fa fa-trash-o"></i></a>
+                            </label>
+                        </div>
+                        <!-- /.form-group -->
+                    </form>
+                </div>
+                <!-- /.tab-pane -->
+            </div>
+        </aside>
+        <!-- /.control-sidebar -->
+        <!-- Add the sidebar's background. This div must be placed
+             immediately after the control sidebar -->
+        <div class="control-sidebar-bg"></div>
     </div>
-    <div id="menu">
-        <div class="menu_main" id="system_menu">
-            <h2><i class="icon icon_menu_catalog"></i></h2>
+    <!-- ./wrapper -->
+    <!-- jQuery 2.2.3 -->
+    <script src="@Url.Scrpit("~/Scripts/vendor/jQuery/jquery-2.2.3.min.js")"></script>
+    <!-- Bootstrap 3.3.6 -->
+    <script src="@Url.Scrpit("~/Scripts/vendor/bootstrap/js/bootstrap.min.js")"></script>
+    <!-- Slimscroll -->
+    <script src="@Url.Scrpit("~/Scripts/vendor/slimScroll/jquery.slimscroll.min.js")"></script>
+    <!-- FastClick -->
+    <script src="@Url.Scrpit("~/Scripts/vendor/fastclick/fastclick.js")"></script>
+    <!-- AdminLTE App -->
+    <script src="@Url.Scrpit("~/Scripts/vendor/adminlte/dist/js/app.js")"></script>
+    <!-- AdminLTE for demo purposes -->
+    <script src="@Url.Scrpit("~/Scripts/vendor/adminlte/dist/js/demo.js")"></script>
+    <!--tabs-->
+    <script src="@Url.Scrpit("~/Scripts/vendor/adminlte/dist/js/app_iframe.js")"></script>
 
-            @foreach (var firstMenu in menus)
-            {
-                if (firstMenu.IsShow)
-                {
-                    <a class="main_item" href="javascript:void(0)" title="@firstMenu.Name"><i class="icon @firstMenu.Icon"></i><span>@firstMenu.Name.Substring(0, 2)</span></a>
-                    <div class="menu_sub">
-                        <dl>
-                            @foreach (var secondMenu in firstMenu.SubMenus)
-                            {
-                                if (secondMenu.IsShow)
-                                {
-                                    <dt><span>@secondMenu.Name</span></dt>
-                                    <dd>
-                                        @foreach (var item in secondMenu.SubMenus)
-                                        {
-                                            if (item.IsShow)
-                                            {
-                                                <a href="javascript:;" onclick="Desktop.tabs.add('_panel_@(item.Id)','@(item.Name)','@item.Url')" class="sub_item">@item.Name</a>
-                                            }
-                                        }
-                                    </dd>
-                                }
-                            }
-                        </dl>
-                    </div>
-                }
-            }
-        </div>
-    </div>
-    <div id="main">
-        <div id="page">
-            <div id="global_tabs" data-options="tabHeight:30"></div>
-        </div>
-    </div>
+    <!--layer-->
+    <script src="@Url.Scrpit("~/Scripts/vendor/layer/layer.js")"></script>
+    <script src="@Url.Scrpit("~/Scripts/vendor/layer/layer-extends.js")"></script>
 
-    <script src="@Url.Scrpit("~/Scripts/jquery.min.js")"></script>
-    <script src="@Url.Scrpit("~/Scripts/easyui/easyloader.js")"></script>
-    <script src="@Url.Scrpit("~/Scripts/easyui/jquery.easyui.min.js")"></script>
-    <script src="@Url.Scrpit("~/Scripts/easyui/locale/easyui-lang-zh_CN.js")"></script>
-    <script src="@Url.Scrpit("~/Scripts/easyui/jquery.easyui.extend.js")"></script>
-    <script src="@Url.Scrpit("~/Scripts/easyui/datagrid-cellediting.js")"></script>
+    <!--fx-->
     <script src="@Url.Scrpit("~/Scripts/util/util.js")"></script>
-    <script src="@Url.Scrpit("~/Scripts/config.js")"></script>
-    <script src="@Url.Scrpit("~/Scripts/jsrender.min.js")"></script>
-    <script src="@Url.Scrpit("~/Scripts/global.js")"></script>
-    <script src="@Url.Scrpit("~/Scripts/util/easyui-extend.js")"></script>
-    <script src="@Url.Scrpit("~/Scripts/util/framework-util.js")"></script>
 
-    <script>
+    <script type="text/javascript">
         var rootUrl = '@Url.Content("~/")';
 
-        (function () {
-            var $container = $("#system_menu");
-            $container.on("click", "a.main_item", function () {
-                $container.find("a.main_item_active").removeClass("main_item_active");
-                $container.find("a.sub_item_active").removeClass("sub_item_active");
-                $(this).addClass("main_item_active");
+        var menus =@menusJson;
+        /**
+         * 本地搜索菜单
+         */
+        function search_menu() {
+            //要搜索的值
+            var text = $('input[name=q]').val();
+
+            var $ul = $('.sidebar-menu');
+            $ul.find("a.nav-link").each(function () {
+                var $a = $(this).css("border", "");
+
+                //判断是否含有要搜索的字符串
+                if ($a.children("span.menu-text").text().indexOf(text) >= 0) {
+
+                    //如果a标签的父级是隐藏的就展开
+                    $ul = $a.parents("ul");
+
+                    if ($ul.is(":hidden")) {
+                        $a.parents("ul").prev().click();
+                    }
+
+                    //点击该菜单
+                    $a.click().css("border", "1px solid");
+                }
             });
-            $container.on("click", "a.sub_item", function () {
-                $container.find("a.sub_item_active").removeClass("sub_item_active");
-                $(this).addClass("sub_item_active");
+        }
+
+        $(function () {
+            //更改密码
+            $('#changePwd').click(function () {
+                dialogOpen({
+                    id: 'changePwdForm',
+                    title: '更改密码',
+                    btn: ['确定', '取消'],
+                    height: '40%',
+                    width:'50%',
+                    url: rootUrl + 'Base_SysManage/Base_User/ChangePwdForm',
+                    yes: function (window, body) {
+                        window.submitForm();
+                    }
+                });
             });
 
-            $container.find("a.main_item:eq(0)").trigger("click");
-
+            //注销
             $('#logout').click(function () {
                 dialogComfirm('确认要注销吗？', function () {
                     $.postJSON(rootUrl + 'Home/Logout', {}, function (resJson) {
@@ -117,19 +645,19 @@
                 });
             });
 
-            //更改密码
-            $('#changePwd').click(function () {
-                dialogOpen({
-                    id: 'changePwdForm',
-                    title: '更改密码',
-                    width: 500,
-                    height: 300,
-                    url: rootUrl + 'Base_SysManage/Base_User/ChangePwdForm',
-                });
+            App.setbasePath("/Scripts/vendor/adminlte/");
+            App.setGlobalImgPath("dist/img/");
+
+            addTabs({
+                id: '324708b9-5027-4fd0-a9eb-a001d214ca72',
+                title: '框架介绍',
+                close: true,
+                url: '/Home/Desktop',
             });
 
-            Desktop.tabs.add('_panel_0110000', '框架介绍', rootUrl + 'Home/Desktop');
-        })();
+            App.fixIframeCotent();
+            $('.sidebar-menu').sidebarMenu({ data: menus });
+        });
     </script>
 </body>
 </html>

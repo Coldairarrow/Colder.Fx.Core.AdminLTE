@@ -2,83 +2,101 @@
     Layout = "~/Views/Shared/_Layout_List.cshtml";
 }
 
-@section search{
-    <div class="search_wrapper">
-        <div class="search_item">
-            <label class="search_label">选择数据库</label>
-            <input id="linkId" class="easyui-combobox" data-options="
-                width:250,
-                valueField: 'Id',
-                textField: 'LinkName',
-                url: '@Url.Content("~/")Base_SysManage/RapidDevelopment/GetAllDbLink',
-                onSelect: function(rec){
-                   var param={linkId:rec.Id};
-                   $('#dataTable').datagrid('load',param);
-            }">
-        </div>
-        <div class="search_submit">
-            <a id="buildCode" href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-add'">生成代码</a>
-        </div>
+<div class="fx-content">
+    <div class="fx-wrapper">
+        <form class="form-inline" id="searchForm">
+            <div class="form-group">
+                <label>请选择数据库</label>
+                <select class="selectpicker" id="linkId" name="linkId" data-style="btn-default btn-sm" data-width="200px">
+                </select>
+            </div>
+            <div class="form-group">
+                <button id="buildCode" type="button" class="btn btn-default btn-sm">
+                    <i class="glyphicon glyphicon-search"></i>
+                    生成代码
+                </button>
+            </div>
+        </form>
     </div>
-}
-<div id="dataTable">
-
+    <div class="fx-wrapper">
+        <table id="dataTable" class="table-bordered"></table>
+    </div>
 </div>
 
 <script>
-    var rootUrl = '@Url.Content("~/")';
+    var $table = $('#dataTable');
 
+    $(function () {
+        initTable();
+        bindEvent();
+    });
+
+    //初始化表格
     function initTable() {
-        $('#dataTable').datagrid({
+        $table.bootstrapTable({
             url: rootUrl + 'Base_SysManage/RapidDevelopment/GetDbTableList',
-            method: 'POST',
-            //queryParams: { 'id': id },
             idField: 'Id',
-            fit: true,
-            fitColumns: true,
-            singleSelect: false,
-            selectOnCheck: false,
-            checkOnSelect: false,
-            //rownumbers: true,
-            //pagination: true,
-            pageSize: 30,
-            //nowrap: false,
-            //pageList: [10, 20, 30, 50, 100, 150, 200],
-            //showFooter: true,
-            columns: [[
-                { title: 'ck', field: 'ck', checkbox: true },
-                { title: '表名', field: 'TableName', width: 200, fixed: true },
-                { title: '描述', field: 'Description', width: 200, fixed: true }
-            ]],
-            onBeforeSelect: function () {
-                return false;
+            pagination: false,
+            method: 'post',
+            clickToSelect: true,
+            //sidePagination: "server",
+            //pageNumber: 1,
+            //pageSize: 30,
+            //pageList: [10, 30, 60, 100],
+            columns: [
+                { title: 'ck', field: 'ck', checkbox: true, width: '3%' },
+                { title: '表名', field: 'TableName', width: '10%' },
+                { title: '描述', field: 'Description', width: '20%' },
+                {
+                    title: '', field: '_', width: '100%', formatter: function () {
+                        return '';
+                    }
+                }
+            ],
+            queryParams: function (params) {
+                var searchParams = $('#searchForm').getValues();
+                $.extend(params, searchParams);
+
+                return params;
             }
         });
     }
 
-    $(function () {
-        initTable();
-
-        //生成代码
-        $('#buildCode').click(function () {
-            var selected = $("#dataTable").datagrid("getChecked");
-            if (!selected || !selected.length) {
-                dialogError('请选择需要生成的表!');
-                return;
+    //绑定事件
+    function bindEvent() {
+        $('#linkId').selectpicker({
+            url: '/Base_SysManage/RapidDevelopment/GetAllDbLink',
+            textField: 'LinkName',
+            valueField: 'Id',
+            onSelect: function (value) {
+                $table.bootstrapTable('refresh');
             }
-            var tableNames = $.map(selected, function (item) {
-                return item['TableName'];
-            });
+        });
 
-            var tables = encodeURI(JSON.stringify(tableNames));
-            var linkId = $('#linkId').combobox('getValue');
+        $('#buildCode').click(function () {
+            var tables = [];
+
+            var rows = $table.bootstrapTable('getSelections');
+            if (rows.length == 0) {
+                dialogError('请选择需要生成的表！');
+                return;
+            } else {
+                $.each(rows, function (index, value) {
+                    tables.push(value['TableName']);
+                })
+            }
+
+            var linkId = $('#linkId').val();
             dialogOpen({
                 id: 'form',
+                height:'50%',
                 title: '生成选项',
-                width: 500,
-                height: 270,
-                url: rootUrl + 'Base_SysManage/RapidDevelopment/Form?linkId={0}&tables={1}'.format(linkId, tables),
+                btn: ['生成', '取消'],
+                url: rootUrl + 'Base_SysManage/RapidDevelopment/Form?linkId={0}&tables={1}'.format(linkId, encodeURI(JSON.stringify(tables))),
+                yes: function (window, body) {
+                    window.submitForm();
+                }
             });
         });
-    });
+    }
 </script>
