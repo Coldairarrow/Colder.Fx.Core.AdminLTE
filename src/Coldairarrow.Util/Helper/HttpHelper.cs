@@ -197,8 +197,15 @@ namespace Coldairarrow.Util
             List<string> paramKeys = new List<string>();
             var getParams = request.Query.Keys.ToList();
             var postParams = new List<string>();
-            if (request.Method.ToLower() != "get")
-                postParams = request.Form.Keys.ToList();
+            try
+            {
+                if (request.Method.ToLower() != "get")
+                    postParams = request.Form.Keys.ToList();
+            }
+            catch
+            {
+
+            }
             paramKeys.AddRange(getParams);
             paramKeys.AddRange(postParams);
 
@@ -225,7 +232,8 @@ namespace Coldairarrow.Util
                     var obj = str.ToJObject();
                     foreach (var aProperty in obj)
                     {
-                        allParams.Add(aProperty.Key, aProperty.Value);
+                        allParams[aProperty.Key] = aProperty.Value;
+                        //allParams.Add(aProperty.Key, aProperty.Value);
                     }
                 }
             }

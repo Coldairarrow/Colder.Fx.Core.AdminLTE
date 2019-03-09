@@ -1,4 +1,4 @@
-@using Coldairarrow.Entity.Base_SysManage;
+ï»¿@using Coldairarrow.Entity.Base_SysManage;
 @using Coldairarrow.Util;
 
 @{
@@ -10,21 +10,21 @@
 <div style="padding:15px;padding-right:45px;">
     <form id="form" class="form-horizontal" role="form">
         <div class="form-group form-group-sm">
-            <label class="col-sm-2 control-label">Á¬½ÓÃû</label>
+            <label class="col-sm-2 control-label">è¿æ¥å</label>
             <div class="col-sm-5">
                 <input name="LinkName" value="@obj.LinkName" type="text" class="form-control" required>
                 <div class="help-block with-errors"></div>
             </div>
         </div>
         <div class="form-group form-group-sm">
-            <label class="col-sm-2 control-label">Á¬½Ó×Ö·û´®</label>
+            <label class="col-sm-2 control-label">è¿æ¥å­—ç¬¦ä¸²</label>
             <div class="col-sm-10">
                 <input name="ConnectionStr" value="@obj.ConnectionStr" type="text" class="form-control" required>
                 <div class="help-block with-errors"></div>
             </div>
         </div>
         <div class="form-group form-group-sm">
-            <label class="col-sm-2 control-label">Êı¾İ¿âÀàĞÍ</label>
+            <label class="col-sm-2 control-label">æ•°æ®åº“ç±»å‹</label>
             <div class="col-sm-5">
                 <select id="DbType" name="DbType" class="selectpicker form-control" data-style="btn-default btn-sm" required>
                     <option value="SqlServer">SqlServer</option>
@@ -36,14 +36,14 @@
             </div>
         </div>
         <div class="form-group form-group-sm">
-            <label class="col-sm-2 control-label">ÅÅĞò±àºÅ</label>
+            <label class="col-sm-2 control-label">æ’åºç¼–å·</label>
             <div class="col-sm-5">
                 <input name="SortNum" value="@obj.SortNum" type="text" class="form-control">
                 <div class="help-block with-errors"></div>
             </div>
         </div>
         <div class="form-group">
-            <button id="submit" type="submit" class="hidden">Ìá½»</button>
+            <button id="submit" type="submit" class="hidden">æäº¤</button>
         </div>
     </form>
 </div>
@@ -54,16 +54,16 @@
         initEvent();
     });
 
-    //ÊÂ¼ş°ó¶¨
+    //äº‹ä»¶ç»‘å®š
     function initEvent() {
-        //Êı¾İ¿âÀàĞÍ
+        //æ•°æ®åº“ç±»å‹
         $('#DbType').selectpicker({
             value: theEntity.DbType
         });
 
-        //±íµ¥Ğ£Ñé
+        //è¡¨å•æ ¡éªŒ
         $('#form').validator().on('submit', function (e) {
-            //Ğ£Ñé³É¹¦
+            //æ ¡éªŒæˆåŠŸ
             if (!e.isDefaultPrevented()) {
                 e.preventDefault();
 
@@ -87,7 +87,7 @@
         })
     }
 
-    //Ìá½»±íµ¥
+    //æäº¤è¡¨å•
     function submitForm() {
         $('#submit').trigger('click');
     }

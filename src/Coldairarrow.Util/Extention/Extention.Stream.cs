@@ -45,10 +45,19 @@ namespace Coldairarrow.Util
         /// <returns></returns>
         public static string ReadToString(this Stream stream, Encoding encoding)
         {
+            if (stream.CanSeek)
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+            }
+
             string resStr = string.Empty;
-            stream.Position = 0;
             resStr = new StreamReader(stream, encoding).ReadToEnd();
-            stream.Position = 0;
+
+            if (stream.CanSeek)
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+            }
+
 
             return resStr;
         }

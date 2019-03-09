@@ -46,11 +46,11 @@ namespace Coldairarrow.Web
             Pagination pagination = new Pagination
             {
                 PageIndex = 1,
-                PageRows = int.MaxValue,
-                RecordCount = int.MaxValue
+                PageRows = int.MaxValue
             };
+            var resList = _rapidDevelopmentBus.GetDbTableList(linkId);
 
-            return Content(pagination.BuildTableResult_DataGrid(_rapidDevelopmentBus.GetDbTableList(linkId)).ToJson());
+            return Content(pagination.BuildTableResult_BootstrapTable(resList).ToJson());
         }
 
         #endregion

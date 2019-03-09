@@ -1,4 +1,4 @@
-@{
+ï»¿@{
     Layout = "~/Views/Shared/_Layout_List.cshtml";
 }
 
@@ -6,22 +6,22 @@
     <div class="fx-wrapper">
         <form class="form-inline form-group-sm" id="searchForm">
             <div class="form-group">
-                <label>ÈÕÖ¾ÄÚÈİ</label>
+                <label>æ—¥å¿—å†…å®¹</label>
                 <input type="text" class="form-control input-sm" name="logContent">
             </div>
             <div class="form-group">
-                <label>ÈÕÖ¾Àà±ğ</label>
+                <label>æ—¥å¿—ç±»åˆ«</label>
                 <select class="selectpicker" id="logType" name="logType" data-style="btn-default btn-sm" data-width="100px">
-                    <option value="">ÇëÑ¡Ôñ</option>
+                    <option value="">è¯·é€‰æ‹©</option>
                 </select>
             </div>
             <div class="form-group">
-                <label>ÓÃ»§Ãû</label>
+                <label>ç”¨æˆ·å</label>
                 <input name="opUserName" type="text" class="form-control input-sm">
             </div>
             <br />
             <div class="form-group">
-                <label>Ê±¼ä</label>
+                <label>æ—¶é—´</label>
                 <input name="startTime" id="startTime" type="text" data-date-format="yyyy-mm-dd hh:ii:ss" class="form-control">
                 <label>~</label>
                 <input name="endTime" id="endTime" type="text" data-date-format="yyyy-mm-dd hh:ii:ss" class="form-control">
@@ -29,7 +29,7 @@
             <div class="form-group">
                 <button type="button" class="btn btn-default btn-sm" onclick="javascript: $('#dataTable').bootstrapTable('refresh', { silent: true });">
                     <i class="glyphicon glyphicon-search"></i>
-                    ²éÑ¯
+                    æŸ¥è¯¢
                 </button>
             </div>
         </form>
@@ -61,7 +61,7 @@
         });
     }
 
-    //³õÊ¼»¯±í¸ñ
+    //åˆå§‹åŒ–è¡¨æ ¼
     function initTable() {
         $table.bootstrapTable({
             url: '/Base_SysManage/Base_SysLog/GetLogList',
@@ -75,9 +75,9 @@
             pageList: [10, 30, 60, 100],
             columns: [
                 //{ title: 'ck', field: 'ck', checkbox: true, width: '3%' },
-                { title: 'ÈÕÖ¾ÄÚÈİ', field: 'LogContent', width: '60%' },
-                { title: '²Ù×÷Ô±ÓÃ»§Ãû', field: 'OpUserName', width: '5%' },
-                { title: 'ÈÕÖ¾¼ÇÂ¼Ê±¼ä', field: 'OpTime', width: '10%' }
+                { title: 'æ—¥å¿—å†…å®¹', field: 'LogContent', width: '60%' },
+                { title: 'æ“ä½œå‘˜ç”¨æˆ·å', field: 'OpUserName', width: '5%' },
+                { title: 'æ—¥å¿—è®°å½•æ—¶é—´', field: 'OpTime', width: '10%' }
             ],
             queryParams: function (params) {
                 var searchParams = $('#searchForm').getValues();

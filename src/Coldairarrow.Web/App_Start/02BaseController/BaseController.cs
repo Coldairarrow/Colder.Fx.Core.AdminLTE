@@ -3,7 +3,10 @@ using Coldairarrow.Entity.Base_SysManage;
 using Coldairarrow.Util;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Primitives;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Coldairarrow.Web
@@ -22,6 +25,40 @@ namespace Coldairarrow.Web
             context.HttpContext.Response.Headers.Add("Access-Control-Allow-Origin", "*");
             context.HttpContext.Response.Headers.Add("Access-Control-Allow-Headers", "*");
             context.HttpContext.Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+
+            //参数映射：支持application/json
+
+            var actionParameters = context.ActionDescriptor.Parameters;
+            var paramterObjs = (Dictionary<string, StringValues>)context.HttpContext.Request.Query.GetPropertyValue("Store");
+            if (paramterObjs == null)
+                context.HttpContext.Request.Query.SetPropertyValue("Store", new Dictionary<string, StringValues>());
+            var allParamters = HttpHelper.GetAllRequestParams(context.HttpContext);
+            actionParameters.ForEach(aParamter =>
+            {
+                string key = aParamter.Name;
+                object value = null;
+                try
+                {
+                    value = paramterObjs[key];
+                }
+                catch
+                {
+
+                }
+                if (value.IsNullOrEmpty() && allParamters.ContainsKey(key))
+                {
+                    if (allParamters[key] != null)
+                        paramterObjs[key] = new StringValues(allParamters[key]?.ToString());
+                }
+                    //if (allParamters.ContainsKey(key))
+                    //{
+                    //    if (allParamters[key] != null)
+                    //        aParamter.BindingInfo
+                    //        //actionParameters[key] = allParamters[key]?.ToJson().ToObject(aParamter.ParameterType);
+                    //}
+                });
+
+            string str = string.Empty;
         }
 
         /// <summary>

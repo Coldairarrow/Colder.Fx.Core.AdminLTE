@@ -1,38 +1,38 @@
-@{
+ï»¿@{
     Layout = "~/Views/Shared/_Layout_List.cshtml";
 }
 
 <div class="fx-content">
     <div id="toobar">
         <div class="btn-group btn-group-sm">
-            <button onclick="openForm('', 'Ìí¼ÓÊı¾İ');" type="button" class="btn btn-default" aria-label="Left Align">
+            <button onclick="openForm('', 'æ·»åŠ æ•°æ®');" type="button" class="btn btn-default" aria-label="Left Align">
                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                Ìí¼Ó
+                æ·»åŠ 
             </button>
             <button onclick="deleteData();" type="button" class="btn btn-default" aria-label="Right Align">
                 <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                É¾³ı
+                åˆ é™¤
             </button>
             <button type="button" class="btn btn-default" aria-label="Right Align" onclick="javascript: location.reload();">
                 <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
-                Ë¢ĞÂ
+                åˆ·æ–°
             </button>
         </div>
     </div>
     <div class="fx-wrapper">
         <form class="form-inline" id="searchForm">
             <div class="form-group">
-                <label>²éÑ¯Àà±ğ</label>
+                <label>æŸ¥è¯¢ç±»åˆ«</label>
                 <select class="selectpicker" name="condition" data-style="btn-default btn-sm" data-width="100px">
-                    <option value="">ÇëÑ¡Ôñ</option>
+                    <option value="">è¯·é€‰æ‹©</option>
                     <option value="AppId">AppId</option>
                 </select>
-                <input type="text" class="form-control input-sm" name="keyword" placeholder="ÇëÊäÈë¹Ø¼ü×Ö">
+                <input type="text" class="form-control input-sm" name="keyword" placeholder="è¯·è¾“å…¥å…³é”®å­—">
             </div>
             <div class="form-group">
                 <button type="button" class="btn btn-default btn-sm" onclick="javascript: $('#dataTable').bootstrapTable('refresh', { silent: true });">
                     <i class="glyphicon glyphicon-search"></i>
-                    ²éÑ¯
+                    æŸ¥è¯¢
                 </button>
             </div>
         </form>
@@ -50,7 +50,7 @@
         bindEvent();
     });
 
-    //³õÊ¼»¯±í¸ñ
+    //åˆå§‹åŒ–è¡¨æ ¼
     function initTable() {
         $table.bootstrapTable({
             url: '/Base_SysManage/Base_AppSecret/GetDataList',
@@ -64,14 +64,14 @@
             pageList: [10, 30, 60, 100],
             columns: [
                 { title: 'ck', field: 'ck', checkbox: true, width: '3%' },
-                { title: 'Ó¦ÓÃId', field: 'AppId', width: '10%' },
-                { title: 'ÃÜÔ¿', field: 'AppSecret', width: '30%' },
+                { title: 'åº”ç”¨Id', field: 'AppId', width: '10%' },
+                { title: 'å¯†é’¥', field: 'AppSecret', width: '30%' },
                 {
-                    title: '²Ù×÷', field: '_', width: '', formatter: function (value, row) {
+                    title: 'æ“ä½œ', field: '_', width: '', formatter: function (value, row) {
                         var builder = new BtnBuilder();
                         builder.AddBtn({ icon: 'glyphicon-edit', function: 'openForm', param: [row['Id']] });
                         builder.AddBtn({ icon: 'glyphicon-trash', function: 'deleteData', param: [row['Id']] });
-                        builder.AddBtn({ name: 'È¨ÏŞ·ÖÅä', icon: 'glyphicon-edit', function: 'setPermission', param: [row['appId']] });
+                        builder.AddBtn({ name: 'æƒé™åˆ†é…', icon: 'glyphicon-edit', function: 'setPermission', param: [row['appId']] });
 
                         return builder.build();
                     }
@@ -86,18 +86,18 @@
         });
     }
 
-    //°ó¶¨ÊÂ¼ş
+    //ç»‘å®šäº‹ä»¶
     function bindEvent() {
 
     }
 
-    //´ò¿ª±íµ¥
+    //æ‰“å¼€è¡¨å•
     function openForm(id, title) {
         dialogOpen({
             id: 'form',
             title: title,
             height: '40%',
-            btn: ['È·¶¨', 'È¡Ïû'],
+            btn: ['ç¡®å®š', 'å–æ¶ˆ'],
             url: '/Base_SysManage/Base_AppSecret/Form?id={0}'.format(id || ''),
             yes: function (window, body) {
                 window.submitForm();
@@ -105,17 +105,17 @@
         });
     }
 
-    //É¾³ıÊı¾İ
+    //åˆ é™¤æ•°æ®
     function deleteData(id) {
-        dialogComfirm('È·ÈÏÉ¾³ıÂğ£¿', function () {
+        dialogComfirm('ç¡®è®¤åˆ é™¤å—ï¼Ÿ', function () {
             var ids = [];
 
-            if (typeof (id) == 'string') {//µ¥ÌõÊı¾İ
+            if (typeof (id) == 'string') {//å•æ¡æ•°æ®
                 ids.push(id);
-            } else {//¶àÌõÊı¾İ
+            } else {//å¤šæ¡æ•°æ®
                 var rows = $table.bootstrapTable('getSelections');
                 if (rows.length == 0) {
-                    dialogError('ÇëÑ¡ÔñĞèÒªÉ¾³ıµÄÊı¾İ£¡');
+                    dialogError('è¯·é€‰æ‹©éœ€è¦åˆ é™¤çš„æ•°æ®ï¼');
                     return;
                 } else {
                     $.each(rows, function (index, value) {
@@ -130,7 +130,7 @@
 
                 if (resJson.Success) {
                     $table.bootstrapTable('refresh');
-                    dialogSuccess('É¾³ı³É¹¦!');
+                    dialogSuccess('åˆ é™¤æˆåŠŸ!');
                 }
                 else {
                     dialogError(resJson.Msg);
@@ -139,14 +139,14 @@
         });
     }
 
-    //ÉèÖÃÈ¨ÏŞ
+    //è®¾ç½®æƒé™
     function setPermission(appId) {
         dialogOpen({
             id: 'permissionForm',
-            title: 'ÉèÖÃÓ¦ÓÃId¡¾{0}¡¿È¨ÏŞ'.format(appId),
+            title: 'è®¾ç½®åº”ç”¨Idã€{0}ã€‘æƒé™'.format(appId),
             width: '80.5%',
             height: '80.5%',
-            btn: ['È·¶¨', 'È¡Ïû'],
+            btn: ['ç¡®å®š', 'å–æ¶ˆ'],
             url: '/Base_SysManage/Base_AppSecret/PermissionForm?appId={0}'.format(appId),
             yes: function (iframeWin) {
                 iframeWin.savePermission();

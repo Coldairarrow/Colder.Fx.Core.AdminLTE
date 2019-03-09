@@ -349,6 +349,7 @@ namespace Coldairarrow.Business.Base_SysManage
 
     public class PermissionItem
     {
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         public string Name { get; set; }
         public string Value { get; set; }
         public bool IsChecked { get; set; }
