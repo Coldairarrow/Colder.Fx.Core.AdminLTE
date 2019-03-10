@@ -58,7 +58,6 @@ namespace Coldairarrow.Util
                 stream.Seek(0, SeekOrigin.Begin);
             }
 
-
             return resStr;
         }
     }

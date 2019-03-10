@@ -19,6 +19,8 @@ namespace Coldairarrow.Web
         /// <param name="filterContext">请求上下文</param>
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
+            base.OnActionExecuting(filterContext);
+
             var sessionCookie = HttpContext.Request.Cookies[SessionHelper.SessionCookieName];
             if (sessionCookie.IsNullOrEmpty())
             {

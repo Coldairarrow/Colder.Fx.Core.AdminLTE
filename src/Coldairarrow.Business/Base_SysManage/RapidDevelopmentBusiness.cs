@@ -302,11 +302,13 @@ namespace Coldairarrow.Web
             StringBuilder searchConditionSelectHtml = new StringBuilder();
             StringBuilder tableColsBuilder = new StringBuilder();
             StringBuilder formRowBuilder = new StringBuilder();
-
+            var formHeight = tableInfoList.Where(x => x.Name != "Id").Count() * 2;
+            if (formHeight > 8)
+                formHeight = 8;
             tableInfoList.Where(x => x.Name != "Id").ForEach((aField, index) =>
-                {
-                    //搜索的下拉选项
-                    Type fieldType = _dbHelper.DbTypeStr_To_CsharpType(aField.Type);
+            {
+                //搜索的下拉选项
+                Type fieldType = _dbHelper.DbTypeStr_To_CsharpType(aField.Type);
                 if (fieldType == typeof(string))
                 {
                     string newOption = $@"
@@ -314,20 +316,20 @@ namespace Coldairarrow.Web
                     searchConditionSelectHtml.Append(newOption);
                 }
 
-                    //数据表格列
-                string end = (index == tableInfoList.Count - 2) ? "" : ",";
-                string newCol =$@"
-                {{ title: '{aField.Description}', field: '{aField.Name}', width: 200 }}{end}";
+                //数据表格列
+                string newCol = $@"
+                {{ title: '{aField.Description}', field: '{aField.Name}', width: '5%' }},";
                 tableColsBuilder.Append(newCol);
 
                 //Form页面中的Html
                 string newFormRow = $@"
-            <tr>
-                <th>{aField.Description}</th>
-                <td>
-                    <input name=""{aField.Name}"" value=""@obj.{aField.Name}"" class=""easyui-textbox"" data-options=""width:'200px',required:true"">
-                </td>
-            </tr>";
+        <div class=""form-group form-group-sm"">
+            <label class=""col-sm-2 control-label"">{aField.Description}</label>
+            <div class=""col-sm-5"">
+                <input name=""{aField.Name}"" value=""@obj.{aField.Name}"" type=""text"" class=""form-control"" required>
+                <div class=""help-block with-errors""></div>
+            </div>
+        </div>";
                 formRowBuilder.Append(newFormRow);
             });
             string indexHtml =
@@ -335,182 +337,204 @@ $@"@{{
     Layout = ""~/Views/Shared/_Layout_List.cshtml"";
 }}
 
-@section toolbar{{
-    <a id=""add"" class=""easyui-linkbutton"" data-options=""iconCls:'icon-add'"">添加</a>
-    <a id=""edit"" class=""easyui-linkbutton"" data-options=""iconCls:'icon-edit'"">修改</a>
-    <a id=""delete"" class=""easyui-linkbutton"" data-options=""iconCls:'icon-remove'"">删除</a>
-}}
-
-@section search{{
-    <div class=""search_wrapper"">
-        <div class=""search_item"">
-            <label class=""search_label"">查询类别</label>
-            <select name=""condition"" class=""easyui-combobox"" data-options=""width:100"">
-                <option value="""">请选择</option>
-                {searchConditionSelectHtml.ToString()}
-            </select>
-            <input name=""keyword"" class=""easyui-textbox"" style=""width:150px"" />
-        </div>
-        <div class=""search_submit"">
-            <a href=""javascript:;"" class=""easyui-linkbutton"" data-options=""iconCls:'icon-search'"" onclick=""searchGrid(this,'#dataTable')"">查询</a>
+<div class=""fx-content"">
+    <div id=""toobar"">
+        <div class=""btn-group btn-group-sm"">
+            <button onclick=""openForm('', '添加数据');"" type=""button"" class=""btn btn-default"" aria-label=""Left Align"">
+                <span class=""glyphicon glyphicon-plus"" aria-hidden=""true""></span>
+                添加
+            </button>
+            <button onclick=""deleteData();"" type=""button"" class=""btn btn-default"" aria-label=""Right Align"">
+                <span class=""glyphicon glyphicon-trash"" aria-hidden=""true""></span>
+                删除
+            </button>
+            <button type=""button"" class=""btn btn-default"" aria-label=""Right Align"" onclick=""javascript: location.reload();"">
+                <span class=""glyphicon glyphicon-refresh"" aria-hidden=""true""></span>
+                刷新
+            </button>
         </div>
     </div>
-}}
-<div id=""dataTable"">
-
+    <div class=""fx-wrapper"">
+        <form class=""form-inline"" id=""searchForm"">
+            <div class=""form-group"">
+                <label>查询类别</label>
+                <select class=""selectpicker"" name=""condition"" data-style=""btn-default btn-sm"" data-width=""100px"">
+                    <option value="""">请选择</option>
+                    {searchConditionSelectHtml.ToString()}
+                </select>
+                <input type=""text"" class=""form-control input-sm"" name=""keyword"" placeholder=""请输入关键字"">
+            </div>
+            <div class=""form-group"">
+                <button type=""button"" class=""btn btn-default btn-sm"" onclick=""javascript: $('#dataTable').bootstrapTable('refresh', {{ silent: true }});"">
+                    <i class=""glyphicon glyphicon-search""></i>
+                    查询
+                </button>
+            </div>
+        </form>
+    </div>
+    <div class=""fx-wrapper"">
+        <table id=""dataTable"" class=""table-bordered""></table>
+    </div>
 </div>
 
 <script>
-    var rootUrl = '@Url.Content(""~/"")';
-    var formWidth = 500;
-    var formHeight = {(tableInfoList.Count - 1) * 35 + 200};
+    var $table = $('#dataTable');
 
+    $(function () {{
+        initTable();
+        bindEvent();
+    }});
+
+    //初始化表格
     function initTable() {{
-        $('#dataTable').datagrid({{
-            url: rootUrl + '{areaName}/{entityName}/GetDataList',
-            method: 'POST',
-            //queryParams: {{ 'id': id }},
+        $table.bootstrapTable({{
+            url: '/{areaName}/{entityName}/GetDataList',
             idField: 'Id',
-            fit: true,
-            fitColumns: true,
-            singleSelect: false,
-            selectOnCheck: false,
-            checkOnSelect: false,
-            //sortName: 'Id',
-            //sortOrder: 'asc',
-            //rownumbers: true,
             pagination: true,
+            method: 'post',
+            clickToSelect: false,
+            sidePagination: ""server"",
+            pageNumber: 1,
             pageSize: 30,
-            //nowrap: false,
-            pageList: [10, 20, 30, 50, 100, 150, 200],
-            //showFooter: true,
-            columns: [[
-                {{ title: 'ck', field: 'ck', checkbox: true }},
-                {tableColsBuilder.ToString()}
-            ]],
-            onBeforeLoad: function (param) {{
+            pageList: [10, 30, 60, 100],
+            columns: [
+                {{ title: 'ck', field: 'ck', checkbox: true, width: '3%' }},{tableColsBuilder.ToString()}
+                {{
+                    title: '操作', field: '_', width: '80%', formatter: function (value, row) {{
+                        var builder = new BtnBuilder();
+                        builder.AddBtn({{ icon: 'glyphicon-edit', function: 'openForm', param: [row['Id']] }});
+                        builder.AddBtn({{ icon: 'glyphicon-trash', function: 'deleteData', param: [row['Id']] }});
 
-            }},
-            onBeforeSelect: function () {{
-                return false;
+                        return builder.build();
+                    }}
+                }}
+            ],
+            queryParams: function (params) {{
+                var searchParams = $('#searchForm').getValues();
+                $.extend(params, searchParams);
+
+                return params;
             }}
         }});
     }}
 
-    $(function () {{
-        initTable();
+    //绑定事件
+    function bindEvent() {{
 
-        //添加数据
-        $('#add').click(function () {{
-            dialogOpen({{
-                id: 'form',
-                title: '添加数据',
-                width: formWidth,
-                height: formHeight,
-                url: rootUrl + '{areaName}/{entityName}/Form',
-            }});
-        }});
+    }}
 
-        //修改数据
-        $('#edit').click(function () {{
-            var selected = $(""#dataTable"").datagrid(""getChecked"");
-            if (!selected || !selected.length) {{
-                dialogError('请选择要修改的记录!');
-                return;
+    //打开表单
+    function openForm(id, title) {{
+        dialogOpen({{
+            id: 'form',
+            title: title,
+            btn: ['确定', '取消'],
+            height:'{formHeight}0%',
+            url: '/{areaName}/{entityName}/Form?id={{0}}'.format(id || ''),
+            yes: function (window, body) {{
+                window.submitForm();
             }}
-            var id = selected[0].Id;
-
-            dialogOpen({{
-                id: 'form',
-                title: '修改数据',
-                width: formWidth,
-                height: formHeight,
-                url: rootUrl + '{areaName}/{entityName}/Form?id=' + id,
-            }});
         }});
+    }}
 
-        //删除数据
-        $('#delete').click(function () {{
-            var checked = $(""#dataTable"").datagrid(""getChecked"");
-            if (!checked || !checked.length) {{
-                dialogError('请选择要删除的记录!');
-                return;
+    //删除数据
+    function deleteData(id) {{
+        dialogComfirm('确认删除吗？', function () {{
+            var ids = [];
+
+            if (typeof (id) == 'string') {{//单条数据
+                ids.push(id);
+            }} else {{//多条数据
+                var rows = $table.bootstrapTable('getSelections');
+                if (rows.length == 0) {{
+                    dialogError('请选择需要删除的数据！');
+                    return;
+                }} else {{
+                    $.each(rows, function (index, value) {{
+                        ids.push(value['Id']);
+                    }})
+                }}
             }}
-            var ids = $.map(checked, function (item) {{
-                return item['Id'];
-            }});
 
-            dialogComfirm('确认删除吗？', function () {{
-                $.postJSON(rootUrl + '{areaName}/{entityName}/DeleteData', {{ ids: JSON.stringify(ids) }}, function (resJson) {{
-                    if (resJson.Success) {{
-                        $('#dataTable').datagrid('clearSelections').datagrid('clearChecked');
-                        $('#dataTable').datagrid('reload');
-                        dialogMsg('删除成功!');
-                    }}
-                    else {{
-                        dialogError(resJson.Msg);
-                    }}
-                }});
-            }});
-        }});
-    }});
-</script>";
-            string indexPath = Path.Combine(_contentRootPath, "Areas", areaName, "Views", entityName, "Index.cshtml");
+            loading();
+            $.postJSON('/{areaName}/{entityName}/DeleteData', {{ ids: JSON.stringify(ids) }}, function (resJson) {{
+                loading(false);
 
-            FileHelper.WriteTxt(indexHtml, indexPath, FileMode.Create);
-
-            //生成Form页面
-            string formHtml = 
-$@"@using Coldairarrow.Entity.{areaName};
-@using Coldairarrow.Util;
-
-@{{
-    Layout = ""~/Views/Shared/_Layout_List.cshtml"";
-
-    var obj = ({entityName})Model;
-    var objStr = Html.Raw(obj.ToJson());
-}}
-
-<form id=""dataForm"" enctype=""multipart/form-data"" class=""easyui-form"" method=""post"" data-options=""novalidate:true"">
-    <table class=""table_base"">
-        <colgroup>
-            <col style=""width:80px;"" />
-        </colgroup>
-        <tbody>
-            {formRowBuilder.ToString()}
-        </tbody>
-    </table>
-</form>
-
-@section foottoolbar{{
-    <a id=""saveForm"" href=""javascript:;"" class=""easyui-linkbutton"" data-options=""iconCls:'icon-save'"">保存</a>
-}}
-
-<script>
-    var rootUrl = '@Url.Content(""~/"")';
-    var theEntity = @objStr;
-
-    $(function () {{
-        $('#saveForm').click(function () {{
-            if (!$('#dataForm').form('enableValidation').form('validate'))
-                return;
-
-            var formValues = $('#dataForm').getValues();
-            $.extend(theEntity, formValues);
-            $.postJSON(rootUrl + '{areaName}/{entityName}/SaveData', theEntity, function (resJson) {{
                 if (resJson.Success) {{
-                    parent.dialogMsg('保存成功!');
-                    parent.$('#dataTable').datagrid('clearChecked').datagrid('reload');
-                    parent.dialogClose('form');
+                    $table.bootstrapTable('refresh');
+                    dialogSuccess('删除成功!');
                 }}
                 else {{
                     dialogError(resJson.Msg);
                 }}
             }});
         }});
-    }});
+    }}
 </script>
 ";
+            string indexPath = Path.Combine(_contentRootPath, "Areas", areaName, "Views", entityName, "Index.cshtml");
+
+            FileHelper.WriteTxt(indexHtml, indexPath, FileMode.Create);
+
+            //生成Form页面
+            string formHtml =
+$@"@using Coldairarrow.Entity.{areaName};
+@using Coldairarrow.Util;
+
+@{{
+    Layout = ""~/Views/Shared/_Layout_Form.cshtml"";
+
+    var obj = ({entityName})Model;
+    var objStr = Html.Raw(obj.ToJson());
+}}
+<div style=""padding:15px;padding-right:45px;"">
+    <form id=""form"" class=""form-horizontal"" role=""form"">
+        {formRowBuilder.ToString()}
+        <div class=""form-group"">
+            <button id=""submit"" type=""submit"" class=""hidden"">提交</button>
+        </div>
+    </form>
+</div>
+<script>
+    var theEntity = @objStr;
+
+    $(function () {{
+        initEvent();
+    }});
+
+    //事件绑定
+    function initEvent() {{
+        //表单校验
+        $('#form').validator().on('submit', function (e) {{
+            //校验成功
+            if (!e.isDefaultPrevented()) {{
+                e.preventDefault();
+
+                var values = $('#form').getValues();
+                
+                $.extend(theEntity, values);
+                loading();
+                $.postJSON('/{areaName}/{entityName}/SaveData', theEntity, function (resJson) {{
+                    loading(false);
+
+                    if (resJson.Success) {{
+                        parent.$('#dataTable').bootstrapTable('refresh');
+                        parent.dialogSuccess();
+                        dialogClose();
+                    }}
+                    else {{
+                        dialogError(resJson.Msg);
+                    }}
+                }});
+            }}
+        }})
+    }}
+
+    //提交表单
+    function submitForm() {{
+        $('#submit').trigger('click');
+    }}
+</script>";
             string formPath = Path.Combine(_contentRootPath, "Areas", areaName, "Views", entityName, "Form.cshtml");
 
             FileHelper.WriteTxt(formHtml, formPath, FileMode.Create);

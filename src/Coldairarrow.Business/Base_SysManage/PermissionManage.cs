@@ -1,12 +1,11 @@
 ﻿using Coldairarrow.Business.Common;
 using Coldairarrow.Entity.Base_SysManage;
 using Coldairarrow.Util;
-using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using static Coldairarrow.Entity.Base_SysManage.EnumType;
 
 namespace Coldairarrow.Business.Base_SysManage
 {
@@ -30,20 +29,13 @@ namespace Coldairarrow.Business.Base_SysManage
 
         #region 内部成员
 
-        private static string _permissionConfigFile
-        {
-            get
-            {
-                string rootPath = AutofacHelper.GetService<IHostingEnvironment>().WebRootPath;
-                return Path.Combine(rootPath, "Config", "Permission.config");
-            }
-        }
+        private static string _permissionConfigFile { get; } = "~/Config/Permission.config";
         private static List<PermissionModule> _allPermissionModules { get; set; }
         private static List<string> _allPermissionValues { get; set; }
         private static void InitAllPermissionModules()
         {
             List<PermissionModule> resList = new List<PermissionModule>();
-            string filePath = _permissionConfigFile;
+            string filePath = PathHelper.GetAbsolutePath(_permissionConfigFile);
             XElement xe = XElement.Load(filePath);
             xe.Elements("module")?.ForEach(aModule =>
             {
@@ -59,7 +51,7 @@ namespace Coldairarrow.Business.Base_SysManage
                     newModule.Items.Add(newItem);
 
                     newItem.Name = aItem?.Attribute("name")?.Value;
-                    newItem.Value = aItem?.Attribute("value")?.Value;
+                    newItem.Value = $"{newModule.Value}.{aItem?.Attribute("value")?.Value}";
                 });
             });
 
@@ -73,7 +65,7 @@ namespace Coldairarrow.Business.Base_SysManage
             {
                 aModule.Items?.ForEach(aItem =>
                 {
-                    resList.Add($"{aModule.Value}.{aItem.Value}");
+                    resList.Add(aItem.Value);
                 });
             });
 
@@ -86,7 +78,7 @@ namespace Coldairarrow.Business.Base_SysManage
             {
                 aModule.Items?.ForEach(aItem =>
                 {
-                    aItem.IsChecked = hasPermissions.Contains($"{aModule.Value}.{aItem.Value}");
+                    aItem.IsChecked = hasPermissions.Contains(aItem.Value);
                 });
             });
 
@@ -132,9 +124,14 @@ namespace Coldairarrow.Business.Base_SysManage
         public static List<PermissionModule> GetRolePermissionModules(string roleId)
         {
             BaseBusiness<Base_PermissionRole> _db = new BaseBusiness<Base_PermissionRole>();
-            var hasPermissions = _db.GetIQueryable().Where(x => x.RoleId == roleId).Select(x => x.PermissionValue).ToList();
+            List<string> permissions = new List<string>();
+            var theRoleInfo = _db.Service.GetIQueryable<Base_SysRole>().Where(x => x.RoleId == roleId).FirstOrDefault();
+            if (theRoleInfo.RoleType == EnumType.RoleType.超级管理员)
+                permissions = _allPermissionValues.DeepClone();
+            else
+                permissions = _db.GetIQueryable().Where(x => x.RoleId == roleId).Select(x => x.PermissionValue).ToList();
 
-            return GetPermissionModules(hasPermissions);
+            return GetPermissionModules(permissions);
         }
 
         #endregion
@@ -215,7 +212,12 @@ namespace Coldairarrow.Business.Base_SysManage
         /// <returns></returns>
         public static List<PermissionModule> GetUserPermissionModules(string userId)
         {
-            var hasPermissions = GetUserPermissionValues(userId);
+            var userInfo = Base_UserBusiness.GetTheUser(userId);
+            List<string> hasPermissions = new List<string>();
+            if (userInfo.RoleType.HasFlag(RoleType.超级管理员))
+                hasPermissions = _allPermissionValues.DeepClone();
+            else
+                hasPermissions = GetUserPermissionValues(userId);
 
             return GetPermissionModules(hasPermissions);
         }
@@ -277,7 +279,7 @@ namespace Coldairarrow.Business.Base_SysManage
         }
 
         /// <summary>
-        /// 清楚所有用户权限缓存
+        /// 清除所有用户权限缓存
         /// </summary>
         public static void ClearUserPermissionCache()
         {
@@ -332,7 +334,7 @@ namespace Coldairarrow.Business.Base_SysManage
         /// <returns></returns>
         public static bool OperatorHasPermissionValue(string value)
         {
-            return GetOperatorPermissionValues().Select(x => x.ToLower()).Contains(value.ToLower());
+            return GetOperatorPermissionValues().Exists(x => x.ToLower() == value.ToLower());
         }
 
         #endregion

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -153,6 +154,28 @@ namespace Coldairarrow.Util
         public static void SetPropertyValue(this object obj, string propertyName, object value)
         {
             obj.GetType().GetProperty(propertyName, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static).SetValue(obj, value);
+        }
+
+        /// <summary>
+        /// 改变类型
+        /// </summary>
+        /// <param name="obj">原对象</param>
+        /// <param name="targetType">目标类型</param>
+        /// <returns></returns>
+        public static object ChangeType(this object obj, Type targetType)
+        {
+            object resObj = null;
+            if (targetType.IsGenericType && targetType.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
+            {
+                NullableConverter newNullableConverter = new NullableConverter(targetType);
+                resObj = newNullableConverter.ConvertFrom(obj);
+            }
+            else
+            {
+                resObj = Convert.ChangeType(obj, targetType);
+            }
+
+            return resObj;
         }
     }
 }

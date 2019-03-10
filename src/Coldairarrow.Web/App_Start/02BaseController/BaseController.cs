@@ -3,10 +3,7 @@ using Coldairarrow.Entity.Base_SysManage;
 using Coldairarrow.Util;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Primitives;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Text;
 
 namespace Coldairarrow.Web
@@ -17,6 +14,32 @@ namespace Coldairarrow.Web
     public class BaseController : Controller
     {
         /// <summary>
+        /// 执行前调用
+        /// </summary>
+        /// <param name="context">请求上下文</param>
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            base.OnActionExecuting(context);
+
+            //参数映射：支持application/json
+            var actionParameters = context.ActionDescriptor.Parameters;
+            var allParamters = HttpHelper.GetAllRequestParams(context.HttpContext);
+            var actionArguments = context.ActionArguments;
+            actionParameters.ForEach(aParamter =>
+            {
+                string key = aParamter.Name;
+                if (allParamters.ContainsKey(key))
+                {
+                    actionArguments[key] = allParamters[key]?.ToString()?.ChangeType(aParamter.ParameterType);
+                }
+                else
+                {
+                    actionArguments[key] = allParamters.ToJson().ToObject(aParamter.ParameterType);
+                }
+            });
+        }
+
+        /// <summary>
         /// 在调用操作方法后调用
         /// </summary>
         /// <param name="filterContext">请求上下文</param>
@@ -25,40 +48,6 @@ namespace Coldairarrow.Web
             context.HttpContext.Response.Headers.Add("Access-Control-Allow-Origin", "*");
             context.HttpContext.Response.Headers.Add("Access-Control-Allow-Headers", "*");
             context.HttpContext.Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-
-            //参数映射：支持application/json
-
-            var actionParameters = context.ActionDescriptor.Parameters;
-            var paramterObjs = (Dictionary<string, StringValues>)context.HttpContext.Request.Query.GetPropertyValue("Store");
-            if (paramterObjs == null)
-                context.HttpContext.Request.Query.SetPropertyValue("Store", new Dictionary<string, StringValues>());
-            var allParamters = HttpHelper.GetAllRequestParams(context.HttpContext);
-            actionParameters.ForEach(aParamter =>
-            {
-                string key = aParamter.Name;
-                object value = null;
-                try
-                {
-                    value = paramterObjs[key];
-                }
-                catch
-                {
-
-                }
-                if (value.IsNullOrEmpty() && allParamters.ContainsKey(key))
-                {
-                    if (allParamters[key] != null)
-                        paramterObjs[key] = new StringValues(allParamters[key]?.ToString());
-                }
-                    //if (allParamters.ContainsKey(key))
-                    //{
-                    //    if (allParamters[key] != null)
-                    //        aParamter.BindingInfo
-                    //        //actionParameters[key] = allParamters[key]?.ToJson().ToObject(aParamter.ParameterType);
-                    //}
-                });
-
-            string str = string.Empty;
         }
 
         /// <summary>

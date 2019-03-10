@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Coldairarrow.Util;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Coldairarrow.Web
 {
@@ -14,10 +15,9 @@ namespace Coldairarrow.Web
             return View();
         }
 
-        [CheckParamNotEmpty("name","sex")]
-        public IActionResult Test()
+        public IActionResult Test(string name,int age)
         {
-            return Success();
+            return Content(new { name, age }.ToJson());
         }
     }
 }

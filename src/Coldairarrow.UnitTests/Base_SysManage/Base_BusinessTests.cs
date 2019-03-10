@@ -364,13 +364,19 @@ namespace Coldairarrow.UnitTests
             distributedTransaction.BeginTransaction();
             _bus1.ExecuteSql("insert into Base_UnitTest(Id) values('10') ");
             _bus1.Insert(data1);
-            _bus1.Insert(data2);
+            _bus1.Insert(data3);
             _bus2.Insert(data1);
-            _bus2.Insert(data3);
+            _bus2.Insert(data2);
             bool succcess = distributedTransaction.EndTransaction();
+            int count1 = _bus1.GetIQueryable().Count();
+            int count2 = _bus2.GetIQueryable().Count();
             Assert.AreEqual(succcess, false);
+            Assert.AreEqual(count1, 0);
+            Assert.AreEqual(count2, 0);
 
             //成功事务
+            _bus1.DeleteAll();
+            _bus2.DeleteAll();
             distributedTransaction = new DistributedTransaction(_bus1.Service, _bus2.Service);
             distributedTransaction.BeginTransaction();
             _bus1.ExecuteSql("insert into Base_UnitTest(Id) values('10') ");
@@ -379,8 +385,8 @@ namespace Coldairarrow.UnitTests
             _bus2.Insert(data1);
             _bus2.Insert(data3);
             succcess = distributedTransaction.EndTransaction();
-            int count1 = _bus1.GetIQueryable().Count();
-            int count2 = _bus2.GetIQueryable().Count();
+            count1 = _bus1.GetIQueryable().Count();
+            count2 = _bus2.GetIQueryable().Count();
             Assert.AreEqual(succcess, true);
             Assert.AreEqual(count1, 3);
             Assert.AreEqual(count2, 2);

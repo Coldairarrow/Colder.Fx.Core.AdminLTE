@@ -59,15 +59,7 @@ namespace Coldairarrow.Util
                         if (dbValue != null)
                         {
                             Type memberType = theField.FieldType;
-                            if (memberType.IsGenericType && memberType.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
-                            {
-                                NullableConverter newNullableConverter = new NullableConverter(memberType);
-                                dbValue = newNullableConverter.ConvertFrom(dbValue);
-                            }
-                            else
-                            {
-                                dbValue = Convert.ChangeType(dbValue, memberType);
-                            }
+                            dbValue = dbValue.ChangeType(memberType);
                         }
                         theField.SetValue(_t, dbValue);
                     }

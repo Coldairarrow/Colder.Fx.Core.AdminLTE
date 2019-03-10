@@ -213,9 +213,9 @@ namespace Coldairarrow.Util
             {
                 object value = null;
                 if (request.Query.ContainsKey(aParam))
-                    value = request.Query[aParam];
+                    value = request.Query[aParam].ToString();
                 else if (request.Form.ContainsKey(aParam))
-                    value = request.Form[aParam];
+                    value = request.Form[aParam].ToString();
 
                 allParams.Add(aParam, value);
             });
@@ -233,7 +233,6 @@ namespace Coldairarrow.Util
                     foreach (var aProperty in obj)
                     {
                         allParams[aProperty.Key] = aProperty.Value;
-                        //allParams.Add(aProperty.Key, aProperty.Value);
                     }
                 }
             }

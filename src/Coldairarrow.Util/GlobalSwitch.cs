@@ -24,7 +24,7 @@ namespace Coldairarrow.Util
         /// <summary>
         /// 项目名
         /// </summary>
-        public static string ProjectName { get; } = "Coldairarrow.Fx.Core.Easyui.GitHub";
+        public static string ProjectName { get; } = "Colder.Fx.Core.AdminLTE";
 
         /// <summary>
         /// 网站根地址
@@ -38,7 +38,7 @@ namespace Coldairarrow.Util
         /// <summary>
         /// 运行模式
         /// </summary>
-        public static RunModel RunModel { get; } = RunModel.LocalTest;
+        public static RunModel RunModel { get; } = RunModel.Publish;
 
         /// <summary>
         /// 网站文件根路径
