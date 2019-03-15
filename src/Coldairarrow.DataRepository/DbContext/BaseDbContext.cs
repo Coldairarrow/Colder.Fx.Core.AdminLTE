@@ -57,7 +57,7 @@ namespace Coldairarrow.DataRepository
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             var entityMethod = typeof(ModelBuilder).GetMethod("Entity", new Type[] { });
             List<Type> types = Assembly.Load("Coldairarrow.Entity").GetTypes()
-                .Where(x => x.GetCustomAttribute(typeof(TableAttribute)) != null && x.FullName.Contains(_entityNamespace))
+                .Where(x => x.GetCustomAttribute(typeof(TableAttribute), false) != null && x.FullName.Contains(_entityNamespace))
                 .ToList();
 
             foreach (var type in types)
