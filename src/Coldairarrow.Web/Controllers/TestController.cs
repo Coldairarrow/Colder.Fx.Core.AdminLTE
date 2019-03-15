@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Coldairarrow.Web
 {
+    //[CheckUrlPermission]
     public class TestController : BaseController
     {
         public ActionResult Index()
