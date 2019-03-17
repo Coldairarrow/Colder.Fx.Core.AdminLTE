@@ -47,7 +47,8 @@ $('#roleList').selectpicker({
                 data: [],
                 valueField: 'value',
                 textField: 'text',
-                onSelect: null
+                onSelect: null,
+                pleaseSelect: true
             };
             var _options = $.extend(defaults, options);
             $(_this)._selectpicker(_options);
@@ -100,6 +101,11 @@ $('#roleList').selectpicker({
                     var selectedHtml = ''
                     if (selected.indexOf(value) > -1) {
                         selectedHtml = 'selected="selected"';
+                    }
+
+                    //添加请选择
+                    if (_options.pleaseSelect) {
+                        $(_this).append("<option>请选择</option>");
                     }
 
                     $(_this).append("<option " + selectedHtml + " value=" + value + ">" + text + "</option>");
