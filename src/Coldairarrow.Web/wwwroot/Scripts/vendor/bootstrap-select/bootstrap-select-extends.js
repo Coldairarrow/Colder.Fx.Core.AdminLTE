@@ -40,7 +40,16 @@ $('#roleList').selectpicker({
             init(options);
         }
 
+
         function init(options) {
+            var pleaseSelect = false;
+            //只有远程并单选时添加“请选择”选项
+            if (options.url) {
+                if (!$(_this)[0].multiple) {
+                    pleaseSelect = true;
+                }
+            }
+
             var defaults = {
                 value: [],
                 url: null,
@@ -48,9 +57,10 @@ $('#roleList').selectpicker({
                 valueField: 'value',
                 textField: 'text',
                 onSelect: null,
-                pleaseSelect: true
+                pleaseSelect: pleaseSelect
             };
             var _options = $.extend(defaults, options);
+
             $(_this)._selectpicker(_options);
             _options.value = initValue(_options.value);
 
