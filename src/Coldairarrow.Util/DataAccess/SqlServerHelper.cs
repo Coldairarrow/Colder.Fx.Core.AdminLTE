@@ -35,6 +35,7 @@ namespace Coldairarrow.Util
             { "char", typeof(string) },
             { "date", typeof(DateTime) },
             { "datetime", typeof(DateTime) },
+            { "datetime2", typeof(DateTime) },
             { "decimal", typeof(decimal) },
             { "float", typeof(double) },
             { "image", typeof(byte[]) },

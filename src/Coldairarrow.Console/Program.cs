@@ -1,4 +1,9 @@
-﻿using System;
+﻿using Coldairarrow.DataRepository;
+using Coldairarrow.Entity.Base_SysManage;
+using System;
+using System.Linq.Expressions;
+using Coldairarrow.Util;
+using System.Linq;
 
 namespace Coldairarrow.ConsoleApp
 {
@@ -6,7 +11,7 @@ namespace Coldairarrow.ConsoleApp
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("完成");
+
             Console.ReadLine();
         }
     }

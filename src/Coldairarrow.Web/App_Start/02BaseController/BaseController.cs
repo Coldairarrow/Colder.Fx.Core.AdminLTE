@@ -4,6 +4,7 @@ using Coldairarrow.Util;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
+using System.Linq;
 using System.Text;
 
 namespace Coldairarrow.Web
@@ -34,7 +35,14 @@ namespace Coldairarrow.Web
                 }
                 else
                 {
-                    actionArguments[key] = allParamters.ToJson().ToObject(aParamter.ParameterType);
+                    try
+                    {
+                        actionArguments[key] = allParamters.ToJson().ToObject(aParamter.ParameterType);
+                    }
+                    catch
+                    {
+
+                    }
                 }
             });
         }
