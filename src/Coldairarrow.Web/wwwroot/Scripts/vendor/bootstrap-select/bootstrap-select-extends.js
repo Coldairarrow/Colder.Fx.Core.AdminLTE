@@ -104,6 +104,10 @@ $('#roleList').selectpicker({
                 var data = _options.data;
                 var selected = _options.value || [];
                 $(_this).empty();
+                //添加请选择
+                if (_options.pleaseSelect) {
+                    $(_this).append("<option>请选择</option>");
+                }
                 for (var i = 0; i < data.length; i++) {
                     var text = data[i][_options.textField];
                     var value = data[i][_options.valueField];
@@ -111,11 +115,6 @@ $('#roleList').selectpicker({
                     var selectedHtml = ''
                     if (selected.indexOf(value) > -1) {
                         selectedHtml = 'selected="selected"';
-                    }
-
-                    //添加请选择
-                    if (_options.pleaseSelect) {
-                        $(_this).append("<option>请选择</option>");
                     }
 
                     $(_this).append("<option " + selectedHtml + " value=" + value + ">" + text + "</option>");
