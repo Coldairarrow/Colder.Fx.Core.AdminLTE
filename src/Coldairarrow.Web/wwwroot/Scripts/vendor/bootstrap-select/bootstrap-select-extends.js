@@ -106,7 +106,7 @@ $('#roleList').selectpicker({
                 $(_this).empty();
                 //添加请选择
                 if (_options.pleaseSelect) {
-                    $(_this).append("<option>请选择</option>");
+                    $(_this).append('<option value="">请选择</option>');
                 }
                 for (var i = 0; i < data.length; i++) {
                     var text = data[i][_options.textField];
