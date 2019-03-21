@@ -45,7 +45,7 @@ namespace Coldairarrow.Util
             if (!redisValue.HasValue)
                 return null;
             ValueInfoEntry valueEntry = redisValue.ToString().ToObject<ValueInfoEntry>();
-            if (valueEntry.TypeName == typeof(string).FullName)
+            if (valueEntry.TypeName == typeof(string).AssemblyQualifiedName)
                 value = valueEntry.Value;
             else
                 value = valueEntry.Value.ToObject(Type.GetType(valueEntry.TypeName));
@@ -97,7 +97,7 @@ namespace Coldairarrow.Util
             ValueInfoEntry entry = new ValueInfoEntry
             {
                 Value = jsonStr,
-                TypeName = value.GetType().FullName,
+                TypeName = value.GetType().AssemblyQualifiedName,
                 ExpireTime = timeout,
                 ExpireType = expireType
             };

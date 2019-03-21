@@ -62,7 +62,7 @@ namespace Coldairarrow.Web
         /// 保存
         /// </summary>
         /// <param name="theData">保存的数据</param>
-        public ActionResult SaveData(Base_User theData,string Pwd, string RoleIdList)
+        public ActionResult SaveData(Base_User theData, string Pwd, string RoleIdList)
         {
             if (!Pwd.IsNullOrEmpty())
                 theData.Password = Pwd.ToMD5String();
@@ -71,7 +71,7 @@ namespace Coldairarrow.Web
             if (theData.Id.IsNullOrEmpty())
             {
                 theData.Id = Guid.NewGuid().ToSequentialGuid();
-                theData.UserId= Guid.NewGuid().ToSequentialGuid();
+                theData.UserId = Guid.NewGuid().ToSequentialGuid();
 
                 _base_UserBusiness.AddData(theData);
             }

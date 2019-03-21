@@ -1,4 +1,3 @@
-using Coldairarrow.Business.Cache;
 using Coldairarrow.Entity.Base_SysManage;
 using Coldairarrow.Util;
 using System;
@@ -10,7 +9,6 @@ namespace Coldairarrow.Business.Base_SysManage
 {
     public class Base_SysRoleBusiness : BaseBusiness<Base_SysRole>
     {
-        static Base_SysRoleCache _cache { get; } = new Base_SysRoleCache();
         #region 外部接口
 
         /// <summary>
@@ -40,11 +38,6 @@ namespace Coldairarrow.Business.Base_SysManage
             return GetEntity(id);
         }
 
-        public static string GetRoleName(string userId)
-        {
-            return _cache.GetCache(userId)?.RoleName;
-        }
-
         /// <summary>
         /// 添加数据
         /// </summary>
@@ -60,7 +53,6 @@ namespace Coldairarrow.Business.Base_SysManage
         public void UpdateData(Base_SysRole theData)
         {
             Update(theData);
-            _cache.UpdateCache(theData.RoleId);
         }
 
         /// <summary>
@@ -69,10 +61,7 @@ namespace Coldairarrow.Business.Base_SysManage
         /// <param name="theData">删除的数据</param>
         public void DeleteData(List<string> ids)
         {
-            var roleIds = GetIQueryable().Where(x => ids.Contains(x.RoleId)).Select(x => x.RoleId).ToList();
-            //删除角色
             Delete(ids);
-            _cache.UpdateCache(roleIds);
         }
 
         /// <summary>
@@ -80,7 +69,7 @@ namespace Coldairarrow.Business.Base_SysManage
         /// </summary>
         /// <param name="roleId">角色Id</param>
         /// <param name="permissions">权限值</param>
-        public void SavePermission(string roleId,List<string> permissions)
+        public void SavePermission(string roleId, List<string> permissions)
         {
             Service.Delete<Base_PermissionRole>(x => x.RoleId == roleId);
             List<Base_PermissionRole> insertList = new List<Base_PermissionRole>();
@@ -88,9 +77,9 @@ namespace Coldairarrow.Business.Base_SysManage
             {
                 insertList.Add(new Base_PermissionRole
                 {
-                    Id=Guid.NewGuid().ToSequentialGuid(),
-                    RoleId=roleId,
-                    PermissionValue=newPermission
+                    Id = Guid.NewGuid().ToSequentialGuid(),
+                    RoleId = roleId,
+                    PermissionValue = newPermission
                 });
             });
 

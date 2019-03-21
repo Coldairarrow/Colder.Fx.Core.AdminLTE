@@ -71,7 +71,7 @@ namespace Coldairarrow.Util
         /// <summary>
         /// Redis配置字符串
         /// </summary>
-        public static string RedisConfig { get; } = null /*"localhost:6379,password=123456"*/;
+        public static string RedisConfig { get; } = null /*"localhost:6379"*/;
 
         #endregion
 
