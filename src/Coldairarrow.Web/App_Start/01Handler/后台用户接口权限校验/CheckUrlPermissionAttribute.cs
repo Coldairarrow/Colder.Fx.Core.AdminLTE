@@ -32,7 +32,7 @@ namespace Coldairarrow.Web
 
             var allUrlPermissions = UrlPermissionManage.GetAllUrlPermissions();
             string requestUrl = filterContext.HttpContext.Request.Path;
-            var thePermission = allUrlPermissions.Where(x => requestUrl.Contains(x.Url.ToLower())).FirstOrDefault();
+            var thePermission = allUrlPermissions.Where(x => requestUrl.ToLower().Contains(x.Url.ToLower())).FirstOrDefault();
             if (thePermission == null)
                 return;
             string needPermission = thePermission.PermissionValue;
