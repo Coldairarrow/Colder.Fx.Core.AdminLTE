@@ -439,7 +439,10 @@ namespace Coldairarrow.DataRepository
         /// <returns></returns>
         public T GetEntity<T>(params object[] keyValue) where T : class, new()
         {
-            return Db.Set<T>().Find(keyValue);
+            var entity = Db.Set<T>().Find(keyValue);
+            Db.Entry(entity).State = EntityState.Detached;
+
+            return entity;
         }
 
         /// <summary>
