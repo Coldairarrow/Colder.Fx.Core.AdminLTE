@@ -23,28 +23,32 @@ namespace Coldairarrow.Web
             base.OnActionExecuting(context);
 
             //参数映射：支持application/json
-            var actionParameters = context.ActionDescriptor.Parameters;
-            var allParamters = HttpHelper.GetAllRequestParams(context.HttpContext);
-            var actionArguments = context.ActionArguments;
-            actionParameters.ForEach(aParamter =>
+            string contentType = context.HttpContext.Request.ContentType;
+            if (!contentType.IsNullOrEmpty() && contentType.Contains("application/json"))
             {
-                string key = aParamter.Name;
-                if (allParamters.ContainsKey(key))
+                var actionParameters = context.ActionDescriptor.Parameters;
+                var allParamters = HttpHelper.GetAllRequestParams(context.HttpContext);
+                var actionArguments = context.ActionArguments;
+                actionParameters.ForEach(aParamter =>
                 {
-                    actionArguments[key] = allParamters[key]?.ToString()?.ChangeType(aParamter.ParameterType);
-                }
-                else
-                {
-                    try
+                    string key = aParamter.Name;
+                    if (allParamters.ContainsKey(key))
                     {
-                        actionArguments[key] = allParamters.ToJson().ToObject(aParamter.ParameterType);
+                        actionArguments[key] = allParamters[key]?.ToString()?.ChangeType(aParamter.ParameterType);
                     }
-                    catch
+                    else
                     {
+                        try
+                        {
+                            actionArguments[key] = allParamters.ToJson().ToObject(aParamter.ParameterType);
+                        }
+                        catch
+                        {
 
+                        }
                     }
-                }
-            });
+                });
+            }
         }
 
         /// <summary>
