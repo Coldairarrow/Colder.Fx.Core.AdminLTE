@@ -218,8 +218,8 @@ namespace Coldairarrow.Util
 
         #region BootstrapTable方案
 
-        public int offset { get => (_pageIndex - 1) * limit; set => _pageIndex = value / limit + 1; }
-
+        public int pageNumber { get => _pageIndex; set => _pageIndex = value; }
+        public int pageSize { get => _pageRows; set => _pageRows = value; }
         public object BuildTableResult_BootstrapTable(object dataList)
         {
             return BuildTableResult_DataGrid(dataList);
