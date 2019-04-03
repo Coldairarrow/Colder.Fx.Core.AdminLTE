@@ -57,7 +57,8 @@ $('#roleList').selectpicker({
                 valueField: 'value',
                 textField: 'text',
                 onSelect: null,
-                pleaseSelect: pleaseSelect
+                pleaseSelect: pleaseSelect,
+                onLoadSuccess: null
             };
             var _options = $.extend(defaults, options);
 
@@ -72,6 +73,9 @@ $('#roleList').selectpicker({
                 getData(function () {
                     renderHtml();
                     bindEvent();
+                    if (_options.onLoadSuccess) {
+                        _options.onLoadSuccess();
+                    }
                 });
             }
 
@@ -108,11 +112,14 @@ $('#roleList').selectpicker({
                 if (_options.pleaseSelect) {
                     $(_this).append('<option value="">请选择</option>');
                 }
+                var multiple = $(_this).prop('multiple');
                 for (var i = 0; i < data.length; i++) {
+
                     var text = data[i][_options.textField];
                     var value = data[i][_options.valueField];
 
-                    var selectedHtml = ''
+                    var selectedHtml = '';
+
                     if (selected.indexOf(value) > -1) {
                         selectedHtml = 'selected="selected"';
                     }
@@ -152,7 +159,11 @@ $('#roleList').selectpicker({
                         getOption().data = resJson || [];
                         next();
                     });
-                } else {//本地数据
+                }
+                else if (getOption().data && getOption().data.length > 0) {
+                    next();
+                }
+                else {//本地数据
                     getOption().data = [];
                     $(_this).find('option').each(function () {
                         getOption().data.push({
