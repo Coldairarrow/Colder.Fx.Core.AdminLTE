@@ -12,7 +12,6 @@ namespace Coldairarrow.Web
     /// </summary>
     public class CheckSignAttribute : Attribute, IActionFilter
     {
-        private CheckSignBusiness _checkSignBusiness { get; } = new CheckSignBusiness();
 
         /// <summary>
         /// Action执行之前执行
@@ -20,6 +19,8 @@ namespace Coldairarrow.Web
         /// <param name="filterContext"></param>
         public void OnActionExecuting(ActionExecutingContext filterContext)
         {
+            CheckSignBusiness _checkSignBusiness = new CheckSignBusiness();
+
             //若为本地测试，则不需要校验
             if (GlobalSwitch.RunModel == RunModel.LocalTest)
             {
