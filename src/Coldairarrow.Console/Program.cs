@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using Coldairarrow.Util;
 using System.Linq;
 
-namespace Coldairarrow.ConsoleApp
+namespace Coldairarrow.Console1
 {
     class Program
     {

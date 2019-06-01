@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>Coldairarrow.ConsoleApp</AssemblyName>
-    <RootNamespace>Coldairarrow.ConsoleApp</RootNamespace>
+    <RootNamespace>Coldairarrow.Console1</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
