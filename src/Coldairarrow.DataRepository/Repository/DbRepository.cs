@@ -229,7 +229,8 @@ namespace Coldairarrow.DataRepository
         /// <param name="entity">实体</param>
         public void Insert<T>(T entity) where T : class, new()
         {
-            Db.Add(entity);
+            Db.Entry(entity).State = EntityState.Added;
+            //Db.Add(entity);
             Commit();
         }
 

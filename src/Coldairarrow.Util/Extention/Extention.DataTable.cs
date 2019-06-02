@@ -59,7 +59,7 @@ namespace Coldairarrow.Util
                         if (dbValue != null)
                         {
                             Type memberType = theField.FieldType;
-                            dbValue = dbValue.ChangeType(memberType);
+                            dbValue = dbValue.ChangeType_ByConvert(memberType);
                         }
                         theField.SetValue(_t, dbValue);
                     }
@@ -73,15 +73,7 @@ namespace Coldairarrow.Util
                         if (dbValue != null)
                         {
                             Type memberType = theProperty.PropertyType;
-                            if (memberType.IsGenericType && memberType.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
-                            {
-                                NullableConverter newNullableConverter = new NullableConverter(memberType);
-                                dbValue = newNullableConverter.ConvertFrom(dbValue);
-                            }
-                            else
-                            {
-                                dbValue = Convert.ChangeType(dbValue, memberType);
-                            }
+                            dbValue = dbValue.ChangeType_ByConvert(memberType);
                         }
                         theProperty.SetValue(_t, dbValue);
                     }
@@ -164,5 +156,7 @@ namespace Coldairarrow.Util
 
             return sb.ToString();
         }
+
+
     }
 }

@@ -157,14 +157,25 @@ namespace Coldairarrow.Util
         }
 
         /// <summary>
+        /// 改变实体类型
+        /// </summary>
+        /// <param name="obj">对象</param>
+        /// <param name="targetType">目标类型</param>
+        /// <returns></returns>
+        public static object ChangeType(this object obj, Type targetType)
+        {
+            return obj.ToJson().ToObject(targetType);
+        }
+
+        /// <summary>
         /// 改变类型
         /// </summary>
         /// <param name="obj">原对象</param>
         /// <param name="targetType">目标类型</param>
         /// <returns></returns>
-        public static object ChangeType(this object obj, Type targetType)
+        public static object ChangeType_ByConvert(this object obj, Type targetType)
         {
-            object resObj = null;
+            object resObj;
             if (targetType.IsGenericType && targetType.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
             {
                 NullableConverter newNullableConverter = new NullableConverter(targetType);

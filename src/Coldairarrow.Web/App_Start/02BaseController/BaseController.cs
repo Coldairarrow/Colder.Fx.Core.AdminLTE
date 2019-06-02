@@ -34,7 +34,7 @@ namespace Coldairarrow.Web
                     string key = aParamter.Name;
                     if (allParamters.ContainsKey(key))
                     {
-                        actionArguments[key] = allParamters[key]?.ToString()?.ChangeType(aParamter.ParameterType);
+                        actionArguments[key] = allParamters[key]?.ToString()?.ChangeType_ByConvert(aParamter.ParameterType);
                     }
                     else
                     {

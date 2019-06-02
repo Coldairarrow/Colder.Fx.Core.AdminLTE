@@ -175,6 +175,20 @@ namespace Coldairarrow.Util
         }
 
         /// <summary>
+        /// string转long
+        /// </summary>
+        /// <param name="str">字符串</param>
+        /// <returns></returns>
+        public static long ToLong(this string str)
+        {
+            str = str.Replace("\0", "");
+            if (string.IsNullOrEmpty(str))
+                return 0;
+
+            return Convert.ToInt64(str);
+        }
+
+        /// <summary>
         /// 二进制字符串转为Int
         /// </summary>
         /// <param name="str">二进制字符串</param>

@@ -88,6 +88,13 @@ namespace Coldairarrow.Util
         public static Uri[] ElasticSearchNodes { get; set; } = new Uri[] { new Uri("http://localhost:9200/") };
 
         #endregion
+
+        #region 雪花Id配置
+
+        public static long DatacenterId { get => ConfigHelper.GetValue("DatacenterId").ToString().ToLong(); }
+        public static long WorkerId { get => ConfigHelper.GetValue("WorkerId").ToString().ToLong(); }
+
+        #endregion
     }
 
     /// <summary>
