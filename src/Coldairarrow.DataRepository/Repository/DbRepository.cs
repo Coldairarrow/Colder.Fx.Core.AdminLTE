@@ -229,6 +229,13 @@ namespace Coldairarrow.DataRepository
         /// <param name="entity">实体</param>
         public void Insert<T>(T entity) where T : class, new()
         {
+            var type = entity.GetType();
+            if (!BaseDbContext._modelTypes.Contains(type))
+                BaseDbContext._modelTypes.Add(type);
+            //if (BaseDbContext._model.FindRuntimeEntityType(typeof(T))==null)
+            //{
+            //    BaseDbContext._model.AddEntityType(typeof(T));
+            //}
             Db.Entry(entity).State = EntityState.Added;
             //Db.Add(entity);
             Commit();

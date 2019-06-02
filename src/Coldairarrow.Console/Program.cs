@@ -31,19 +31,29 @@ namespace Coldairarrow.Console1
         static void Main(string[] args)
         {
             var db1 = DbFactory.GetRepository();
-            var db2 = DbFactory.GetRepository("MySQL", DatabaseType.MySql);
-            db1.GetList<Base_UnitTest>();
-            db1.GetList<Base_UnitTest>();
-            //Base_UnitTest data = new Base_UnitTest
-            //{
-            //    Id = IdHelper.GetId(),
-            //    UserId = IdHelper.GetId(),
-            //    Age = 10,
-            //    UserName = IdHelper.GetId()
-            //};
-            //var targetType = MapTable(typeof(Base_UnitTest), "Base_UnitTest_0");
-            //var targetObj = data.ChangeType(targetType);
-            //db.Insert(targetObj);
+            db1 = DbFactory.GetRepository();
+            //var db2 = DbFactory.GetRepository("MySQL", DatabaseType.MySql);
+            //var list1 = db1.GetList<Base_UnitTest>();
+            //var list2 = db1.GetList<Base_UnitTest>();
+
+            Base_UnitTest data = new Base_UnitTest
+            {
+                Id = IdHelper.GetId(),
+                UserId = IdHelper.GetId(),
+                Age = 10,
+                UserName = IdHelper.GetId(),
+            };
+            var targetType = MapTable(typeof(Base_UnitTest), "Base_UnitTest_0");
+            var targetObj = data.ChangeType(targetType);
+            db1.Insert(data);
+            try
+            {
+                db1.Insert(targetObj);
+            }
+            catch (Exception ex)
+            {
+                string str = string.Empty;
+            }
 
             Console.WriteLine("完成");
             Console.ReadLine();
