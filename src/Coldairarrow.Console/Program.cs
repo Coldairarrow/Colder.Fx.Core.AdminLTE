@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using Coldairarrow.Util;
 using System.Linq;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Collections.Concurrent;
 
 namespace Coldairarrow.Console1
 {
@@ -54,6 +55,7 @@ namespace Coldairarrow.Console1
             {
                 string str = string.Empty;
             }
+            ConcurrentBag<string> bag = new ConcurrentBag<string>();
 
             Console.WriteLine("完成");
             Console.ReadLine();

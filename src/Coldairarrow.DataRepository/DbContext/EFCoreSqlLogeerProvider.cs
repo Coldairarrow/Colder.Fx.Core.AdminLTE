@@ -6,11 +6,15 @@ namespace Coldairarrow.DataRepository
 {
     public class EFCoreSqlLogeerProvider : ILoggerProvider
     {
-        public static Action<string> HandleSqlLog { get; set; }
+        public EFCoreSqlLogeerProvider(LoggerHandlerContainer loggerHandlerContainer)
+        {
+            _loggerHandlerContainer = loggerHandlerContainer;
+        }
+        private LoggerHandlerContainer _loggerHandlerContainer { get; set; }
 
         public ILogger CreateLogger(string categoryName)
         {
-            return new MyLogger();
+            return new MyLogger(_loggerHandlerContainer);
         }
 
         public void Dispose()
@@ -18,6 +22,11 @@ namespace Coldairarrow.DataRepository
 
         private class MyLogger : ILogger
         {
+            public MyLogger(LoggerHandlerContainer loggerHandlerContainer)
+            {
+                _loggerHandlerContainer = loggerHandlerContainer;
+            }
+            private LoggerHandlerContainer _loggerHandlerContainer { get; set; }
             public bool IsEnabled(LogLevel logLevel)
             {
                 return true;
@@ -29,7 +38,7 @@ namespace Coldairarrow.DataRepository
                 if (eventId.Id == RelationalEventId.CommandExecuted.Id)
                 {
                     string logContent = formatter(state, exception);
-                    HandleSqlLog?.Invoke(logContent);
+                    _loggerHandlerContainer.HandleSqlLog?.Invoke(logContent);
                 }
             }
 
@@ -37,6 +46,11 @@ namespace Coldairarrow.DataRepository
             {
                 return null;
             }
+        }
+
+        public class LoggerHandlerContainer
+        {
+            public Action<string> HandleSqlLog { get; set; }
         }
     }
 }

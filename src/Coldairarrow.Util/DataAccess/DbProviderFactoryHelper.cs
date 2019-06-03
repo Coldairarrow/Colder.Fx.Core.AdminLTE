@@ -167,6 +167,22 @@ namespace Coldairarrow.Util
             return conStr;
         }
 
+        /// <summary>
+        /// 获取数据库连接对象
+        /// </summary>
+        /// <param name="conStr">连接字符串</param>
+        /// <param name="dbType">数据库类型</param>
+        /// <returns></returns>
+        public static DbConnection GetDbConnection(string conStr, DatabaseType dbType)
+        {
+            if (conStr.IsNullOrEmpty())
+                conStr = GlobalSwitch.DefaultDbConName;
+            DbConnection dbConnection = GetDbConnection(dbType);
+            dbConnection.ConnectionString = GetConStr(conStr);
+
+            return dbConnection;
+        }
+
         #endregion
     }
 }

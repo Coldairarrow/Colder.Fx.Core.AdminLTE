@@ -1,9 +1,9 @@
 ﻿using Coldairarrow.Util;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using System;
 using System.Data.Common;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
 
 namespace Coldairarrow.DataRepository
 {
@@ -20,7 +20,7 @@ namespace Coldairarrow.DataRepository
         /// <param name="conString">数据库连接名或连接字符串</param>
         /// <param name="dbType">数据库类型</param>
         /// <param name="entityNamespace">数据库实体命名空间,注意,该命名空间应该包含所有需要的数据库实体</param>
-        public RepositoryDbContext(string conString, DatabaseType dbType, string entityNamespace)
+        public RepositoryDbContext(string conString, DatabaseType dbType)
         {
             _conString = conString;
             _dbType = dbType;
@@ -41,18 +41,18 @@ namespace Coldairarrow.DataRepository
             if (_transaction != null)
                 con = _transaction.Connection;
             else
-                con = _db?.Database?.Connection ?? DbProviderFactoryHelper.GetDbConnection(_conString, _dbType);
+                con = _db?.Database?.GetDbConnection() ?? DbProviderFactoryHelper.GetDbConnection(_conString, _dbType);
 
             var dBCompiledModel = DbModelFactory.GetDbCompiledModel(_conString, _dbType);
-            _db = new BaseDbContext(con, dBCompiledModel);
+            _db = new BaseDbContext(_dbType,con, dBCompiledModel);
             _db.Database.UseTransaction(_transaction);
-            _db.Database.Log = HandleSqlLog;
+            _db.HandleSqlLog= HandleSqlLog;
             disposedValue = false;
         }
 
         public DatabaseFacade Database => _db.Database;
 
-        public DbEntityEntry Entry(object entity)
+        public EntityEntry Entry(object entity)
         {
             object targetObj = null;
             var type = entity.GetType();
@@ -65,17 +65,12 @@ namespace Coldairarrow.DataRepository
             return _db.Entry(targetObj);
         }
 
-        public DbEntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class
-        {
-            return Entry(entity as object).Cast<TEntity>();
-        }
-
         public DbSet<TEntity> Set<TEntity>() where TEntity : class
         {
-            return _db.Set(typeof(TEntity)).Cast<TEntity>();
+            return _db.Set<TEntity>();
         }
 
-        public DbSet Set(Type entityType)
+        public DbSet<object> Set(Type entityType)
         {
             var targetModel = CheckModel(entityType);
 
@@ -102,11 +97,11 @@ namespace Coldairarrow.DataRepository
             if (_transaction == transaction)
                 return;
 
-            if (_transaction == null && _db.Database.Connection == transaction.Connection)
+            if (_transaction == null && _db.Database.GetDbConnection() == transaction.Connection)
             {
                 _transaction = transaction;
             }
-            if (_transaction == null && _db.Database.Connection != transaction.Connection)
+            if (_transaction == null && _db.Database.GetDbConnection() != transaction.Connection)
             {
                 _transaction = transaction;
                 RefreshDb();
@@ -118,7 +113,7 @@ namespace Coldairarrow.DataRepository
         #region 私有成员
 
         private DbTransaction _transaction { get; set; }
-        private DbContext _db { get; set; }
+        private BaseDbContext _db { get; set; }
         private DatabaseType _dbType { get; }
         private string _conString { get; }
         private Type CheckModel(Type type)
