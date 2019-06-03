@@ -187,7 +187,7 @@ namespace Coldairarrow.Business.Base_SysManage
             BaseBusiness<Base_UnitTest> _db = new BaseBusiness<Base_UnitTest>();
             var Service = _db.Service;
 
-            Service.Delete_Sql<Base_PermissionAppId>(x => x.AppId == appId);
+            Service.Delete<Base_PermissionAppId>(x => x.AppId == appId);
 
             List<Base_PermissionAppId> insertList = new List<Base_PermissionAppId>();
             permissions.ForEach(newPermission =>
@@ -254,7 +254,7 @@ namespace Coldairarrow.Business.Base_SysManage
             BaseBusiness<Base_UnitTest> _db = new BaseBusiness<Base_UnitTest>();
             var Service = _db.Service;
 
-            Service.Delete_Sql<Base_PermissionUser>(x => x.UserId == userId);
+            Service.Delete<Base_PermissionUser>(x => x.UserId == userId);
             var roleIdList = _db.Service.GetIQueryable<Base_UserRoleMap>().Where(x => x.UserId == userId).Select(x => x.RoleId).ToList();
             var existsPermissions = Service.GetIQueryable<Base_PermissionRole>()
                 .Where(x => roleIdList.Contains(x.RoleId) && permissions.Contains(x.PermissionValue))

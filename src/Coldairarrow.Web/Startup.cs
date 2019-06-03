@@ -1,6 +1,8 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Autofac.Extras.DynamicProxy;
+using AutoMapper;
+using Coldairarrow.Business.Base_SysManage;
 using Coldairarrow.DataRepository;
 using Coldairarrow.Entity.Base_SysManage;
 using Coldairarrow.Util;
@@ -70,6 +72,7 @@ namespace Coldairarrow.Web
             });
 
             InitEF();
+            InitAutoMapper();
         }
 
         private void InitEF()
@@ -121,13 +124,22 @@ namespace Coldairarrow.Web
                 .Where(t =>typeof(Controller).IsAssignableFrom(t) &&t.Name.EndsWith("Controller", StringComparison.Ordinal))
                 .PropertiesAutowired();
 
-            //×¢²áView
-            //builder.RegisterSource(new ViewRegistrationSource());
-
             //AOP
             builder.RegisterType<Interceptor>();
 
             return builder;
+        }
+
+        /// <summary>
+        /// ³õÊ¼»¯AutoMapper
+        /// </summary>
+        private void InitAutoMapper()
+        {
+            Mapper.Initialize(cfg =>
+            {
+                cfg.CreateMap<Base_User, Base_UserDTO>();
+                cfg.CreateMap<Base_SysRole, Base_SysRoleDTO>();
+            });
         }
     }
 }

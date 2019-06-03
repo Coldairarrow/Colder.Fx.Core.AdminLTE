@@ -112,6 +112,20 @@
     };
 })();
 
+//拓展String的getFileName方法，获取URL中的文件名
+(function () {
+    if (String.prototype.getFileName)
+        return;
+
+    String.prototype.getFileName = function () {
+        var str = this;
+        var url = str.split('?')[0];
+        var pathArray = url.split('/');
+
+        return pathArray[pathArray.length - 1];
+    };
+})();
+
 //拓展Array的forEach方法，用在某些浏览器没有forEach方法
 (function (Array) {
     if (Array.prototype.forEach)
@@ -458,20 +472,35 @@
     };
 })();
 
+//将对象转为x-www-form-urlencoded格式字符串
+(function () {
+    if (window.objToFormData)
+        return;
+
+    window.objToFormData = function (element, key, list) {
+        var list = list || [];
+        if (typeof (element) == 'object') {
+            for (var idx in element)
+                objToFormData(element[idx], key ? key + '[' + idx + ']' : idx, list);
+        } else {
+            list.push(key + '=' + encodeURIComponent(element));
+        }
+        return list.join('&');
+    };
+})();
+
 //使用文件Url下载文件
 (function () {
     if (window.downloadFile)
         return;
 
-    window.downloadFile = function (url) {
-        var a = document.createElement('a');
-        a.hidden = true;
-        a.download = '';
-        a.href = url
-        $("body").append(a);  // 修复firefox中无法触发click
-        a.click();
-        $(a).remove();
-    };
+    window.downloadFile = function (url, fileName, params) {
+        if (params) {
+            url = url + '?' + objToFormData(params);
+        }
+        fileName = fileName || url.getFileName();
+        saveAs(url, fileName);
+    }
 })();
 
 //拓展window的toDateString方法
@@ -494,6 +523,9 @@
         return;
 
     window.getType = function (obj) {
+        if (obj == null)
+            return 'null';
+        
         var type = typeof (obj);
         if (type == 'object') {
             type = Object.prototype.toString.call(obj);

@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
+﻿using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.EntityFrameworkCore.Storage;
 using System;
@@ -264,7 +263,7 @@ namespace Coldairarrow.Util
         /// <returns></returns>
         public static IQueryable ChangeSource(this IQueryable source, IQueryable targetSource)
         {
-            if (!(source is DbQuery<object> && targetSource is DbQuery<object>))
+            if (!(source is IQueryable && targetSource is IQueryable))
                 throw new Exception("仅支持EF的IQueryable!");
 
             Dictionary<Type, Type> typeMap = new Dictionary<Type, Type>();
@@ -281,7 +280,7 @@ namespace Coldairarrow.Util
                     break;
                 var theMethod = methods.Pop();
                 string methodName = theMethod.Method.Name;
-                if (theMethod.Method.Name == "MergeAs")
+                if (theMethod.Method.Name == "AsNoTracking")
                     continue;
 
                 var args = theMethod.Arguments.ToList();

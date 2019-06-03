@@ -213,7 +213,7 @@ namespace Coldairarrow.Business
         /// <param name="condition">筛选条件</param>
         public void Delete(Expression<Func<T, bool>> condition)
         {
-            Service.Delete_Sql(condition);
+            Service.Delete(condition);
         }
 
         #endregion

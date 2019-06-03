@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using System;
 using System.Data.Common;
+using System.Linq;
 
 namespace Coldairarrow.DataRepository
 {
@@ -11,7 +12,8 @@ namespace Coldairarrow.DataRepository
         DbContext GetDbContext();
         Action<string> HandleSqlLog { get; set; }
         DbSet<TEntity> Set<TEntity>() where TEntity : class;
-        DbSet<dynamic> Set(Type entityType);
+        IQueryable GetIQueryable(Type type);
+        EntityEntry Attach(object entity);
         EntityEntry Entry(object entity);
         int SaveChanges();
         DatabaseFacade Database { get; }

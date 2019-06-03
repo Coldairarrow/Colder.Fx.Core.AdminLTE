@@ -6,6 +6,7 @@ using System.Linq;
 
 namespace Coldairarrow.Web.Areas.Base_SysManage.Controllers
 {
+    [Area("Base_SysManage")]
     public class Base_UserController : BaseMvcController
     {
         #region DI

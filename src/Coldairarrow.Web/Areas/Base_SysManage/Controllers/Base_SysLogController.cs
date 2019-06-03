@@ -7,6 +7,7 @@ using System.Collections.Generic;
 
 namespace Coldairarrow.Web.Areas.Base_SysManage.Controllers
 {
+    [Area("Base_SysManage")]
     public class Base_SysLogController : BaseMvcController
     {
         #region DI

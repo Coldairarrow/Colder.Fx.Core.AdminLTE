@@ -121,7 +121,7 @@ namespace Coldairarrow.Business.Base_SysManage
 
         public void SetUserRole(string userId, List<string> roleIds)
         {
-            Service.Delete_Sql<Base_UserRoleMap>(x => x.UserId == userId);
+            Service.Delete<Base_UserRoleMap>(x => x.UserId == userId);
             var insertList = roleIds.Select(x => new Base_UserRoleMap
             {
                 Id = IdHelper.GetId(),

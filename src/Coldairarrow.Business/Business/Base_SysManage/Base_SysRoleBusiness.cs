@@ -87,7 +87,7 @@ namespace Coldairarrow.Business.Base_SysManage
         /// <param name="permissions">È¨ÏÞÖµ</param>
         public void SavePermission(string roleId, List<string> permissions)
         {
-            Service.Delete_Sql<Base_PermissionRole>(x => x.RoleId == roleId);
+            Service.Delete<Base_PermissionRole>(x => x.RoleId == roleId);
             List<Base_PermissionRole> insertList = new List<Base_PermissionRole>();
             permissions.ForEach(newPermission =>
             {

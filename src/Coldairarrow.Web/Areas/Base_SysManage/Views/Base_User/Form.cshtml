@@ -1,4 +1,4 @@
-﻿@inherits  DependencyViewPage
+@inherits  DependencyViewPage
 
 @using Coldairarrow.Entity.Base_SysManage;
 @using Coldairarrow.Util;
@@ -27,8 +27,7 @@
         <div class="form-group form-group-sm">
             <label class="col-sm-2 control-label">密码</label>
             <div class="col-sm-5">
-                <input id="Pwd" name="Pwd" style="display:none" type="text" class="form-control">
-                <input id="Pwd_Show" type="text" class="form-control">
+                <input id="Pwd" name="Pwd" type="text" class="form-control">
                 <div class="help-block with-errors"></div>
             </div>
         </div>
@@ -74,35 +73,9 @@
     $(function () {
         initEvent();
     });
-    function getCursor(elem) {
-        //IE 9 ，10，其他浏览器
-        if (elem.selectionStart != undefined) {
-            return elem.selectionStart;
-        } else { //IE 6,7,8
-            var range = document.selection.createRange();
-            range.moveStart("character", -elem.value.length);
-            var len = range.text.length;
-            return len;
-        }
-    }
     //事件绑定
     function initEvent() {
-        $('#Pwd_Show').bind('input propertychange', function () {
-            console.log(getCursor(this));
-            var real = $('#Pwd').val();
-            var show = $(this).val();
-
-            if (show.length > real.length) {
-                real += show[show.length - 1];
-            } else {
-                real = real.substring(0, real.length - 1);
-            }
-
-            $('#Pwd').val(real);
-
-            console.log('密码:' + real);
-            console.log('显示:' + real.replace(/./g,'●'));
-        });
+        $('#Pwd').bootstrapPwdBox();
 
         $('#Sex').selectpicker({
             value: theEntity.Sex

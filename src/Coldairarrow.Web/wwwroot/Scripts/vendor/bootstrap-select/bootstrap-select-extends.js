@@ -120,7 +120,7 @@ $('#roleList').selectpicker({
 
                     var selectedHtml = '';
 
-                    if (selected.indexOf(value) > -1) {
+                    if (selected.indexOf((value || '').toString()) > -1) {
                         selectedHtml = 'selected="selected"';
                     }
 

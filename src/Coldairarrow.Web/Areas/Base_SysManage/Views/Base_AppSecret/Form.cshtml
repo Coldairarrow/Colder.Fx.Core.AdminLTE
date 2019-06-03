@@ -10,21 +10,21 @@
 <div style="padding:15px;padding-right:45px;">
     <form id="form" class="form-horizontal" role="form">
         <div class="form-group form-group-sm">
-            <label class="col-sm-2 control-label">应用Id</label>
+            <label class="col-sm-2 control-label">搴旂敤Id</label>
             <div class="col-sm-5">
                 <input name="AppId" value="@obj.AppId" type="text" class="form-control" required>
                 <div class="help-block with-errors"></div>
             </div>
         </div>
         <div class="form-group form-group-sm">
-            <label class="col-sm-2 control-label">密钥</label>
+            <label class="col-sm-2 control-label">瀵嗛挜</label>
             <div class="col-sm-5">
                 <input name="AppSecret" value="@obj.AppSecret" type="text" class="form-control" required>
                 <div class="help-block with-errors"></div>
             </div>
         </div>
         <div class="form-group">
-            <button id="submit" type="submit" class="hidden">提交</button>
+            <button id="submit" type="submit" class="hidden">鎻愪氦</button>
         </div>
     </form>
 </div>
@@ -35,11 +35,11 @@
             initEvent();
         });
 
-        //事件绑定
+        //浜嬩欢缁戝畾
         function initEvent() {
-            //表单校验
+            //琛ㄥ崟鏍￠獙
             $('#form').validator().on('submit', function (e) {
-                //校验成功
+                //鏍￠獙鎴愬姛
                 if (!e.isDefaultPrevented()) {
                     e.preventDefault();
 
@@ -62,7 +62,7 @@
             })
         }
 
-        //提交表单
+        //鎻愪氦琛ㄥ崟
         function submitForm() {
             $('#submit').trigger('click');
         }

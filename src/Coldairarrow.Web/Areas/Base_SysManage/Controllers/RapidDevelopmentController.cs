@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Coldairarrow.Web.Areas.Base_SysManage.Controllers
 {
+    [Area("Base_SysManage")]
     public class RapidDevelopmentController : BaseMvcController
     {
         public RapidDevelopmentController(IRapidDevelopmentBusiness rapidDevBus)

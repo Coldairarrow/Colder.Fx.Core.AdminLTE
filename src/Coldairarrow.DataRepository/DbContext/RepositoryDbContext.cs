@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using System;
 using System.Data.Common;
+using System.Linq;
 
 namespace Coldairarrow.DataRepository
 {
@@ -54,9 +55,9 @@ namespace Coldairarrow.DataRepository
 
         public EntityEntry Entry(object entity)
         {
-            object targetObj = null;
             var type = entity.GetType();
             var model = CheckModel(entity.GetType());
+            object targetObj;
             if (type == model)
                 targetObj = entity;
             else
@@ -70,11 +71,24 @@ namespace Coldairarrow.DataRepository
             return _db.Set<TEntity>();
         }
 
-        public DbSet<dynamic> Set(Type entityType)
+        public IQueryable GetIQueryable(Type type)
         {
-            var targetModel = CheckModel(entityType);
+            var model = CheckModel(type);
 
-            return _db.Set(targetModel);
+            return _db.GetIQueryable(model);
+        }
+
+        public EntityEntry Attach(object entity)
+        {
+            var type = entity.GetType();
+            var model = CheckModel(entity.GetType());
+            object targetObj;
+            if (type == model)
+                targetObj = entity;
+            else
+                targetObj = entity.ChangeType(model);
+
+            return _db.Attach(targetObj);
         }
 
         public int SaveChanges()

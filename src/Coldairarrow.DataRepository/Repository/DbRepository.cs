@@ -357,18 +357,6 @@ namespace Coldairarrow.DataRepository
         }
 
         /// <summary>
-        /// 通过条件删除记录
-        /// 注:使用SQL方式
-        /// </summary>
-        /// <typeparam name="T">实体泛型</typeparam>
-        /// <param name="condition">筛选条件</param>
-        /// <exception cref="NotImplementedException">不支持此操作!</exception>
-        public virtual void Delete_Sql<T>(Expression<Func<T, bool>> condition) where T : class, new()
-        {
-            throw new NotImplementedException("不支持此操作!");
-        }
-
-        /// <summary>
         /// 删除单条记录
         /// </summary>
         /// <typeparam name="T">实体泛型</typeparam>
@@ -492,7 +480,7 @@ namespace Coldairarrow.DataRepository
                 entities.ForEach(aEntity =>
                 {
                     var targetObj = aEntity.ChangeType(Db.CheckEntityType(aEntity.GetType()));
-                    Db.Set(aEntity.GetType()).Attach(targetObj);
+                    Db.Attach(targetObj);
                     properties.ForEach(aProperty =>
                     {
                         Db.Entry(targetObj).Property(aProperty).IsModified = true;
@@ -526,21 +514,10 @@ namespace Coldairarrow.DataRepository
         /// <returns></returns>
         public T GetEntity<T>(params object[] keyValue) where T : class, new()
         {
-            return GetEntity(typeof(T), keyValue) as T;
-        }
+            var obj = Db.Set<T>().Find(keyValue);
+            Db.Entry(obj).State = EntityState.Detached;
 
-        /// <summary>
-        /// 获取单条记录
-        /// </summary>
-        /// <param name="type">实体类型</param>
-        /// <param name="keyValue">主键</param>
-        /// <returns></returns>
-        public object GetEntity(Type type, params object[] keyValue)
-        {
-            var entity = Db.Set(type).Find(keyValue);
-            Db.Entry(entity).State = EntityState.Detached;
-
-            return entity;
+            return obj;
         }
 
         /// <summary>
@@ -582,7 +559,7 @@ namespace Coldairarrow.DataRepository
         /// <returns></returns>
         public IQueryable GetIQueryable(Type type)
         {
-            return Db.Set(type).AsNoTracking();
+            return Db.GetIQueryable(type);
         }
 
         /// <summary>

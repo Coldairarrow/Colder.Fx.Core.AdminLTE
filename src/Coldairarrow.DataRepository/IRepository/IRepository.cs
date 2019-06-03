@@ -109,14 +109,6 @@ namespace Coldairarrow.DataRepository
         /// <param name="keys">多条记录主键集合</param>
         void Delete<T>(List<string> keys) where T : class, new();
 
-        /// <summary>
-        /// 通过条件删除记录
-        /// 注:使用SQL方式
-        /// </summary>
-        /// <typeparam name="T">实体泛型</typeparam>
-        /// <param name="condition">筛选条件</param>
-        void Delete_Sql<T>(Expression<Func<T, bool>> condition) where T : class, new();
-
         #endregion
 
         #region 更新数据
@@ -145,14 +137,6 @@ namespace Coldairarrow.DataRepository
         /// <param name="keyValue">主键</param>
         /// <returns></returns>
         T GetEntity<T>(params object[] keyValue) where T : class, new();
-
-        /// <summary>
-        /// 获取单条记录
-        /// </summary>
-        /// <param name="type">实体类型</param>
-        /// <param name="keyValue">主键</param>
-        /// <returns></returns>
-        object GetEntity(Type type, params object[] keyValue);
 
         /// <summary>
         /// 获取列表

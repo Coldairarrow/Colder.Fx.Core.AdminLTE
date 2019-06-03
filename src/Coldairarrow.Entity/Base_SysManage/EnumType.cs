@@ -21,7 +21,7 @@
         /// </summary>
         public enum RoleType
         {
-            超级管理员 = 1,
+            超级管理员 = 1
         }
     }
 }

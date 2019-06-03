@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Coldairarrow.Web.Areas.Base_SysManage.Controllers
 {
+    [Area("Base_SysManage")]
     public class Base_SysRoleController : BaseMvcController
     {
         public Base_SysRoleController(IBase_SysRoleBusiness sysRoleBus, IPermissionManage permissionManage)
