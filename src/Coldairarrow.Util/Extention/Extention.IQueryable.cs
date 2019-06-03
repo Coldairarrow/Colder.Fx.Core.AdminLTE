@@ -343,7 +343,7 @@ namespace Coldairarrow.Util
         /// </summary>
         /// <param name="source">数据源</param>
         /// <returns></returns>
-        public static ObjectQuery GetObjQuery(this IQueryable source)
+        public static IQueryable GetObjQuery(this IQueryable source)
         {
             GetObjQueryVisitor visitor = new GetObjQueryVisitor();
             visitor.Visit(source.Expression);
@@ -645,11 +645,11 @@ namespace Coldairarrow.Util
 
         class GetObjQueryVisitor : ExpressionVisitor
         {
-            public ObjectQuery ObjQuery { get; set; }
+            public IQueryable ObjQuery { get; set; }
             protected override Expression VisitConstant(ConstantExpression node)
             {
-                if (node.Value is ObjectQuery)
-                    ObjQuery = node.Value as ObjectQuery;
+                if (node.Value is IQueryable)
+                    ObjQuery = node.Value as IQueryable;
 
                 return base.VisitConstant(node);
             }

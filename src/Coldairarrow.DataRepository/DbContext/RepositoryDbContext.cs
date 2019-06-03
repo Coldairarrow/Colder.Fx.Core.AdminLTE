@@ -70,7 +70,7 @@ namespace Coldairarrow.DataRepository
             return _db.Set<TEntity>();
         }
 
-        public DbSet<object> Set(Type entityType)
+        public DbSet<dynamic> Set(Type entityType)
         {
             var targetModel = CheckModel(entityType);
 

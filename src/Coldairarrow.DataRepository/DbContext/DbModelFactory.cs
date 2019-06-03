@@ -80,7 +80,7 @@ namespace Coldairarrow.DataRepository
 
         private static void InitModelType()
         {
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Union(new Assembly[] { Assembly.Load("Coldairarrow.Entity") });
+            var assemblies = new Assembly[] { Assembly.Load("Coldairarrow.Entity") };
             List<Type> allTypes = new List<Type>();
             assemblies.ForEach(aAssembly =>
             {

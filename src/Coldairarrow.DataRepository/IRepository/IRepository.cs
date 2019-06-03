@@ -14,12 +14,6 @@ namespace Coldairarrow.DataRepository
         #region 数据库相关
 
         /// <summary>
-        /// 获取DbContext
-        /// </summary>
-        /// <returns></returns>
-        DbContext GetDbContext();
-
-        /// <summary>
         /// SQL日志处理方法
         /// </summary>
         /// <value>

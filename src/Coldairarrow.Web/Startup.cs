@@ -1,6 +1,6 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using Coldairarrow.Business.Base_SysManage;
+using Autofac.Extras.DynamicProxy;
 using Coldairarrow.DataRepository;
 using Coldairarrow.Entity.Base_SysManage;
 using Coldairarrow.Util;
@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Coldairarrow.Web
@@ -32,17 +33,17 @@ namespace Coldairarrow.Web
             services.AddMvc(options =>
             {
                 options.Filters.Add<GlobalExceptionFilter>();
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+            .AddControllersAsServices();
             services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<IActionContextAccessor, ActionContextAccessor>();
             services.AddSingleton(Configuration);
             services.AddLogging();
 
             //使用Autofac替换自带IOC
-            var containerBuilder = new ContainerBuilder();
-            containerBuilder.RegisterModule<BusinessModule>();
-            containerBuilder.Populate(services);
-            var container = containerBuilder.Build();
+            var builder = InitAutofac();
+            builder.Populate(services);
+            var container = builder.Build();
             AutofacHelper.Container = container;
             return new AutofacServiceProvider(container);
         }
@@ -77,7 +78,7 @@ namespace Coldairarrow.Web
             {
                 try
                 {
-                    DbFactory.GetRepository(null, null, null).GetIQueryable<Base_User>().ToList();
+                    DbFactory.GetRepository(null, null).GetIQueryable<Base_User>().ToList();
                 }
                 catch
                 {
@@ -85,13 +86,48 @@ namespace Coldairarrow.Web
                 }
             });
         }
-    }
 
-    public class BusinessModule : Module
-    {
-        protected override void Load(ContainerBuilder builder)
+        private ContainerBuilder InitAutofac()
         {
-            builder.RegisterType<HomeBusiness>().AsImplementedInterfaces();
+            var builder = new ContainerBuilder();
+
+            var baseType = typeof(IDependency);
+            var baseTypeCircle = typeof(ICircleDependency);
+
+            //Coldairarrow相关程序集
+            var assemblys = Assembly.GetEntryAssembly().GetReferencedAssemblies()
+                .Select(Assembly.Load)
+                .Cast<Assembly>()
+                .Where(x => x.FullName.Contains("Coldairarrow")).ToList();
+
+            //自动注入IDependency接口,支持AOP
+            builder.RegisterAssemblyTypes(assemblys.ToArray())
+                .Where(x => baseType.IsAssignableFrom(x) && x != baseType)
+                .AsImplementedInterfaces()
+                .PropertiesAutowired()
+                .InstancePerLifetimeScope()
+                .EnableInterfaceInterceptors()
+                .InterceptedBy(typeof(Interceptor));
+
+            //自动注入ICircleDependency接口,循环依赖注入,不支持AOP
+            builder.RegisterAssemblyTypes(assemblys.ToArray())
+                .Where(x => baseTypeCircle.IsAssignableFrom(x) && x != baseTypeCircle)
+                .AsImplementedInterfaces()
+                .PropertiesAutowired(PropertyWiringOptions.AllowCircularDependencies)
+                .InstancePerLifetimeScope();
+
+            //注册Controller
+            builder.RegisterAssemblyTypes(typeof(Startup).GetTypeInfo().Assembly)
+                .Where(t =>typeof(Controller).IsAssignableFrom(t) &&t.Name.EndsWith("Controller", StringComparison.Ordinal))
+                .PropertiesAutowired();
+
+            //注册View
+            //builder.RegisterSource(new ViewRegistrationSource());
+
+            //AOP
+            builder.RegisterType<Interceptor>();
+
+            return builder;
         }
     }
 }

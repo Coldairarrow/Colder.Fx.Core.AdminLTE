@@ -1,8 +1,9 @@
-﻿@using Coldairarrow.Business.Base_SysManage;
+﻿@inherits  DependencyViewPage
 
 @{
     Layout = "~/Views/Shared/_Layout_List.cshtml";
-    var manageSysPermission = PermissionManage.OperatorHasPermissionValue("sysuser.manageSysPermission");
+        
+    var manageSysPermission = this.PermissionManage.OperatorHasPermissionValue("sysuser.manageSysPermission");
 }
 
 <div class="fx-content">
@@ -25,12 +26,7 @@
     <div class="fx-wrapper">
         <form class="form-inline" id="searchForm">
             <div class="form-group">
-                <label>查询类别</label>
-                <select class="selectpicker" name="condition" data-style="btn-default btn-sm" data-width="100px">
-                    <option value="">请选择</option>
-                    <option value="UserName">用户名</option>
-                    <option value="RealName">真实姓名</option>
-                </select>
+                <label>关键字</label>
                 <input type="text" class="form-control input-sm" name="keyword" placeholder="请输入关键字">
             </div>
             <div class="form-group">
@@ -95,7 +91,7 @@
                         builder.AddBtn({ icon: 'glyphicon-edit', function: 'openForm', param: [row['Id']] });
                         builder.AddBtn({ icon: 'glyphicon-trash', function: 'deleteData', param: [row['Id']] });
                         if (manageSysPermission) {
-                            builder.AddBtn({ name: '权限分配', icon: 'glyphicon-edit', function: 'setPermission', param: [row['UserId'], row['RealName']] });
+                            builder.AddBtn({ name: '权限分配', icon: 'glyphicon-edit', function: 'setPermission', param: [row['Id'], row['RealName']] });
                         }
 
                         return builder.build();

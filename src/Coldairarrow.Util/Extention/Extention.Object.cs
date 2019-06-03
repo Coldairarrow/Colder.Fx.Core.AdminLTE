@@ -168,6 +168,17 @@ namespace Coldairarrow.Util
         }
 
         /// <summary>
+        /// 改变实体类型
+        /// </summary>
+        /// <typeparam name="T">目标泛型</typeparam>
+        /// <param name="obj">对象</param>
+        /// <returns></returns>
+        public static T ChangeType<T>(this object obj)
+        {
+            return obj.ToJson().ToObject<T>();
+        }
+
+        /// <summary>
         /// 改变类型
         /// </summary>
         /// <param name="obj">原对象</param>

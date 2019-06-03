@@ -29,7 +29,7 @@ namespace Coldairarrow.Business
         }
         private static ConnectionSettings _connectionSettings { get; set; }
         private static ElasticClient _elasticClient { get; set; }
-        public List<Base_SysLog> GetLogList(string logContent, string logType, string opUserName, DateTime? startTime, DateTime? endTime, Pagination pagination)
+        public List<Base_SysLog> GetLogList(Pagination pagination, string logContent, string logType, string opUserName, DateTime? startTime, DateTime? endTime)
         {
             var client = GetElasticClient();
             var filters = new List<Func<QueryContainerDescriptor<Base_SysLog>, QueryContainer>>();
@@ -53,7 +53,7 @@ namespace Coldairarrow.Business
                 .Skip((pagination.page - 1) * pagination.rows)
                 .Take(pagination.rows)
             );
-            pagination.RecordCount = result.Hits.Count;
+            pagination.RecordCount = (int)result.Total;
 
             return result.Documents.ToList();
         }

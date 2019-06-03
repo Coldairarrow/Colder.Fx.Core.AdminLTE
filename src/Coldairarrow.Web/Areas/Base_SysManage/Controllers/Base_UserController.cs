@@ -2,14 +2,23 @@ using Coldairarrow.Business.Base_SysManage;
 using Coldairarrow.Entity.Base_SysManage;
 using Coldairarrow.Util;
 using Microsoft.AspNetCore.Mvc;
-using System;
+using System.Linq;
 
-namespace Coldairarrow.Web
+namespace Coldairarrow.Web.Areas.Base_SysManage.Controllers
 {
-    [Area("Base_SysManage")]
     public class Base_UserController : BaseMvcController
     {
-        Base_UserBusiness _base_UserBusiness = new Base_UserBusiness();
+        #region DI
+
+        public Base_UserController(IBase_UserBusiness sysUserBus, IPermissionManage permissionManage)
+        {
+            _sysUserBus = sysUserBus;
+            _permissionManage = permissionManage;
+        }
+        IBase_UserBusiness _sysUserBus { get; }
+        IPermissionManage _permissionManage { get; set; }
+
+        #endregion
 
         #region 视图功能
 
@@ -20,7 +29,7 @@ namespace Coldairarrow.Web
 
         public ActionResult Form(string id)
         {
-            var theData = id.IsNullOrEmpty() ? new Base_User() : _base_UserBusiness.GetTheData(id);
+            var theData = id.IsNullOrEmpty() ? new Base_User() : _sysUserBus.GetTheData(id);
 
             return View(theData);
         }
@@ -41,46 +50,45 @@ namespace Coldairarrow.Web
 
         #region 获取数据
 
-        /// <summary>
-        /// 获取数据列表
-        /// </summary>
-        /// <param name="condition">查询类型</param>
-        /// <param name="keyword">关键字</param>
-        /// <returns></returns>
-        public ActionResult GetDataList(string condition, string keyword, Pagination pagination)
+        public ActionResult GetDataList(Pagination pagination, string keyword)
         {
-            var dataList = _base_UserBusiness.GetDataList(condition, keyword, pagination);
+            var dataList = _sysUserBus.GetDataList(pagination, null, keyword);
 
-            return Content(pagination.BuildTableResult_DataGrid(dataList).ToJson());
+            return DataTable_Bootstrap(dataList, pagination);
+        }
+
+        public ActionResult GetDataList_NoPagin(string values, string q)
+        {
+            var resList = _sysUserBus.BuildSelectResult(values, q, "RealName", "Id");
+
+            return Content(resList.ToJson());
         }
 
         #endregion
 
         #region 提交数据
 
-        /// <summary>
-        /// 保存
-        /// </summary>
-        /// <param name="theData">保存的数据</param>
         public ActionResult SaveData(Base_User theData, string Pwd, string RoleIdList)
         {
             if (!Pwd.IsNullOrEmpty())
                 theData.Password = Pwd.ToMD5String();
-            var roleIdList = RoleIdList.ToList<string>();
 
             if (theData.Id.IsNullOrEmpty())
             {
-                theData.Id = Guid.NewGuid().ToSequentialGuid();
-                theData.UserId = Guid.NewGuid().ToSequentialGuid();
+                theData.Id = IdHelper.GetId();
 
-                _base_UserBusiness.AddData(theData);
+                _sysUserBus.AddData(theData);
             }
             else
             {
-                _base_UserBusiness.UpdateData(theData);
+                _sysUserBus.UpdateData(theData);
             }
 
-            _base_UserBusiness.SetUserRole(theData.UserId, roleIdList);
+            //角色设置
+            if (!RoleIdList.IsNullOrEmpty())
+            {
+                _sysUserBus.SetUserRole(theData.Id, RoleIdList.ToList<string>());
+            }
 
             return Success();
         }
@@ -91,7 +99,7 @@ namespace Coldairarrow.Web
         /// <param name="theData">删除的数据</param>
         public ActionResult DeleteData(string ids)
         {
-            _base_UserBusiness.DeleteData(ids.ToList<string>());
+            _sysUserBus.DeleteData(ids.ToList<string>());
 
             return Success("删除成功！");
         }
@@ -103,7 +111,7 @@ namespace Coldairarrow.Web
         /// <param name="newPwd">新密码</param>
         public ActionResult ChangePwd(string oldPwd, string newPwd)
         {
-            var res = _base_UserBusiness.ChangePwd(oldPwd, newPwd);
+            var res = _sysUserBus.ChangePwd(oldPwd, newPwd);
 
             return Content(res.ToJson());
         }
@@ -116,7 +124,7 @@ namespace Coldairarrow.Web
         /// <returns></returns>
         public ActionResult SavePermission(string userId, string permissions)
         {
-            PermissionManage.SetUserPermission(userId, permissions.ToList<string>());
+            _permissionManage.SetUserPermission(userId, permissions.ToList<string>());
 
             return Success();
         }

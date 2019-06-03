@@ -1,4 +1,4 @@
-﻿using Coldairarrow.Business.Common;
+﻿using Coldairarrow.Business;
 using Coldairarrow.Util;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +20,9 @@ namespace Coldairarrow.Web
         /// <param name="filterContext">过滤器上下文</param>
         public void OnActionExecuting(ActionExecutingContext filterContext)
         {
+            IOperator Operator = AutofacHelper.GetService<IOperator>();
+            IBusHelper BusHelper = AutofacHelper.GetService<IBusHelper>();
+
             var request = filterContext.HttpContext.Request;
 
             try

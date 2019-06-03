@@ -1,4 +1,6 @@
-﻿namespace Coldairarrow.Util
+﻿using System;
+
+namespace Coldairarrow.Util
 {
     /// <summary>
     /// Session帮助类,自定义Session,解决原Session并发问题
@@ -49,6 +51,14 @@
                         CacheHelper.Cache.SetCache(cacheKey, value);
                 }
             }
+        }
+
+        /// <summary>
+        /// 清除Session的Cookie
+        /// </summary>
+        public static void RemoveSessionCookie()
+        {
+            HttpContextCore.Current.Response.Cookies.Delete(SessionCookieName);
         }
 
         #endregion

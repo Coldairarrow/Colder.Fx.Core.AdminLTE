@@ -12,14 +12,13 @@ namespace Coldairarrow.Web
     /// </summary>
     public class CheckSignAttribute : Attribute, IActionFilter
     {
-
         /// <summary>
         /// Action执行之前执行
         /// </summary>
         /// <param name="filterContext"></param>
         public void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            CheckSignBusiness _checkSignBusiness = new CheckSignBusiness();
+            ICheckSignBusiness checkSignBusiness = AutofacHelper.GetService<ICheckSignBusiness>();
 
             //若为本地测试，则不需要校验
             if (GlobalSwitch.RunModel == RunModel.LocalTest)
@@ -36,14 +35,10 @@ namespace Coldairarrow.Web
                 return;
 
             //需要签名
-            if (!_checkSignBusiness.IsSecurity(filterContext.HttpContext))
+            var checkSignRes = checkSignBusiness.IsSecurity(filterContext.HttpContext);
+            if (!checkSignRes.Success)
             {
-                AjaxResult res = new AjaxResult
-                {
-                    Msg = "签名校验失败！拒绝访问！",
-                    Success = false
-                };
-                filterContext.Result = new ContentResult() { Content = res.ToJson() };
+                filterContext.Result = new ContentResult() { Content = checkSignRes.ToJson() };
             }
         }
 

@@ -469,5 +469,15 @@ namespace Coldairarrow.Util
             var values = typeof(T).GetEnumValues().CastToList<T>();
             return values.Where(x => x.ToString() == enumText).FirstOrDefault();
         }
+
+        /// <summary>
+        /// 转为MurmurHash
+        /// </summary>
+        /// <param name="str">字符串</param>
+        /// <returns></returns>
+        public static uint ToMurmurHash(this string str)
+        {
+            return MurmurHash2.Hash(Encoding.UTF8.GetBytes(str));
+        }
     }
 }

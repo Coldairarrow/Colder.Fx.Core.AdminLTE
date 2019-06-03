@@ -11,7 +11,7 @@ namespace Coldairarrow.DataRepository
         DbContext GetDbContext();
         Action<string> HandleSqlLog { get; set; }
         DbSet<TEntity> Set<TEntity>() where TEntity : class;
-        DbSet<object> Set(Type entityType);
+        DbSet<dynamic> Set(Type entityType);
         EntityEntry Entry(object entity);
         int SaveChanges();
         DatabaseFacade Database { get; }

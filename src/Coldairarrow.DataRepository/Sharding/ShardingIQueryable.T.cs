@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -86,7 +85,7 @@ namespace Coldairarrow.DataRepository
             //合并数据
             var resList = all;
             if (!sortColumn.IsNullOrEmpty() && !sortType.IsNullOrEmpty())
-                resList = resList.OrderBy($"{sortColumn} {sortType}").ToList();
+                resList = resList.AsQueryable().OrderBy($"{sortColumn} {sortType}").ToList();
             if (!skip.IsNullOrEmpty())
                 resList = resList.Skip(skip.Value).ToList();
             if (!take.IsNullOrEmpty())

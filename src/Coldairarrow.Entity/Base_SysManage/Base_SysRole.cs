@@ -1,8 +1,6 @@
-using Coldairarrow.Util;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using static Coldairarrow.Entity.Base_SysManage.EnumType;
 
 namespace Coldairarrow.Entity.Base_SysManage
 {
@@ -28,7 +26,5 @@ namespace Coldairarrow.Entity.Base_SysManage
         /// ½ÇÉ«Ãû
         /// </summary>
         public String RoleName { get; set; }
-
-        public RoleType? RoleType { get => RoleName?.ToEnum<RoleType>(); }
     }
 }

@@ -9,11 +9,11 @@ namespace Coldairarrow.Business
     {
         void WriteSysLog(Base_SysLog log);
         List<Base_SysLog> GetLogList(
+            Pagination pagination,
             string logContent,
             string logType,
             string opUserName,
             DateTime? startTime,
-            DateTime? endTime,
-            Pagination pagination);
+            DateTime? endTime);
     }
 }

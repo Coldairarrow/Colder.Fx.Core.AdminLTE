@@ -11,9 +11,9 @@ namespace Coldairarrow.Util
         /// <param name="context">上下文</param>
         /// <param name="entityType">实体类型</param>
         /// <returns></returns>
-        public static DbSet<object> Set(this DbContext context, Type entityType)
+        public static DbSet<dynamic> Set(this DbContext context, Type entityType)
         {
-            return (DbSet<object>)context.GetType().GetMethod("Set").MakeGenericMethod(entityType).Invoke(context, null);
+            return context.GetType().GetMethod("Set").MakeGenericMethod(entityType).Invoke(context, null) as DbSet<dynamic>;
         }
     }
 }

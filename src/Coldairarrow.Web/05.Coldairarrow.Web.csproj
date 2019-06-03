@@ -31,6 +31,7 @@
     <None Include="Areas\Base_SysManage\Views\Base_User\Form.cshtml" />
     <None Include="Areas\Base_SysManage\Views\Base_User\Index.cshtml" />
     <None Include="Areas\Base_SysManage\Views\Base_User\PermissionForm.cshtml" />
+    <None Include="Areas\Base_SysManage\Views\City\Index.cshtml" />
     <None Include="Areas\Base_SysManage\Views\Common\ShowBigImg.cshtml" />
     <None Include="Areas\Base_SysManage\Views\RapidDevelopment\Form.cshtml" />
     <None Include="Areas\Base_SysManage\Views\RapidDevelopment\Index.cshtml" />

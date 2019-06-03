@@ -1,4 +1,4 @@
-﻿using Coldairarrow.Business.Common;
+﻿using Coldairarrow.Business;
 using Coldairarrow.Util;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -9,6 +9,8 @@ namespace Coldairarrow.Web
     {
         public void OnException(ExceptionContext context)
         {
+            IBusHelper BusHelper = AutofacHelper.GetService<IBusHelper>();
+
             var ex = context.Exception;
             BusHelper.HandleException(ex);
 

@@ -19,6 +19,9 @@ namespace Coldairarrow.Web
         /// <param name="filterContext">过滤器上下文</param>
         public void OnActionExecuting(ActionExecutingContext filterContext)
         {
+            IPermissionManage PermissionManage = AutofacHelper.GetService<IPermissionManage>();
+            IUrlPermissionManage UrlPermissionManage = AutofacHelper.GetService<IUrlPermissionManage>();
+
             //若为本地测试，则不需要校验
             if (GlobalSwitch.RunModel == RunModel.LocalTest)
             {
@@ -32,7 +35,7 @@ namespace Coldairarrow.Web
                 return;
 
             var allRequestParams = HttpHelper.GetAllRequestParams(filterContext.HttpContext);
-            if(!allRequestParams.ContainsKey("appId"))
+            if (!allRequestParams.ContainsKey("appId"))
             {
                 res.Success = false;
                 res.Msg = "缺少appId参数！";

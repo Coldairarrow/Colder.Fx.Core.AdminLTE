@@ -1,4 +1,4 @@
-﻿using Coldairarrow.Business.Common;
+﻿using Coldairarrow.Business;
 using Coldairarrow.Entity.Base_SysManage;
 using Coldairarrow.Util;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +14,8 @@ namespace Coldairarrow.Web
     /// </summary>
     public class BaseController : Controller
     {
+        public IBusHelper BusHelper { get; set; }
+
         /// <summary>
         /// 执行前调用
         /// </summary>
@@ -174,6 +176,18 @@ namespace Coldairarrow.Web
         }
 
         /// <summary>
+        /// 返回数据表格数据
+        /// 注：BootstrapTable格式
+        /// </summary>
+        /// <param name="dataList">数据列表</param>
+        /// <param name="pagination">分页参数</param>
+        /// <returns></returns>
+        public ActionResult DataTable_Bootstrap(object dataList, Pagination pagination)
+        {
+            return Content(pagination.BuildTableResult_BootstrapTable(dataList).ToJson());
+        }
+
+        /// <summary>
         /// 当前URL是否包含某字符串
         /// 注：忽略大小写
         /// </summary>
@@ -189,7 +203,7 @@ namespace Coldairarrow.Web
         /// </summary>
         /// <param name="logContent">日志内容</param>
         /// <param name="logType">日志类型</param>
-        public static void WriteSysLog(string logContent, EnumType.LogType logType)
+        public void WriteSysLog(string logContent, EnumType.LogType logType)
         {
             BusHelper.WriteSysLog(logContent, logType);
         }
