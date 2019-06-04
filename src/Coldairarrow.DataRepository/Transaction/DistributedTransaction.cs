@@ -26,7 +26,13 @@ namespace Coldairarrow.DataRepository
                 throw new Exception("repositories不能为NULL");
 
             if (repositories.Length > 0)
-                _repositorys = repositories.Distinct().ToList();
+            {
+                repositories.ForEach(aRepository =>
+                {
+                    if (!_repositorys.Contains(aRepository))
+                        _repositorys.Add(aRepository);
+                });
+            }
         }
 
         #endregion
@@ -34,12 +40,14 @@ namespace Coldairarrow.DataRepository
         #region 内部成员
 
         private IsolationLevel? _isolationLevel { get; set; }
-        private ConcurrentDictionary<string, DbTransaction> _transactionMap { get; } = new ConcurrentDictionary<string, DbTransaction>();
+        private ConcurrentDictionary<string, DbTransaction> _transactionMap { get; } 
+            = new ConcurrentDictionary<string, DbTransaction>();
         private string GetRepositoryId(IRepository repository)
         {
             return $"{repository.DbType.ToString()}{repository.ConnectionString}";
         }
-        private List<IRepository> _repositorys { get; set; } = new List<IRepository>();
+        private SynchronizedCollection<IRepository> _repositorys { get; set; } 
+            = new SynchronizedCollection<IRepository>();
         private object _lock { get; } = new object();
         private void _BeginTransaction(params IRepository[] repositorys)
         {
@@ -77,11 +85,20 @@ namespace Coldairarrow.DataRepository
 
         public void AddRepository(params IRepository[] repositories)
         {
-            var newRepositories = repositories.Distinct();
-            _repositorys.AddRange(newRepositories);
-            _repositorys = _repositorys.Distinct().ToList();
+            List<IRepository> needBeginList = new List<IRepository>();
+            if (repositories.Length > 0)
+            {
+                repositories.ForEach(aRepository =>
+                {
+                    if (!_repositorys.Contains(aRepository))
+                    {
+                        _repositorys.Add(aRepository);
+                        needBeginList.Add(aRepository);
+                    }
+                });
+            }
 
-            _BeginTransaction(newRepositories.ToArray());
+            _BeginTransaction(needBeginList.ToArray());
         }
 
         /// <summary>

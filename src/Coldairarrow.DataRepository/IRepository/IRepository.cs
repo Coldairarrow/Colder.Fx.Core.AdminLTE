@@ -19,7 +19,7 @@ namespace Coldairarrow.DataRepository
         /// <value>
         /// The handle SQL log.
         /// </value>
-        Action<string> HandleSqlLog { get; set; }
+        Action<string> HandleSqlLog {set; }
 
         /// <summary>
         /// 提交到数据库

@@ -33,7 +33,18 @@ namespace Coldairarrow.DataRepository
 
         #region 外部接口
 
-        public Action<string> HandleSqlLog { get; set; }
+        public Action<string> HandleSqlLog
+        {
+            set
+            {
+                _HandleSqlLog = value;
+                _db.HandleSqlLog = _HandleSqlLog;
+            }
+            get
+            {
+                return _HandleSqlLog;
+            }
+        }
 
         public void RefreshDb()
         {
@@ -136,6 +147,7 @@ namespace Coldairarrow.DataRepository
 
             return model;
         }
+        private Action<string> _HandleSqlLog { get; set; }
 
         #endregion
 
