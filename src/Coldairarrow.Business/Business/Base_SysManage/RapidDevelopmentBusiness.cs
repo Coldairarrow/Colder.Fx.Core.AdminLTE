@@ -1,16 +1,25 @@
 ﻿using Coldairarrow.Entity.Base_SysManage;
 using Coldairarrow.Util;
+using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Linq.Dynamic;
 using System.Text;
 
 namespace Coldairarrow.Business.Base_SysManage
 {
     public class RapidDevelopmentBusiness : BaseBusiness<Base_DatabaseLink>, IRapidDevelopmentBusiness, IDependency
     {
+        #region DI
+
+        public RapidDevelopmentBusiness(IHostingEnvironment hostingEnvironment)
+        {
+            _contentRootPath = $"{hostingEnvironment.ContentRootPath}\\";
+        }
+
+        #endregion
+
         #region 外部接口
 
         /// <summary>
@@ -70,13 +79,11 @@ namespace Coldairarrow.Business.Base_SysManage
                 //控制器
                 if (buildTypeList.Exists(x => x.ToLower() == "controller"))
                 {
-                    BuildArea(areaName);
                     BuildController(areaName, aTable);
                 }
                 //视图
                 if (buildTypeList.Exists(x => x.ToLower() == "view"))
                 {
-                    BuildArea(areaName);
                     BuildView(tableFieldInfo, areaName, aTable);
                 }
             });
@@ -85,28 +92,16 @@ namespace Coldairarrow.Business.Base_SysManage
         #endregion
 
         #region 私有成员
-
-        /// <summary>
-        /// 生成实体
-        /// </summary>
-        /// <param name="tableInfo">表字段信息</param>
-        /// <param name="areaName">区域名</param>
-        /// <param name="tableName">表名</param>
+        private string _contentRootPath { get; }
         private void BuildEntity(List<TableInfo> tableInfo, string areaName, string tableName)
         {
-            string rootPath = AppDomain.CurrentDomain.BaseDirectory;
+            string rootPath = _contentRootPath;
             string entityPath = rootPath.Replace("Coldairarrow.Web", "Coldairarrow.Entity") + areaName;
             string filePath = $@"{entityPath}\{tableName}.cs";
             string nameSpace = $@"Coldairarrow.Entity.{areaName}";
 
             _dbHelper.SaveEntityToFile(tableInfo, tableName, _dbTableInfoDic[tableName].Description, filePath, nameSpace);
         }
-
-        /// <summary>
-        /// 生成业务逻辑接口
-        /// </summary>
-        /// <param name="areaName">区域名</param>
-        /// <param name="entityName">实体名</param>
         private void BuildIBusiness(string areaName, string entityName)
         {
             string className = $"I{entityName}Business";
@@ -126,17 +121,11 @@ namespace Coldairarrow.Business.{areaName}
         void DeleteData(List<string> ids);
     }}
 }}";
-            string rootPath = AppDomain.CurrentDomain.BaseDirectory.Replace("Coldairarrow.Web", "Coldairarrow.Business"); ;
+            string rootPath = _contentRootPath.Replace("Coldairarrow.Web", "Coldairarrow.Business"); ;
             string filePath = Path.Combine(rootPath, "IBusiness", areaName, $"{className}.cs");
 
             FileHelper.WriteTxt(code, filePath, FileMode.Create);
         }
-
-        /// <summary>
-        /// 生成业务逻辑实现
-        /// </summary>
-        /// <param name="areaName">区域名</param>
-        /// <param name="entityName">实体名</param>
         private void BuildBusiness(string areaName, string entityName)
         {
             string className = $"{entityName}Business";
@@ -145,7 +134,7 @@ $@"using Coldairarrow.Entity.{areaName};
 using Coldairarrow.Util;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic;
+using System.Linq.Dynamic.Core;
 
 namespace Coldairarrow.Business.{areaName}
 {{
@@ -194,17 +183,11 @@ namespace Coldairarrow.Business.{areaName}
         #endregion
     }}
 }}";
-            string rootPath = AppDomain.CurrentDomain.BaseDirectory.Replace("Coldairarrow.Web", "Coldairarrow.Business"); ;
+            string rootPath = _contentRootPath.Replace("Coldairarrow.Web", "Coldairarrow.Business"); ;
             string filePath = Path.Combine(rootPath, "Business", areaName, $"{className}.cs");
 
             FileHelper.WriteTxt(code, filePath, FileMode.Create);
         }
-
-        /// <summary>
-        /// 生成控制器代码
-        /// </summary>
-        /// <param name="areaName">区域名</param>
-        /// <param name="entityName">实体名</param>
         private void BuildController(string areaName, string entityName)
         {
             string ibusName = $"I{entityName}Business";
@@ -214,10 +197,11 @@ namespace Coldairarrow.Business.{areaName}
 $@"using Coldairarrow.Business.{areaName};
 using Coldairarrow.Entity.{areaName};
 using Coldairarrow.Util;
-using System.Web.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Coldairarrow.Web.Areas.{areaName}.Controllers
 {{
+    [Area(""{areaName}"")]
     public class {entityName}Controller : BaseMvcController
     {{
         #region DI
@@ -300,18 +284,11 @@ namespace Coldairarrow.Web.Areas.{areaName}.Controllers
         #endregion
     }}
 }}";
-            string rootPath = AppDomain.CurrentDomain.BaseDirectory;
+            string rootPath = _contentRootPath;
             string filePath = $@"{rootPath}Areas\{areaName}\Controllers\{entityName}Controller.cs";
 
             FileHelper.WriteTxt(code, filePath, FileMode.Create);
         }
-
-        /// <summary>
-        /// 生成视图
-        /// </summary>
-        /// <param name="tableInfoList">表字段信息</param>
-        /// <param name="areaName">区域名</param>
-        /// <param name="entityName">实体名</param>
         private void BuildView(List<TableInfo> tableInfoList, string areaName, string entityName)
         {
             //生成Index页面
@@ -490,7 +467,7 @@ $@"@{{
     }}
 </script>
 ";
-            string rootPath = AppDomain.CurrentDomain.BaseDirectory;
+            string rootPath = _contentRootPath;
             string indexPath = $@"{rootPath}Areas\{areaName}\Views\{entityName}\Index.cshtml";
 
             FileHelper.WriteTxt(indexHtml, indexPath, FileMode.Create);
@@ -558,91 +535,6 @@ $@"@using Coldairarrow.Entity.{areaName};
 
             FileHelper.WriteTxt(formHtml, formPath, FileMode.Create);
         }
-
-        /// <summary>
-        /// 生成区域配置代码
-        /// </summary>
-        /// <param name="areaName">区域名</param>
-        private void BuildArea(string areaName)
-        {
-            //生成区域注册文件
-            string areaRegistrationCode =
-$@"using System.Web.Mvc;
-
-namespace Coldairarrow.Web.Areas.{areaName}
-{{
-    public class {areaName}AreaRegistration : AreaRegistration 
-    {{
-        public override string AreaName 
-        {{
-            get 
-            {{
-                return ""{areaName}"";
-            }}
-        }}
-
-        public override void RegisterArea(AreaRegistrationContext context) 
-        {{
-            context.MapRoute(
-                ""{areaName}_default"",
-                ""{areaName}/{{controller}}/{{action}}/{{id}}"",
-                new {{ action = ""Index"", id = UrlParameter.Optional }}
-            );
-        }}
-    }}
-}}";
-            string rootPath = AppDomain.CurrentDomain.BaseDirectory;
-            string areaRegistrationPath = $@"{rootPath}Areas\{areaName}\{areaName}AreaRegistration.cs";
-            if (!FileHelper.Exists(areaRegistrationPath))
-                FileHelper.WriteTxt(areaRegistrationCode, areaRegistrationPath, FileMode.Create);
-
-            //生成区域web.config
-            string webConfigCode =
-$@"<?xml version=""1.0""?>
-
-<configuration>
-  <configSections>
-    <sectionGroup name=""system.web.webPages.razor"" type=""System.Web.WebPages.Razor.Configuration.RazorWebSectionGroup, System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35"">
-      <section name=""host"" type=""System.Web.WebPages.Razor.Configuration.HostSection, System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35"" requirePermission=""false"" />
-      <section name=""pages"" type=""System.Web.WebPages.Razor.Configuration.RazorPagesSection, System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35"" requirePermission=""false"" />
-    </sectionGroup>
-  </configSections>
-
-  <system.web.webPages.razor>
-    <host factoryType=""System.Web.Mvc.MvcWebRazorHostFactory, System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35"" />
-    <pages pageBaseType=""System.Web.Mvc.WebViewPage"">
-      <namespaces>
-        <add namespace=""System.Web.Mvc"" />
-        <add namespace=""System.Web.Mvc.Ajax"" />
-        <add namespace=""System.Web.Mvc.Html"" />
-        <add namespace=""System.Web.Routing"" />
-        <add namespace=""Coldairarrow.Web"" />
-      </namespaces>
-    </pages>
-  </system.web.webPages.razor>
-
-  <appSettings>
-    <add key=""webpages:Enabled"" value=""false"" />
-  </appSettings>
-
-  <system.webServer>
-    <handlers>
-      <remove name=""BlockViewHandler""/>
-      <add name=""BlockViewHandler"" path=""*"" verb=""*"" preCondition=""integratedMode"" type=""System.Web.HttpNotFoundHandler"" />
-    </handlers>
-  </system.webServer>
-</configuration>";
-            rootPath = AppDomain.CurrentDomain.BaseDirectory;
-            string webConfigPath = $@"{rootPath}Areas\{areaName}\Views\web.config";
-            if (!FileHelper.Exists(webConfigPath))
-                FileHelper.WriteTxt(webConfigCode, webConfigPath, FileMode.Create);
-        }
-
-        /// <summary>
-        /// 获取对应的数据库帮助类
-        /// </summary>
-        /// <param name="linkId">数据库连接Id</param>
-        /// <returns></returns>
         private DbHelper GetTheDbHelper(string linkId)
         {
             var theLink = GetTheLink(linkId);
@@ -650,12 +542,6 @@ $@"<?xml version=""1.0""?>
 
             return dbHelper;
         }
-
-        /// <summary>
-        /// 获取指定的数据库连接
-        /// </summary>
-        /// <param name="linkId">连接Id</param>
-        /// <returns></returns>
         private Base_DatabaseLink GetTheLink(string linkId)
         {
             Base_DatabaseLink resObj = new Base_DatabaseLink();
@@ -664,9 +550,7 @@ $@"<?xml version=""1.0""?>
 
             return resObj;
         }
-
         private DbHelper _dbHelper { get; set; }
-
         private Dictionary<string, DbTableInfo> _dbTableInfoDic { get; set; } = new Dictionary<string, DbTableInfo>();
 
         #endregion
