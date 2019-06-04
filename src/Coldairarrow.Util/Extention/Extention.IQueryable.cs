@@ -65,7 +65,8 @@ namespace Coldairarrow.Util
         /// <returns></returns>
         public static IOrderedQueryable<T> OrderBy<T>(this IQueryable<T> source, string sortColumn, string sortType)
         {
-            return source.OrderBy(new KeyValuePair<string, string>(sortColumn, sortType));
+            //return source.OrderBy(new KeyValuePair<string, string>(sortColumn, sortType));
+            return source.OrderBy($"{sortColumn} {sortType}");
         }
 
         /// <summary>
