@@ -1,6 +1,4 @@
-﻿using Coldairarrow.Util;
-using Microsoft.AspNetCore.Mvc;
-using System.IO;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace Coldairarrow.Web.Controllers
 {
@@ -13,11 +11,37 @@ namespace Coldairarrow.Web.Controllers
             return View();
         }
 
-        public ActionResult UploadFileIndex()
+        public ActionResult TreeGrid()
         {
             return View();
         }
-        public ActionResult UploadFileForm()
+
+        public ActionResult ZTree()
+        {
+            return View();
+        }
+
+        public ActionResult ZTreeSelect()
+        {
+            return View();
+        }
+
+        public ActionResult UploadImgForm()
+        {
+            return View();
+        }
+
+        public ActionResult DownloadFile()
+        {
+            return View();
+        }
+
+        public ActionResult SelectSearch()
+        {
+            return View();
+        }
+
+        public ActionResult BootstrapPwdBox()
         {
             return View();
         }
@@ -25,24 +49,6 @@ namespace Coldairarrow.Web.Controllers
         #endregion
 
         #region 接口
-
-        public ActionResult UploadFile(string fileBase64, string fileName)
-        {
-            byte[] bytes = fileBase64.ToBytes_FromBase64Str();
-            string fileDir = Path.Combine(GlobalSwitch.WebRootPath, "Upload", "File");
-            if (!Directory.Exists(fileDir))
-                Directory.CreateDirectory(fileDir);
-            string filePath = Path.Combine(fileDir, fileName);
-            using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                using (MemoryStream m = new MemoryStream(bytes))
-                {
-                    m.WriteTo(fileStream);
-                }
-            }
-
-            return Success();
-        }
 
         #endregion
     }

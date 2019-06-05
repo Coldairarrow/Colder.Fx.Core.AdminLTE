@@ -71,7 +71,12 @@ namespace Coldairarrow.Web
         /// <returns></returns>
         public override ContentResult Content(string content)
         {
-            return base.Content(content, "application/json", Encoding.UTF8);
+            return JsonContent(content);
+        }
+
+        public ContentResult JsonContent(string jsonStr)
+        {
+            return base.Content(jsonStr, "application/json", Encoding.UTF8);
         }
 
         /// <summary>

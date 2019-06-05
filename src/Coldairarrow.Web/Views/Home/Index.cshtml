@@ -433,7 +433,7 @@
             var desktop = '@desktopUrl';
             addTabs({
                 id: desktop,
-                title: '@tapName',
+                title: '@Html.Raw(tapName)',
                 close: true,
                 url: desktop,
             });
