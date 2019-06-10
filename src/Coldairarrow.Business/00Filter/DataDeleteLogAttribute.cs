@@ -20,7 +20,7 @@ namespace Coldairarrow.Business
         {
             List<string> ids = invocation.Arguments[0] as List<string>;
             var q = invocation.InvocationTarget.GetType().GetMethod("GetIQueryable").Invoke(invocation.InvocationTarget, new object[] { }) as IQueryable;
-            _deleteList = q.Where("@0.Contains(outerIt.Id)", ids).CastToList<object>();
+            _deleteList = q.Where("@0.Contains(Id)", ids).CastToList<object>();
         }
 
         public override void OnActionExecuted(IInvocation invocation)
