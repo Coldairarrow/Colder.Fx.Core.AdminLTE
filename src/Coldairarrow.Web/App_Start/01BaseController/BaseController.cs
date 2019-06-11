@@ -79,6 +79,11 @@ namespace Coldairarrow.Web
             return base.Content(jsonStr, "application/json", Encoding.UTF8);
         }
 
+        public ContentResult HtmlContent(string body)
+        {
+            return base.Content(body);
+        }
+
         /// <summary>
         /// 返回成功
         /// </summary>

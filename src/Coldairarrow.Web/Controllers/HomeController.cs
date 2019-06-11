@@ -29,14 +29,7 @@ namespace Coldairarrow.Web
             if (_operator.Logged())
             {
                 string loginUrl = Url.Content("~/");
-                string script = $@"    
-<html>
-    <script>
-        top.location.href = '{loginUrl}';
-    </script>
-</html>
-";
-                return Content(script);
+                return Redirect(loginUrl);
             }
 
             return View();
