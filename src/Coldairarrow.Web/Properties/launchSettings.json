@@ -3,7 +3,7 @@
     "windowsAuthentication": false, 
     "anonymousAuthentication": true, 
     "iisExpress": {
-      "applicationUrl": "http://127.0.0.1:51126",
+      "applicationUrl": "http://localhost:51126",
       "sslPort": 0
     }
   },
@@ -18,7 +18,7 @@
     "Coldairarrow.Web": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "http://127.0.0.1:51126",
+      "applicationUrl": "http://localhost:51126",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
