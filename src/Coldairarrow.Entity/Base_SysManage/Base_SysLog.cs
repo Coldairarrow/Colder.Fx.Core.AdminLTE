@@ -43,5 +43,9 @@ namespace Coldairarrow.Entity.Base_SysManage
         [Keyword]
         public DateTime? OpTime { get; set; }
 
+        /// <summary>
+        /// 数据备份
+        /// </summary>
+        public string Data { get; set; }
     }
 }

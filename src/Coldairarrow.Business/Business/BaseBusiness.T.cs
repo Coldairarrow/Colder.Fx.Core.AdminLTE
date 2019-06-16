@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
-using System.Linq.Dynamic;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 
@@ -538,9 +537,9 @@ namespace Coldairarrow.Business
             List<string> ids = selectedValueJson?.ToList<string>() ?? new List<string>();
             if (ids.Count > 0)
             {
-                selectedList = GetNewQ().Where($"@0.Contains(outerIt.{valueField})", ids).ToList();
+                selectedList = GetNewQ().Where($"@0.Contains({valueField})", ids).ToList();
 
-                where += $" && !@0.Contains(outerIt.{valueField})";
+                where += $" && !@0.Contains({valueField})";
             }
 
             if (!q.IsNullOrEmpty())

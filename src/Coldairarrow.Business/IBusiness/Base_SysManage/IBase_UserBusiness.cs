@@ -6,7 +6,7 @@ namespace Coldairarrow.Business.Base_SysManage
 {
     public interface IBase_UserBusiness
     {
-        List<Base_UserDTO> GetDataList(Pagination pagination, string userId = null, string keyword = null);
+        List<Base_UserDTO> GetDataList(Pagination pagination, bool all, string userId = null, string keyword = null);
         Base_User GetTheData(string id);
         Base_UserDTO GetTheInfo(string userId);
         void AddData(Base_User newData);
@@ -42,5 +42,7 @@ namespace Coldairarrow.Business.Base_SysManage
                 return (EnumType.RoleType)type;
             }
         }
+
+        public string DepartmentName { get; set; }
     }
 }

@@ -26,7 +26,7 @@ namespace Coldairarrow.Business
         public override void OnActionExecuted(IInvocation invocation)
         {
             string names = string.Join(",", _deleteList.Select(x => x.GetPropertyValue(_nameField)?.ToString()));
-            BusHelper.WriteSysLog($"删除{_dataName}:{names}", _logType);
+            BusHelper.WriteSysLog($"删除{_dataName}:{names}", _logType, _deleteList.ToJson());
         }
     }
 }

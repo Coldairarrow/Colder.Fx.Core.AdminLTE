@@ -10,7 +10,7 @@ namespace Coldairarrow.Business
         /// </summary>
         /// <param name="logContent">日志内容</param>
         /// <param name="logType">日志类型</param>
-        void WriteSysLog(string logContent, EnumType.LogType logType);
+        void WriteSysLog(string logContent, EnumType.LogType logType, string data = null);
 
         /// <summary>
         /// 处理系统异常

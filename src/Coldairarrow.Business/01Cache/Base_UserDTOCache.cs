@@ -10,7 +10,7 @@ namespace Coldairarrow.Business.Cache
         protected override string _moduleKey => "Base_UserDTO";
         protected override Base_UserDTO GetDbData(string key)
         {
-            return SysUserBus.GetDataList(new Pagination(), key).FirstOrDefault();
+            return SysUserBus.GetDataList(new Pagination(), true, key).FirstOrDefault();
         }
     }
 }

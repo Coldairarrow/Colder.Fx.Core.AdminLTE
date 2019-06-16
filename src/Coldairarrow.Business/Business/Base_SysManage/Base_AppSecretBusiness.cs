@@ -38,6 +38,9 @@ namespace Coldairarrow.Business.Base_SysManage
         /// 添加数据
         /// </summary>
         /// <param name="newData">数据</param>
+        [DataRepeatValidate(new string[] { "AppId" },
+            new string[] { "应用Id" })]
+        [DataAddLog(EnumType.LogType.接口密钥管理, "应用Id", "AppId")]
         public void AddData(Base_AppSecret newData)
         {
             Insert(newData);
@@ -46,6 +49,9 @@ namespace Coldairarrow.Business.Base_SysManage
         /// <summary>
         /// 更新数据
         /// </summary>
+        [DataRepeatValidate(new string[] { "AppId" },
+            new string[] { "应用Id" })]
+        [DataEditLog(EnumType.LogType.接口密钥管理, "应用Id", "AppId")]
         public void UpdateData(Base_AppSecret theData)
         {
             Update(theData);
@@ -55,6 +61,8 @@ namespace Coldairarrow.Business.Base_SysManage
         /// 删除数据
         /// </summary>
         /// <param name="theData">删除的数据</param>
+        /// 
+        [DataDeleteLog(EnumType.LogType.接口密钥管理, "应用Id", "AppId")]
         public void DeleteData(List<string> ids)
         {
             Delete(ids);

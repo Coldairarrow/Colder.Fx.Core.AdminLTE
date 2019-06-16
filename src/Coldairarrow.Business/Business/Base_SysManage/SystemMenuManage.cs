@@ -76,42 +76,55 @@ namespace Coldairarrow.Business.Base_SysManage
 
             if (GlobalSwitch.RunModel == RunModel.LocalTest)
             {
-                Menu newMenu1_1 = new Menu
+                Menu developMenu = new Menu
                 {
                     text = "开发",
                     icon = "glyphicon glyphicon-console",
                     children = new List<Menu>()
                 };
-                menus.Add(newMenu1_1);
-                Menu newMenu1_1_1 = new Menu
+                menus.Add(developMenu);
+                developMenu.children.Add(new Menu
                 {
                     text = "代码生成",
                     icon = "fa fa-circle-o",
                     url = GetUrl("~/Base_SysManage/RapidDevelopment/Index")
-                };
-                newMenu1_1.children.Add(newMenu1_1_1);
-
-                Menu newMenu1_1_2 = new Menu
+                });
+                developMenu.children.Add(new Menu
                 {
                     text = "数据库连接管理",
                     icon = "fa fa-circle-o",
                     url = GetUrl("~/Base_SysManage/Base_DatabaseLink/Index")
-                };
-                newMenu1_1.children.Add(newMenu1_1_2);
-
-                //Menu newMenu1_1_3 = new Menu
-                //{
-                //    text = "UEditor Demo",
-                //    url = GetUrl("~/Demo/UMEditor")
-                //};
-                //newMenu1_1.children.Add(newMenu1_1_3);
-
-                //Menu newMenu1_1_4 = new Menu
-                //{
-                //    text = "文件上传Demo",
-                //    url = GetUrl("~/Demo/UploadFileIndex")
-                //};
-                //newMenu1_1.children.Add(newMenu1_1_4);
+                });
+                developMenu.children.Add(new Menu
+                {
+                    text = "UMEditor Demo",
+                    icon = "fa fa-circle-o",
+                    url = GetUrl("~/Demo/UMEditor")
+                });
+                developMenu.children.Add(new Menu
+                {
+                    text = "下拉搜索",
+                    icon = "fa fa-circle-o",
+                    url = GetUrl("~/Demo/SelectSearch")
+                });
+                developMenu.children.Add(new Menu
+                {
+                    text = "上传文件",
+                    icon = "fa fa-circle-o",
+                    url = GetUrl("~/Demo/UploadFile")
+                });
+                developMenu.children.Add(new Menu
+                {
+                    text = "下载文件",
+                    icon = "fa fa-circle-o",
+                    url = GetUrl("~/Demo/DownloadFile")
+                });
+                developMenu.children.Add(new Menu
+                {
+                    text = "表格树及下拉树",
+                    icon = "fa fa-circle-o",
+                    url = GetUrl("~/Base_SysManage/Base_Department/Index")
+                });
             }
 
             _allMenu = menus;

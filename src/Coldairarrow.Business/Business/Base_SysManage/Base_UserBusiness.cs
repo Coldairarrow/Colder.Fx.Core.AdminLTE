@@ -1,11 +1,11 @@
-using AutoMapper;
 using Coldairarrow.Business.Cache;
 using Coldairarrow.Entity.Base_SysManage;
 using Coldairarrow.Util;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic;
+using System.Linq.Expressions;
 
 namespace Coldairarrow.Business.Base_SysManage
 {
@@ -13,19 +13,26 @@ namespace Coldairarrow.Business.Base_SysManage
     {
         #region DI
 
-        public Base_UserBusiness(IBase_UserDTOCache sysUserCache, IOperator @operator, IPermissionManage permissionManage)
+        public Base_UserBusiness(IBase_UserDTOCache sysUserCache, IOperator @operator, IPermissionManage permissionManage, IDataPermission dataPermission)
         {
             _sysUserCache = sysUserCache;
             _operator = @operator;
             _permissionManage = permissionManage;
+            _dataPermission = dataPermission;
         }
         IBase_UserDTOCache _sysUserCache { get; }
         IOperator _operator { get; }
         IPermissionManage _permissionManage { get; }
+        IDataPermission _dataPermission { get; }
 
         #endregion
 
         #region 重写
+
+        public override IQueryable<Base_User> GetIQueryable()
+        {
+            return _dataPermission.GetIQ_Base_User(Service);
+        }
 
         protected override EnumType.LogType LogType => EnumType.LogType.系统用户管理;
 
@@ -33,21 +40,30 @@ namespace Coldairarrow.Business.Base_SysManage
 
         #region 外部接口
 
-        public List<Base_UserDTO> GetDataList(Pagination pagination, string userId = null, string keyword = null)
+        public List<Base_UserDTO> GetDataList(Pagination pagination, bool all, string userId = null, string keyword = null)
         {
-            var where = LinqHelper.True<Base_User>();
+            Expression<Func<Base_User, Base_Department, Base_UserDTO>> select = (a, b) => new Base_UserDTO
+            {
+                DepartmentName = b.Name
+            };
+            select = select.BuildExtendSelectExpre();
+            var q_User = all ? Service.GetIQueryable<Base_User>() : GetIQueryable();
+            var q = from a in q_User.AsExpandable()
+                    join b in Service.GetIQueryable<Base_Department>() on a.DepartmentId equals b.Id into ab
+                    from b in ab.DefaultIfEmpty()
+                    select @select.Invoke(a, b);
+
+            var where = LinqHelper.True<Base_UserDTO>();
             if (!userId.IsNullOrEmpty())
                 where = where.And(x => x.Id == userId);
             if (!keyword.IsNullOrEmpty())
             {
                 where = where.And(x =>
-                    x.UserName.Contains(keyword)
-                    || x.RealName.Contains(keyword));
+                    EF.Functions.Like(x.UserName, keyword)
+                    || EF.Functions.Like(x.RealName, keyword));
             }
 
-            var list = GetIQueryable().Where(where).GetPagination(pagination).ToList()
-                .Select(x => Mapper.Map<Base_UserDTO>(x))
-                .ToList();
+            var list = q.Where(where).GetPagination(pagination).ToList();
 
             SetProperty(list);
 

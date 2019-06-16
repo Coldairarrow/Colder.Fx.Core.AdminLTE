@@ -18,7 +18,7 @@ namespace Coldairarrow.Business
         /// </summary>
         /// <param name="logContent">日志内容</param>
         /// <param name="logType">日志类型</param>
-        public void WriteSysLog(string logContent, EnumType.LogType logType)
+        public void WriteSysLog(string logContent, EnumType.LogType logType, string data = null)
         {
             string userName = null;
             try
@@ -35,7 +35,8 @@ namespace Coldairarrow.Business
                 LogType = logType.ToString(),
                 LogContent = logContent.Replace("\r\n", "<br />").Replace("  ", "&nbsp;&nbsp;"),
                 OpTime = DateTime.Now,
-                OpUserName = userName
+                OpUserName = userName,
+                Data = data
             };
             Task.Run(() =>
             {

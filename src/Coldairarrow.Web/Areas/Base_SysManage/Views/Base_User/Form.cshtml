@@ -1,4 +1,4 @@
-@inherits  DependencyViewPage
+@inherits DependencyViewPage
 
 @using Coldairarrow.Entity.Base_SysManage;
 @using Coldairarrow.Util;
@@ -61,6 +61,13 @@
                 <div class="help-block with-errors"></div>
             </div>
         </div>
+        <div class="form-group form-group-sm">
+            <label class="col-sm-2 control-label">所属部门</label>
+            <div class="col-sm-5">
+                <select name="DepartmentId" id="DepartmentId"></select>
+                <div class="help-block with-errors"></div>
+            </div>
+        </div>
         <div class="form-group">
             <button id="submit" type="submit" class="hidden">提交</button>
         </div>
@@ -75,6 +82,10 @@
     });
     //事件绑定
     function initEvent() {
+        $('#DepartmentId').zTreeSelect({
+            url: '/Base_SysManage/Base_Department/GetDataList_ZTree',
+            value: theEntity['DepartmentId']
+        });
         $('#Pwd').bootstrapPwdBox();
 
         $('#Sex').selectpicker({

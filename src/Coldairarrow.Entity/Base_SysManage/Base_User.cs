@@ -41,5 +41,10 @@ namespace Coldairarrow.Entity.Base_SysManage
         /// 出生日期
         /// </summary>
         public DateTime? Birthday { get; set; }
+
+        /// <summary>
+        /// 所属部门Id
+        /// </summary>
+        public string DepartmentId { get; set; }
     }
 }

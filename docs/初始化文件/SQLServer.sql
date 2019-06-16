@@ -4,14 +4,14 @@ Navicat SQL Server Data Transfer
 Source Server         : .@SQLServer
 Source Server Version : 105000
 Source Host           : .:1433
-Source Database       : Colder.Fx.Core.AdminLTE
+Source Database       : Colder.Fx.Net.AdminLTE
 Source Schema         : dbo
 
 Target Server Type    : SQL Server
 Target Server Version : 105000
 File Encoding         : 65001
 
-Date: 2019-06-04 21:57:50
+Date: 2019-06-15 21:32:03
 */
 
 
@@ -101,7 +101,7 @@ GO
 -- ----------------------------
 BEGIN TRANSACTION
 GO
-INSERT INTO [Base_AppSecret] ([Id], [AppId], [AppSecret], [AppName]) VALUES (N'039e41170bc72-b89139b1-f3f4-430e-aed7-36b193d256dc', N'AppAdmin', N'7344a9c5-4f8c-4725-bde5-3fb99716f457', N'超级权限')
+INSERT INTO [Base_AppSecret] ([Id], [AppId], [AppSecret], [AppName]) VALUES (N'039e41170bc72-b89139b1-f3f4-430e-aed7-36b193d256dc', N'AppAdmin', N'VjxNekN2G2z0qrjW', N'超级权限')
 GO
 GO
 COMMIT TRANSACTION
@@ -208,7 +208,84 @@ GO
 -- ----------------------------
 BEGIN TRANSACTION
 GO
-INSERT INTO [Base_DatabaseLink] ([Id], [LinkName], [ConnectionStr], [DbType], [SortNum]) VALUES (N'039e900bc6bbb-a0070d5c-1fc7-4cf0-a177-e3aebc4633c5', N'SqlServer', N'Data Source=.;Initial Catalog=Colder.Fx.Core.AdminLTE;Integrated Security=True', N'SqlServer', N'aa')
+INSERT INTO [Base_DatabaseLink] ([Id], [LinkName], [ConnectionStr], [DbType], [SortNum]) VALUES (N'039e900bc6bbb-a0070d5c-1fc7-4cf0-a177-e3aebc4633c5', N'SqlServer', N'Data Source=.;Initial Catalog=Colder.Fx.Net.AdminLTE;Integrated Security=True', N'SqlServer', N'aa')
+GO
+GO
+COMMIT TRANSACTION
+GO
+
+-- ----------------------------
+-- Table structure for Base_Department
+-- ----------------------------
+CREATE TABLE [Base_Department] (
+[Id] varchar(50) NOT NULL ,
+[Name] varchar(50) NULL ,
+[ParentId] varchar(50) NULL 
+)
+
+
+GO
+IF ((SELECT COUNT(*) from fn_listextendedproperty('MS_Description', 
+'SCHEMA', N'dbo', 
+'TABLE', N'Base_Department', 
+NULL, NULL)) > 0) 
+EXEC sp_updateextendedproperty @name = N'MS_Description', @value = N'部门表'
+, @level0type = 'SCHEMA', @level0name = N'dbo'
+, @level1type = 'TABLE', @level1name = N'Base_Department'
+ELSE
+EXEC sp_addextendedproperty @name = N'MS_Description', @value = N'部门表'
+, @level0type = 'SCHEMA', @level0name = N'dbo'
+, @level1type = 'TABLE', @level1name = N'Base_Department'
+GO
+IF ((SELECT COUNT(*) from fn_listextendedproperty('MS_Description', 
+'SCHEMA', N'dbo', 
+'TABLE', N'Base_Department', 
+'COLUMN', N'Id')) > 0) 
+EXEC sp_updateextendedproperty @name = N'MS_Description', @value = N'自然主键'
+, @level0type = 'SCHEMA', @level0name = N'dbo'
+, @level1type = 'TABLE', @level1name = N'Base_Department'
+, @level2type = 'COLUMN', @level2name = N'Id'
+ELSE
+EXEC sp_addextendedproperty @name = N'MS_Description', @value = N'自然主键'
+, @level0type = 'SCHEMA', @level0name = N'dbo'
+, @level1type = 'TABLE', @level1name = N'Base_Department'
+, @level2type = 'COLUMN', @level2name = N'Id'
+GO
+IF ((SELECT COUNT(*) from fn_listextendedproperty('MS_Description', 
+'SCHEMA', N'dbo', 
+'TABLE', N'Base_Department', 
+'COLUMN', N'Name')) > 0) 
+EXEC sp_updateextendedproperty @name = N'MS_Description', @value = N'部门名'
+, @level0type = 'SCHEMA', @level0name = N'dbo'
+, @level1type = 'TABLE', @level1name = N'Base_Department'
+, @level2type = 'COLUMN', @level2name = N'Name'
+ELSE
+EXEC sp_addextendedproperty @name = N'MS_Description', @value = N'部门名'
+, @level0type = 'SCHEMA', @level0name = N'dbo'
+, @level1type = 'TABLE', @level1name = N'Base_Department'
+, @level2type = 'COLUMN', @level2name = N'Name'
+GO
+IF ((SELECT COUNT(*) from fn_listextendedproperty('MS_Description', 
+'SCHEMA', N'dbo', 
+'TABLE', N'Base_Department', 
+'COLUMN', N'ParentId')) > 0) 
+EXEC sp_updateextendedproperty @name = N'MS_Description', @value = N'上级部门Id'
+, @level0type = 'SCHEMA', @level0name = N'dbo'
+, @level1type = 'TABLE', @level1name = N'Base_Department'
+, @level2type = 'COLUMN', @level2name = N'ParentId'
+ELSE
+EXEC sp_addextendedproperty @name = N'MS_Description', @value = N'上级部门Id'
+, @level0type = 'SCHEMA', @level0name = N'dbo'
+, @level1type = 'TABLE', @level1name = N'Base_Department'
+, @level2type = 'COLUMN', @level2name = N'ParentId'
+GO
+
+-- ----------------------------
+-- Records of Base_Department
+-- ----------------------------
+BEGIN TRANSACTION
+GO
+INSERT INTO [Base_Department] ([Id], [Name], [ParentId]) VALUES (N'1139811378824089600', N'宁波分公司', null), (N'1139811435694657536', N'鄞州事业部', N'1139811378824089600'), (N'1139812293048143872', N'江北事业部', N'1139811378824089600')
 GO
 GO
 COMMIT TRANSACTION
@@ -359,7 +436,7 @@ GO
 -- ----------------------------
 BEGIN TRANSACTION
 GO
-INSERT INTO [Base_PermissionRole] ([Id], [RoleId], [PermissionValue]) VALUES (N'1133345848604889088', N'1133011663516209152', N'sysuser.search'), (N'1133345848604889089', N'1133011663516209152', N'sysuser.manage'), (N'1133345848604889090', N'1133011663516209152', N'sysrole.search'), (N'1133345848604889091', N'1133011663516209152', N'sysrole.manage')
+INSERT INTO [Base_PermissionRole] ([Id], [RoleId], [PermissionValue]) VALUES (N'1139819691020259328', N'1133011663516209152', N'sysuser.search'), (N'1139819691020259329', N'1133011663516209152', N'sysrole.search'), (N'1139819691020259330', N'1133011663516209152', N'department.search'), (N'1139819691020259331', N'1133011663516209152', N'appsecret.search'), (N'1139819691020259332', N'1133011663516209152', N'sysLog.search')
 GO
 GO
 COMMIT TRANSACTION
@@ -450,7 +527,8 @@ CREATE TABLE [Base_SysLog] (
 [LogType] varchar(255) NULL ,
 [LogContent] varchar(MAX) NULL ,
 [OpUserName] varchar(255) NULL ,
-[OpTime] datetime NULL 
+[OpTime] datetime NULL ,
+[Data] text NULL 
 )
 
 
@@ -537,14 +615,25 @@ EXEC sp_addextendedproperty @name = N'MS_Description', @value = N'日志记录�
 , @level1type = 'TABLE', @level1name = N'Base_SysLog'
 , @level2type = 'COLUMN', @level2name = N'OpTime'
 GO
+IF ((SELECT COUNT(*) from fn_listextendedproperty('MS_Description', 
+'SCHEMA', N'dbo', 
+'TABLE', N'Base_SysLog', 
+'COLUMN', N'Data')) > 0) 
+EXEC sp_updateextendedproperty @name = N'MS_Description', @value = N'数据备份'
+, @level0type = 'SCHEMA', @level0name = N'dbo'
+, @level1type = 'TABLE', @level1name = N'Base_SysLog'
+, @level2type = 'COLUMN', @level2name = N'Data'
+ELSE
+EXEC sp_addextendedproperty @name = N'MS_Description', @value = N'数据备份'
+, @level0type = 'SCHEMA', @level0name = N'dbo'
+, @level1type = 'TABLE', @level1name = N'Base_SysLog'
+, @level2type = 'COLUMN', @level2name = N'Data'
+GO
 
 -- ----------------------------
 -- Records of Base_SysLog
 -- ----------------------------
 BEGIN TRANSACTION
-GO
-INSERT INTO [Base_SysLog] ([Id], [LogType], [LogContent], [OpUserName], [OpTime]) VALUES (N'1134061523694653440', N'系统用户管理', N'修改用户:312321', N'超级管理员', N'2019-05-30 19:38:31.750'), (N'1134084489014808576', N'系统用户管理', N'修改用户:312321', N'超级管理员', N'2019-05-30 21:09:47.110'), (N'1134629240688480256', N'系统用户管理', N'修改用户:312321', N'超级管理员', N'2019-06-01 09:14:26.030'), (N'1134629639390629888', N'系统用户管理', N'修改用户:xiaoming', N'超级管理员', N'2019-06-01 09:16:01.087'), (N'1134629682306748416', N'系统用户管理', N'修改用户:xiaoming', N'超级管理员', N'2019-06-01 09:16:11.320'), (N'1134629761109331968', N'系统用户管理', N'修改用户:xiaoming', N'超级管理员', N'2019-06-01 09:16:30.107'), (N'1134630005599506432', N'系统用户管理', N'修改用户:xiaoming', N'超级管理员', N'2019-06-01 09:17:28.400'), (N'1134630141855666176', N'系统用户管理', N'修改用户:xiaoming', N'超级管理员', N'2019-06-01 09:18:00.887'), (N'1135549917687844864', N'系统异常', N'<br />1层错误:<br />&nbsp;&nbsp;消息:<br />&nbsp;&nbsp;&nbsp;&nbsp;不支持此操作!<br />&nbsp;&nbsp;位置:<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; at Coldairarrow.DataRepository.DbRepository.Delete_Sql[T](Expression`1 condition) in D:\文档\0软件项目\GitHub\Colder.Fx.Core.AdminLTE\src\Coldairarrow.DataRepository\Repository\DbRepository.cs:line 368<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; at Coldairarrow.Business.Base_SysManage.Base_SysRoleBusiness.SavePermission(String roleId, List`1 permissions) in D:\文档\0软件项目\GitHub\Colder.Fx.Core.AdminLTE\src\Coldairarrow.Business\Business\Base_SysManage\Base_SysRoleBusiness.cs:line 90<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; at Coldairarrow.Util.Interceptor.Intercept(IInvocation invocation) in D:\文档\0软件项目\GitHub\Colder.Fx.Core.AdminLTE\src\Coldairarrow.Util\DI\Interceptor.cs:line 24<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; at Coldairarrow.Web.Areas.Base_SysManage.Controllers.Base_SysRoleController.SavePermission(String roleId, String permissions) in D:\文档\0软件项目\GitHub\Colder.Fx.Core.AdminLTE\src\Coldairarrow.Web\Areas\Base_SysManage\Controllers\Base_SysRoleController.cs:line 109<br /><br />', N'超级管理员', N'2019-06-03 22:12:52.533'), (N'1135550316536795136', N'系统异常', N'<br />1层错误:<br />&nbsp;&nbsp;消息:<br />&nbsp;&nbsp;&nbsp;&nbsp;不支持此操作!<br />&nbsp;&nbsp;位置:<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; at Coldairarrow.DataRepository.DbRepository.Delete_Sql[T](Expression`1 condition) in D:\文档\0软件项目\GitHub\Colder.Fx.Core.AdminLTE\src\Coldairarrow.DataRepository\Repository\DbRepository.cs:line 368<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; at Coldairarrow.Business.Base_SysManage.PermissionManage.SetUserPermission(String userId, List`1 permissions) in D:\文档\0软件项目\GitHub\Colder.Fx.Core.AdminLTE\src\Coldairarrow.Business\Business\Base_SysManage\PermissionManage.cs:line 257<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; at Coldairarrow.Web.Areas.Base_SysManage.Controllers.Base_UserController.SavePermission(String userId, String permissions) in D:\文档\0软件项目\GitHub\Colder.Fx.Core.AdminLTE\src\Coldairarrow.Web\Areas\Base_SysManage\Controllers\Base_UserController.cs:line 128<br /><br />', N'超级管理员', N'2019-06-03 22:14:27.627'), (N'1135905764288892928', N'系统用户管理', N'修改用户:xiaoming', N'超级管理员', N'2019-06-04 21:46:52.973'), (N'1135905778398531584', N'系统用户管理', N'修改用户:xiaoming', N'超级管理员', N'2019-06-04 21:46:56.337'), (N'1135905794324303872', N'系统用户管理', N'修改用户:xiaoming', N'超级管理员', N'2019-06-04 21:47:00.133'), (N'1135905823822843904', N'系统用户管理', N'修改用户:xiaoming', N'超级管理员', N'2019-06-04 21:47:07.167'), (N'1135905844412682240', N'系统用户管理', N'修改用户:xiaoming', N'超级管理员', N'2019-06-04 21:47:12.077')
-GO
 GO
 COMMIT TRANSACTION
 GO
@@ -655,152 +744,8 @@ GO
 -- ----------------------------
 BEGIN TRANSACTION
 GO
-INSERT INTO [Base_UnitTest] ([Id], [UserId], [UserName], [Age]) VALUES (N'10', null, null, null), (N'1135907004167098368', N'1135907004167098369', N'超级管理员', N'22'), (N'13c290da-0830-435b-9b1e-b0510a842173', N'Admin', N'超级管理员', N'22')
+INSERT INTO [Base_UnitTest] ([Id], [UserId], [UserName], [Age]) VALUES (N'10', null, null, null), (N'1139855817357529088', N'1139855817357529089', N'超级管理员', N'22'), (N'6a1230b5-43fa-4d4c-8c3e-59f8e10d89a1', N'Admin', N'超级管理员', N'22')
 GO
-GO
-COMMIT TRANSACTION
-GO
-
--- ----------------------------
--- Table structure for Base_UnitTest_0
--- ----------------------------
-CREATE TABLE [Base_UnitTest_0] (
-[Id] varchar(50) NOT NULL ,
-[UserId] varchar(50) NULL ,
-[UserName] varchar(50) NULL ,
-[Age] int NULL 
-)
-
-
-GO
-IF ((SELECT COUNT(*) from fn_listextendedproperty('MS_Description', 
-'SCHEMA', N'dbo', 
-'TABLE', N'Base_UnitTest_0', 
-NULL, NULL)) > 0) 
-EXEC sp_updateextendedproperty @name = N'MS_Description', @value = N'单元测试表'
-, @level0type = 'SCHEMA', @level0name = N'dbo'
-, @level1type = 'TABLE', @level1name = N'Base_UnitTest_0'
-ELSE
-EXEC sp_addextendedproperty @name = N'MS_Description', @value = N'单元测试表'
-, @level0type = 'SCHEMA', @level0name = N'dbo'
-, @level1type = 'TABLE', @level1name = N'Base_UnitTest_0'
-GO
-IF ((SELECT COUNT(*) from fn_listextendedproperty('MS_Description', 
-'SCHEMA', N'dbo', 
-'TABLE', N'Base_UnitTest_0', 
-'COLUMN', N'Id')) > 0) 
-EXEC sp_updateextendedproperty @name = N'MS_Description', @value = N'代理主键'
-, @level0type = 'SCHEMA', @level0name = N'dbo'
-, @level1type = 'TABLE', @level1name = N'Base_UnitTest_0'
-, @level2type = 'COLUMN', @level2name = N'Id'
-ELSE
-EXEC sp_addextendedproperty @name = N'MS_Description', @value = N'代理主键'
-, @level0type = 'SCHEMA', @level0name = N'dbo'
-, @level1type = 'TABLE', @level1name = N'Base_UnitTest_0'
-, @level2type = 'COLUMN', @level2name = N'Id'
-GO
-
--- ----------------------------
--- Records of Base_UnitTest_0
--- ----------------------------
-BEGIN TRANSACTION
-GO
-COMMIT TRANSACTION
-GO
-
--- ----------------------------
--- Table structure for Base_UnitTest_1
--- ----------------------------
-CREATE TABLE [Base_UnitTest_1] (
-[Id] varchar(50) NOT NULL ,
-[UserId] varchar(50) NULL ,
-[UserName] varchar(50) NULL ,
-[Age] int NULL 
-)
-
-
-GO
-IF ((SELECT COUNT(*) from fn_listextendedproperty('MS_Description', 
-'SCHEMA', N'dbo', 
-'TABLE', N'Base_UnitTest_1', 
-NULL, NULL)) > 0) 
-EXEC sp_updateextendedproperty @name = N'MS_Description', @value = N'单元测试表'
-, @level0type = 'SCHEMA', @level0name = N'dbo'
-, @level1type = 'TABLE', @level1name = N'Base_UnitTest_1'
-ELSE
-EXEC sp_addextendedproperty @name = N'MS_Description', @value = N'单元测试表'
-, @level0type = 'SCHEMA', @level0name = N'dbo'
-, @level1type = 'TABLE', @level1name = N'Base_UnitTest_1'
-GO
-IF ((SELECT COUNT(*) from fn_listextendedproperty('MS_Description', 
-'SCHEMA', N'dbo', 
-'TABLE', N'Base_UnitTest_1', 
-'COLUMN', N'Id')) > 0) 
-EXEC sp_updateextendedproperty @name = N'MS_Description', @value = N'代理主键'
-, @level0type = 'SCHEMA', @level0name = N'dbo'
-, @level1type = 'TABLE', @level1name = N'Base_UnitTest_1'
-, @level2type = 'COLUMN', @level2name = N'Id'
-ELSE
-EXEC sp_addextendedproperty @name = N'MS_Description', @value = N'代理主键'
-, @level0type = 'SCHEMA', @level0name = N'dbo'
-, @level1type = 'TABLE', @level1name = N'Base_UnitTest_1'
-, @level2type = 'COLUMN', @level2name = N'Id'
-GO
-
--- ----------------------------
--- Records of Base_UnitTest_1
--- ----------------------------
-BEGIN TRANSACTION
-GO
-INSERT INTO [Base_UnitTest_1] ([Id], [UserId], [UserName], [Age]) VALUES (N'affbf4a5-ce84-4a91-bb37-2a9a957c3967', N'Admin', N'1135907013855940608', N'22')
-GO
-GO
-COMMIT TRANSACTION
-GO
-
--- ----------------------------
--- Table structure for Base_UnitTest_2
--- ----------------------------
-CREATE TABLE [Base_UnitTest_2] (
-[Id] varchar(50) NOT NULL ,
-[UserId] varchar(50) NULL ,
-[UserName] varchar(50) NULL ,
-[Age] int NULL 
-)
-
-
-GO
-IF ((SELECT COUNT(*) from fn_listextendedproperty('MS_Description', 
-'SCHEMA', N'dbo', 
-'TABLE', N'Base_UnitTest_2', 
-NULL, NULL)) > 0) 
-EXEC sp_updateextendedproperty @name = N'MS_Description', @value = N'单元测试表'
-, @level0type = 'SCHEMA', @level0name = N'dbo'
-, @level1type = 'TABLE', @level1name = N'Base_UnitTest_2'
-ELSE
-EXEC sp_addextendedproperty @name = N'MS_Description', @value = N'单元测试表'
-, @level0type = 'SCHEMA', @level0name = N'dbo'
-, @level1type = 'TABLE', @level1name = N'Base_UnitTest_2'
-GO
-IF ((SELECT COUNT(*) from fn_listextendedproperty('MS_Description', 
-'SCHEMA', N'dbo', 
-'TABLE', N'Base_UnitTest_2', 
-'COLUMN', N'Id')) > 0) 
-EXEC sp_updateextendedproperty @name = N'MS_Description', @value = N'代理主键'
-, @level0type = 'SCHEMA', @level0name = N'dbo'
-, @level1type = 'TABLE', @level1name = N'Base_UnitTest_2'
-, @level2type = 'COLUMN', @level2name = N'Id'
-ELSE
-EXEC sp_addextendedproperty @name = N'MS_Description', @value = N'代理主键'
-, @level0type = 'SCHEMA', @level0name = N'dbo'
-, @level1type = 'TABLE', @level1name = N'Base_UnitTest_2'
-, @level2type = 'COLUMN', @level2name = N'Id'
-GO
-
--- ----------------------------
--- Records of Base_UnitTest_2
--- ----------------------------
-BEGIN TRANSACTION
 GO
 COMMIT TRANSACTION
 GO
@@ -814,7 +759,8 @@ CREATE TABLE [Base_User] (
 [Password] varchar(255) NULL ,
 [RealName] varchar(50) NULL ,
 [Sex] int NULL ,
-[Birthday] date NULL 
+[Birthday] date NULL ,
+[DepartmentId] varchar(50) NULL 
 )
 
 
@@ -915,13 +861,27 @@ EXEC sp_addextendedproperty @name = N'MS_Description', @value = N'出生日期'
 , @level1type = 'TABLE', @level1name = N'Base_User'
 , @level2type = 'COLUMN', @level2name = N'Birthday'
 GO
+IF ((SELECT COUNT(*) from fn_listextendedproperty('MS_Description', 
+'SCHEMA', N'dbo', 
+'TABLE', N'Base_User', 
+'COLUMN', N'DepartmentId')) > 0) 
+EXEC sp_updateextendedproperty @name = N'MS_Description', @value = N'所属部门Id'
+, @level0type = 'SCHEMA', @level0name = N'dbo'
+, @level1type = 'TABLE', @level1name = N'Base_User'
+, @level2type = 'COLUMN', @level2name = N'DepartmentId'
+ELSE
+EXEC sp_addextendedproperty @name = N'MS_Description', @value = N'所属部门Id'
+, @level0type = 'SCHEMA', @level0name = N'dbo'
+, @level1type = 'TABLE', @level1name = N'Base_User'
+, @level2type = 'COLUMN', @level2name = N'DepartmentId'
+GO
 
 -- ----------------------------
 -- Records of Base_User
 -- ----------------------------
 BEGIN TRANSACTION
 GO
-INSERT INTO [Base_User] ([Id], [UserName], [Password], [RealName], [Sex], [Birthday]) VALUES (N'1133345545746780160', N'xiaoming', N'e10adc3949ba59abbe56e057f20f883e', N'xiaoming', N'1', null), (N'Admin', N'Admin', N'e10adc3949ba59abbe56e057f20f883e', N'超级管理员', N'1', N'2017-12-15')
+INSERT INTO [Base_User] ([Id], [UserName], [Password], [RealName], [Sex], [Birthday], [DepartmentId]) VALUES (N'1133345545746780160', N'xiaoming', N'e10adc3949ba59abbe56e057f20f883e', N'xiaoming', N'1', null, N'1139811435694657536'), (N'Admin', N'Admin', N'e10adc3949ba59abbe56e057f20f883e', N'超级管理员', N'1', N'2017-12-15', N'1139811378824089600')
 GO
 GO
 COMMIT TRANSACTION
@@ -943,6 +903,9 @@ GO
 -- Records of Base_UserRoleMap
 -- ----------------------------
 BEGIN TRANSACTION
+GO
+INSERT INTO [Base_UserRoleMap] ([Id], [UserId], [RoleId]) VALUES (N'1139822682855051264', N'1133345545746780160', N'1133011663516209152')
+GO
 GO
 COMMIT TRANSACTION
 GO
@@ -1048,7 +1011,7 @@ GO
 -- ----------------------------
 BEGIN TRANSACTION
 GO
-INSERT INTO [Dev_Project] ([Id], [ProjectId], [ProjectName], [ProjectTypeId], [ProjectManagerId]) VALUES (N'a', N'a', N'a', N'sadsa', N'a')
+INSERT INTO [Dev_Project] ([Id], [ProjectId], [ProjectName], [ProjectTypeId], [ProjectManagerId]) VALUES (N'039e943dea9f4-30e0e19b-828e-4938-98b6-da3941987925', N'asdsa', N'厉害了', N'5645646', N'zxzx')
 GO
 GO
 COMMIT TRANSACTION
@@ -1132,174 +1095,6 @@ COMMIT TRANSACTION
 GO
 
 -- ----------------------------
--- Procedure structure for spCloneTableStructure
--- ----------------------------
-CREATE PROCEDURE [spCloneTableStructure]
-
-@SourceTable            nvarchar(255),
-@DestinationTable       nvarchar(255),
-@PartionField           nvarchar(255) = '',
-@SourceSchema           nvarchar(255) = 'dbo',  
-@DestinationSchema      nvarchar(255) = 'dbo',    
-@RecreateIfExists       bit = 1
-
-AS
-BEGIN
-
-DECLARE @msg  nvarchar(200), @PartionScript nvarchar(255), @sql NVARCHAR(MAX)
-
-    IF EXISTS(Select s.name As SchemaName, t.name As TableName
-                        From sys.tables t
-                        Inner Join sys.schemas s On t.schema_id = s.schema_id
-                        Inner Join sys.partitions p on p.object_id = t.object_id
-                        Where p.index_id In (0, 1) and t.name = @SourceTable
-                        Group By s.name, t.name
-                        Having Count(*) > 1)
-
-        SET @PartionScript = ' ON [PS_PartitionByCompanyId]([' + @PartionField + '])'
-    else
-        SET @PartionScript = ''
-
-SET NOCOUNT ON;
-BEGIN TRY   
-    SET @msg ='  CloneTable  ' + @DestinationTable + ' - Step 1, Drop table if exists. Timestamp: '  + CONVERT(NVARCHAR(50),GETDATE(),108)
-     RAISERROR( @msg,0,1) WITH NOWAIT
-    --drop the table
-    if EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = @DestinationTable)
-    BEGIN
-        if @RecreateIfExists = 1
-            BEGIN
-                exec('DROP TABLE [' + @DestinationSchema + '].[' + @DestinationTable + ']')
-            END
-        ELSE
-            RETURN
-    END
-
-    SET @msg ='  CloneTable  ' + @DestinationTable + ' - Step 2, Create table. Timestamp: '  + CONVERT(NVARCHAR(50),GETDATE(),108)
-    RAISERROR( @msg,0,1) WITH NOWAIT
-    --create the table
-    exec('SELECT TOP (0) * INTO [' + @DestinationTable + '] FROM [' + @SourceTable + ']')       
-
-    --create primary key
-    SET @msg ='  CloneTable  ' + @DestinationTable + ' - Step 3, Create primary key. Timestamp: '  + CONVERT(NVARCHAR(50),GETDATE(),108)
-    RAISERROR( @msg,0,1) WITH NOWAIT
-    DECLARE @PKSchema nvarchar(255), @PKName nvarchar(255),@count   INT
-    SELECT TOP 1 @PKSchema = CONSTRAINT_SCHEMA, @PKName = CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = @SourceSchema AND TABLE_NAME = @SourceTable AND CONSTRAINT_TYPE = 'PRIMARY KEY'
-    IF NOT @PKSchema IS NULL AND NOT @PKName IS NULL
-    BEGIN
-        DECLARE @PKColumns nvarchar(MAX)
-        SET @PKColumns = ''
-
-        SELECT @PKColumns = @PKColumns + '[' + COLUMN_NAME + '],'
-            FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE 
-            where TABLE_NAME = @SourceTable and TABLE_SCHEMA = @SourceSchema AND CONSTRAINT_SCHEMA = @PKSchema AND CONSTRAINT_NAME= @PKName
-            ORDER BY ORDINAL_POSITION
-
-        SET @PKColumns = LEFT(@PKColumns, LEN(@PKColumns) - 1)
-
-        exec('ALTER TABLE [' + @DestinationSchema + '].[' + @DestinationTable + '] ADD  CONSTRAINT [PK_' + @DestinationTable + '] PRIMARY KEY CLUSTERED (' + @PKColumns + ')' + @PartionScript);
-    END
-
-    --create other indexes
-    SET @msg ='  CloneTable  ' + @DestinationTable + ' - Step 4, Create Indexes. Timestamp: '  + CONVERT(NVARCHAR(50),GETDATE(),108)
-    RAISERROR( @msg,0,1) WITH NOWAIT
-    DECLARE @IndexId int, @IndexName nvarchar(255), @IsUnique bit, @IsUniqueConstraint bit, @FilterDefinition nvarchar(max), @type int
-
-    set @count=0
-    DECLARE indexcursor CURSOR FOR
-    SELECT index_id, name, is_unique, is_unique_constraint, filter_definition, type FROM sys.indexes WHERE is_primary_key = 0 and object_id = object_id('[' + @SourceSchema + '].[' + @SourceTable + ']')
-    OPEN indexcursor;
-    FETCH NEXT FROM indexcursor INTO @IndexId, @IndexName, @IsUnique, @IsUniqueConstraint, @FilterDefinition, @type
-    WHILE @@FETCH_STATUS = 0
-       BEGIN
-            set @count =@count +1
-            DECLARE @Unique nvarchar(255)
-            SET @Unique = CASE WHEN @IsUnique = 1 THEN ' UNIQUE ' ELSE '' END
-
-            DECLARE @KeyColumns nvarchar(max), @IncludedColumns nvarchar(max)
-            SET @KeyColumns = ''
-            SET @IncludedColumns = ''
-
-            select @KeyColumns = @KeyColumns + '[' + c.name + '] ' + CASE WHEN is_descending_key = 1 THEN 'DESC' ELSE 'ASC' END + ',' from sys.index_columns ic
-            inner join sys.columns c ON c.object_id = ic.object_id and c.column_id = ic.column_id
-            where index_id = @IndexId and ic.object_id = object_id('[' + @SourceSchema + '].[' + @SourceTable + ']') and key_ordinal > 0
-            order by index_column_id
-
-            select @IncludedColumns = @IncludedColumns + '[' + c.name + '],' from sys.index_columns ic
-            inner join sys.columns c ON c.object_id = ic.object_id and c.column_id = ic.column_id
-            where index_id = @IndexId and ic.object_id = object_id('[' + @SourceSchema + '].[' + @SourceTable + ']') and key_ordinal = 0
-            order by index_column_id
-
-            IF LEN(@KeyColumns) > 0
-                SET @KeyColumns = LEFT(@KeyColumns, LEN(@KeyColumns) - 1)
-
-            IF LEN(@IncludedColumns) > 0
-            BEGIN
-                SET @IncludedColumns = ' INCLUDE (' + LEFT(@IncludedColumns, LEN(@IncludedColumns) - 1) + ')'
-            END
-
-            IF @FilterDefinition IS NULL
-                SET @FilterDefinition = ''
-            ELSE
-                SET @FilterDefinition = 'WHERE ' + @FilterDefinition + ' '
-
-            SET @msg ='  CloneTable  ' + @DestinationTable + ' - Step 4.' + CONVERT(NVARCHAR(5),@count) + ', Create Index ' + @IndexName + '. Timestamp: '  + CONVERT(NVARCHAR(50),GETDATE(),108)
-            RAISERROR( @msg,0,1) WITH NOWAIT
-
-            if @type = 2
-                SET @sql = 'CREATE ' + @Unique + ' NONCLUSTERED INDEX [' + @IndexName + '] ON [' + @DestinationSchema + '].[' + @DestinationTable + '] (' + @KeyColumns + ')' + @IncludedColumns + @FilterDefinition  + @PartionScript
-            ELSE
-                BEGIN
-                    SET @sql = 'CREATE ' + @Unique + ' CLUSTERED INDEX [' + @IndexName + '] ON [' + @DestinationSchema + '].[' + @DestinationTable + '] (' + @KeyColumns + ')' + @IncludedColumns + @FilterDefinition + @PartionScript
-                END
-            EXEC (@sql)
-            FETCH NEXT FROM indexcursor INTO @IndexId, @IndexName, @IsUnique, @IsUniqueConstraint, @FilterDefinition, @type
-       END
-    CLOSE indexcursor
-    DEALLOCATE indexcursor
-
-    --create constraints
-    SET @msg ='  CloneTable  ' + @DestinationTable + ' - Step 5, Create constraints. Timestamp: '  + CONVERT(NVARCHAR(50),GETDATE(),108)
-    RAISERROR( @msg,0,1) WITH NOWAIT
-    DECLARE @ConstraintName nvarchar(max), @CheckClause nvarchar(max), @ColumnName NVARCHAR(255)
-    DECLARE const_cursor CURSOR FOR
-        SELECT
-            REPLACE(dc.name, @SourceTable, @DestinationTable),[definition], c.name
-        FROM sys.default_constraints dc
-            INNER JOIN sys.columns c ON dc.parent_object_id = c.object_id AND dc.parent_column_id = c.column_id
-        WHERE OBJECT_NAME(parent_object_id) =@SourceTable               
-    OPEN const_cursor
-    FETCH NEXT FROM const_cursor INTO @ConstraintName, @CheckClause, @ColumnName
-    WHILE @@FETCH_STATUS = 0
-       BEGIN
-            exec('ALTER TABLE [' + @DestinationTable + '] ADD CONSTRAINT [' + @ConstraintName + '] DEFAULT ' + @CheckClause + ' FOR ' + @ColumnName)
-            FETCH NEXT FROM const_cursor INTO @ConstraintName, @CheckClause, @ColumnName
-       END;
-    CLOSE const_cursor
-    DEALLOCATE const_cursor                 
-
-
-END TRY
-    BEGIN CATCH
-        IF (SELECT CURSOR_STATUS('global','indexcursor')) >= -1
-        BEGIN
-         DEALLOCATE indexcursor
-        END
-
-        IF (SELECT CURSOR_STATUS('global','const_cursor')) >= -1
-        BEGIN
-         DEALLOCATE const_cursor
-        END
-
-
-        PRINT 'Error Message: ' + ERROR_MESSAGE(); 
-    END CATCH
-
-END
-
-GO
-
--- ----------------------------
 -- Indexes structure for table Base_AppSecret
 -- ----------------------------
 CREATE CLUSTERED INDEX [AppId] ON [Base_AppSecret]
@@ -1323,6 +1118,16 @@ GO
 -- Primary Key structure for table Base_DatabaseLink
 -- ----------------------------
 ALTER TABLE [Base_DatabaseLink] ADD PRIMARY KEY NONCLUSTERED ([Id])
+GO
+
+-- ----------------------------
+-- Indexes structure for table Base_Department
+-- ----------------------------
+
+-- ----------------------------
+-- Primary Key structure for table Base_Department
+-- ----------------------------
+ALTER TABLE [Base_Department] ADD PRIMARY KEY ([Id])
 GO
 
 -- ----------------------------
@@ -1404,54 +1209,6 @@ GO
 -- Uniques structure for table Base_UnitTest
 -- ----------------------------
 ALTER TABLE [Base_UnitTest] ADD UNIQUE ([UserId] ASC)
-GO
-
--- ----------------------------
--- Indexes structure for table Base_UnitTest_0
--- ----------------------------
-
--- ----------------------------
--- Primary Key structure for table Base_UnitTest_0
--- ----------------------------
-ALTER TABLE [Base_UnitTest_0] ADD PRIMARY KEY ([Id])
-GO
-
--- ----------------------------
--- Uniques structure for table Base_UnitTest_0
--- ----------------------------
-ALTER TABLE [Base_UnitTest_0] ADD UNIQUE ([UserId] ASC)
-GO
-
--- ----------------------------
--- Indexes structure for table Base_UnitTest_1
--- ----------------------------
-
--- ----------------------------
--- Primary Key structure for table Base_UnitTest_1
--- ----------------------------
-ALTER TABLE [Base_UnitTest_1] ADD PRIMARY KEY ([Id])
-GO
-
--- ----------------------------
--- Uniques structure for table Base_UnitTest_1
--- ----------------------------
-ALTER TABLE [Base_UnitTest_1] ADD UNIQUE ([UserId] ASC)
-GO
-
--- ----------------------------
--- Indexes structure for table Base_UnitTest_2
--- ----------------------------
-
--- ----------------------------
--- Primary Key structure for table Base_UnitTest_2
--- ----------------------------
-ALTER TABLE [Base_UnitTest_2] ADD PRIMARY KEY ([Id])
-GO
-
--- ----------------------------
--- Uniques structure for table Base_UnitTest_2
--- ----------------------------
-ALTER TABLE [Base_UnitTest_2] ADD UNIQUE ([UserId] ASC)
 GO
 
 -- ----------------------------

@@ -53,7 +53,7 @@ namespace Coldairarrow.Web.Areas.Base_SysManage.Controllers
 
         public ActionResult GetDataList(Pagination pagination, string keyword)
         {
-            var dataList = _sysUserBus.GetDataList(pagination, null, keyword);
+            var dataList = _sysUserBus.GetDataList(pagination, false, null, keyword);
 
             return DataTable_Bootstrap(dataList, pagination);
         }

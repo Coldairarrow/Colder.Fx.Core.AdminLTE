@@ -1,22 +1,26 @@
-@inherits  DependencyViewPage
+@inherits DependencyViewPage
 
 @{
     Layout = "~/Views/Shared/_Layout_List.cshtml";
-        
+
     var manageSysPermission = this.PermissionManage.OperatorHasPermissionValue("sysuser.manageSysPermission");
+    var canManage = PermissionManage.OperatorHasPermissionValue("sysuser.manage");
 }
 
 <div class="fx-content">
     <div id="toobar">
         <div class="btn-group btn-group-sm">
-            <button onclick="openForm('', '添加数据');" type="button" class="btn btn-default" aria-label="Left Align">
-                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                添加
-            </button>
-            <button onclick="deleteData();" type="button" class="btn btn-default" aria-label="Right Align">
-                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                删除
-            </button>
+            @if (canManage)
+            {
+                <button onclick="openForm('', '添加数据');" type="button" class="btn btn-default" aria-label="Left Align">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                    添加
+                </button>
+                <button onclick="deleteData();" type="button" class="btn btn-default" aria-label="Right Align">
+                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                    删除
+                </button>
+            }
             <button type="button" class="btn btn-default" aria-label="Right Align" onclick="javascript: location.reload();">
                 <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
                 刷新
@@ -45,6 +49,7 @@
 <script>
     var $table = $('#dataTable');
     var manageSysPermission=@manageSysPermission.ToString().ToLower();
+    var canManage =@canManage.ToString().ToLower();
 
     $(function () {
         initTable();
@@ -69,6 +74,7 @@
                 { title: 'ck', field: 'ck', checkbox: true },
                 { title: '用户名', field: 'UserName', width: 200 },
                 { title: '真实姓名', field: 'RealName', width: 200 },
+                { title: '所属部门', field: 'DepartmentName', width: 200 },
                 {
                     title: '性别', field: 'Sex', width: 200, formatter: function (value, row) {
                         var mapping = {
@@ -88,8 +94,10 @@
                 {
                     title: '操作', field: '_', width: '20%', formatter: function (value, row) {
                         var builder = new BtnBuilder();
-                        builder.AddBtn({ icon: 'glyphicon-edit', function: 'openForm', param: [row['Id']] });
-                        builder.AddBtn({ icon: 'glyphicon-trash', function: 'deleteData', param: [row['Id']] });
+                        if (canManage) {
+                            builder.AddBtn({ icon: 'glyphicon-edit', function: 'openForm', param: [row['Id']] });
+                            builder.AddBtn({ icon: 'glyphicon-trash', function: 'deleteData', param: [row['Id']] });
+                        }
                         if (manageSysPermission) {
                             builder.AddBtn({ name: '权限分配', icon: 'glyphicon-edit', function: 'setPermission', param: [row['Id'], row['RealName']] });
                         }
