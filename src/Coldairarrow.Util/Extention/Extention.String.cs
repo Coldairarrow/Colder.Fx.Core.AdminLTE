@@ -48,6 +48,16 @@ namespace Coldairarrow.Util
         }
 
         /// <summary>
+        /// 转换为MD5加密后的字符串（16位）
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static string ToMD5String16(this string str)
+        {
+            return str.ToMD5String().Substring(8, 16);
+        }
+
+        /// <summary>
         /// Base64加密
         /// 注:默认采用UTF8编码
         /// </summary>

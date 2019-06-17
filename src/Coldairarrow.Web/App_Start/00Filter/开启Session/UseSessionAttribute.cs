@@ -10,10 +10,8 @@ namespace Coldairarrow.Web
     /// <summary>
     /// 使用Session
     /// </summary>
-    public class UseSessionAttribute : Attribute, IActionFilter, IOrderedFilter
+    public class UseSessionAttribute : Attribute, IActionFilter
     {
-        public int Order => 0;
-
         public void OnActionExecuting(ActionExecutingContext context)
         {
             var sessionCookie = context.HttpContext.Request.Cookies[SessionHelper.SessionCookieName];

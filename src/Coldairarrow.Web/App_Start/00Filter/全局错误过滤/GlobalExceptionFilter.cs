@@ -14,7 +14,11 @@ namespace Coldairarrow.Web
             var ex = context.Exception;
             BusHelper.HandleException(ex);
 
-            context.Result = new ContentResult { Content = new AjaxResult { Success = false, Msg = ex.Message }.ToJson() };
+            context.Result = new ContentResult
+            {
+                Content = new AjaxResult { Success = false, Msg = ex.Message }.ToJson(),
+                ContentType = "application/json; charset=utf-8",
+            };
         }
     }
 }
