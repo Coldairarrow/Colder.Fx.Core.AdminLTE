@@ -20,5 +20,11 @@ namespace Coldairarrow.Web
         {
             return Content(new { name, age }.ToJson());
         }
+
+        [CheckSign]
+        public ActionResult RequestTest()
+        {
+            return Success();
+        }
     }
 }

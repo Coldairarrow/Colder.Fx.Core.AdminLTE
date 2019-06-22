@@ -199,14 +199,14 @@ namespace Coldairarrow.DataRepository
         /// 执行SQL语句
         /// </summary>
         /// <param name="sql">SQL语句</param>
-        void ExecuteSql(string sql);
+        int ExecuteSql(string sql);
 
         /// <summary>
         /// 执行SQL语句
         /// </summary>
         /// <param name="sql">SQL语句</param>
         /// <param name="parameters">SQL参数</param>
-        void ExecuteSql(string sql, List<DbParameter> parameters);
+        int ExecuteSql(string sql, List<DbParameter> parameters);
 
         #endregion
     }

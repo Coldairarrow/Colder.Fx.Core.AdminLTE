@@ -26,6 +26,16 @@ namespace Coldairarrow.Business.Base_SysManage
                     return new ErrorResult("签名校验失败：缺少sign签名参数");
                 if (!allRequestParams.ContainsKey("time"))
                     return new ErrorResult("签名校验失败：缺少time时间参数");
+                if (!allRequestParams.ContainsKey("guid"))
+                    return new ErrorResult("签名校验失败：缺少guid参数");
+
+                string guid = allRequestParams["guid"]?.ToString();
+                string cacheKey = $"{GlobalSwitch.ProjectName}_requestGuid_{guid}";
+                if (CacheHelper.Cache.ContainsKey(cacheKey))
+                    return new ErrorResult("非法重复请求!");
+                else
+                    CacheHelper.Cache.SetCache(cacheKey, "1", new TimeSpan(0, 10, 0));
+
                 string appId = allRequestParams["appId"]?.ToString();
                 string appSecret = GetAppSecret(appId);
                 return CheckSign(allRequestParams, appSecret);
@@ -107,6 +117,7 @@ namespace Coldairarrow.Business.Base_SysManage
 
             requestParames.Add("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             requestParames.Add("appId", appId);
+            requestParames.Add("guid", Guid.NewGuid().ToString());
 
             string sign = BuildSign(requestParames, appSecret);
             requestParames.Add("sign", sign);

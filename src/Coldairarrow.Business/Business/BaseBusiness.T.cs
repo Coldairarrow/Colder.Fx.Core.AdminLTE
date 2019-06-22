@@ -396,18 +396,18 @@ namespace Coldairarrow.Business
         /// 执行Sql语句
         /// </summary>
         /// <param name="sql">Sql语句</param>
-        public void ExecuteSql(string sql)
+        public int ExecuteSql(string sql)
         {
-            Service.ExecuteSql(sql);
+            return Service.ExecuteSql(sql);
         }
 
         /// <summary>
         /// 通过参数执行Sql语句
         /// </summary>
         /// <param name="sql">Sql语句</param>
-        public void ExecuteSql(string sql, List<DbParameter> parameters)
+        public int ExecuteSql(string sql, List<DbParameter> parameters)
         {
-            Service.ExecuteSql(sql, parameters);
+            return Service.ExecuteSql(sql, parameters);
         }
 
         #endregion

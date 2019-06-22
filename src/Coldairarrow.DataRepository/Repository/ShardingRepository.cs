@@ -148,15 +148,10 @@ namespace Coldairarrow.DataRepository
 
             void Run()
             {
-                List<Task> tasks = new List<Task>();
                 allDbs.ForEach(x =>
                 {
-                    tasks.Add(Task.Run(() =>
-                    {
-                        x.Db.DeleteAll(x.TargetType);
-                    }));
+                    x.Db.DeleteAll(x.TargetType);
                 });
-                Task.WaitAll(tasks.ToArray());
             }
         }
 

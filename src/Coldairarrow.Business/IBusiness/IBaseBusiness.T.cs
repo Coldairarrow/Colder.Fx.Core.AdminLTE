@@ -175,14 +175,14 @@ namespace Coldairarrow.Business
         /// 执行SQL语句
         /// </summary>
         /// <param name="sql">SQL</param>
-        void ExecuteSql(string sql);
+        int ExecuteSql(string sql);
 
         /// <summary>
         /// 执行SQL语句
         /// </summary>
         /// <param name="sql">SQL</param>
         /// <param name="spList">参数</param>
-        void ExecuteSql(string sql, List<DbParameter> spList);
+        int ExecuteSql(string sql, List<DbParameter> spList);
 
         #endregion
 
