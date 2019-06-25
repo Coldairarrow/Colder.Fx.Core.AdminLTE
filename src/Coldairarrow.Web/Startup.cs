@@ -103,16 +103,16 @@ namespace Coldairarrow.Web
                 .Cast<Assembly>()
                 .Where(x => x.FullName.Contains("Coldairarrow")).ToList();
 
-            //自动注入IDependency接口,支持AOP
+            //自动注入IDependency接口,支持AOP,生命周期为InstancePerDependency
             builder.RegisterAssemblyTypes(assemblys.ToArray())
                 .Where(x => baseType.IsAssignableFrom(x) && x != baseType)
                 .AsImplementedInterfaces()
                 .PropertiesAutowired()
-                .InstancePerLifetimeScope()
+                .InstancePerDependency()
                 .EnableInterfaceInterceptors()
                 .InterceptedBy(typeof(Interceptor));
 
-            //自动注入ICircleDependency接口,循环依赖注入,不支持AOP
+            //自动注入ICircleDependency接口,循环依赖注入,不支持AOP,生命周期为InstancePerLifetimeScope
             builder.RegisterAssemblyTypes(assemblys.ToArray())
                 .Where(x => baseTypeCircle.IsAssignableFrom(x) && x != baseTypeCircle)
                 .AsImplementedInterfaces()
