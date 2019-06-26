@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Routing;
 using System;
-using System.Collections.Generic;
 
 namespace Coldairarrow.Web
 {
@@ -32,12 +31,13 @@ namespace Coldairarrow.Web
                 {
                     return;
                 }
+
                 //判断是否需要登录
-                List<string> attrList = FilterHelper.GetFilterList(filterContext);
-                bool needLogin = attrList.Contains(typeof(CheckLoginAttribute).FullName) && !attrList.Contains(typeof(IgnoreLoginAttribute).FullName);
+                if (filterContext.ContainsFilter<IgnoreLoginAttribute>())
+                    return;
 
                 //转到登录
-                if (needLogin && !Operator.Logged())
+                if (!Operator.Logged())
                 {
                     RedirectToLogin();
                 }

@@ -34,6 +34,11 @@ namespace Coldairarrow.Business.Base_SysManage
             return GetEntity(id);
         }
 
+        public string GetAppSecret(string appId)
+        {
+            return GetIQueryable().Where(x => x.AppId == appId).FirstOrDefault()?.AppSecret;
+        }
+
         /// <summary>
         /// Ìí¼ÓÊý¾Ý
         /// </summary>

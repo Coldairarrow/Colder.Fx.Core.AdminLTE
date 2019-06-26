@@ -29,9 +29,7 @@ namespace Coldairarrow.Web
             }
             AjaxResult res = new AjaxResult();
             //判断是否需要校验
-            List<string> attrList = FilterHelper.GetFilterList(filterContext);
-            bool needCheck = attrList.Contains(typeof(CheckAppIdPermissionAttribute).FullName) && !attrList.Contains(typeof(IgnoreAppIdPermissionAttribute).FullName);
-            if (!needCheck)
+            if (filterContext.ContainsFilter<IgnoreAppIdPermissionAttribute>())
                 return;
 
             var allRequestParams = HttpHelper.GetAllRequestParams(filterContext.HttpContext);

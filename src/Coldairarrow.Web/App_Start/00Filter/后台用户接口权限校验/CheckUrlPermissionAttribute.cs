@@ -27,10 +27,9 @@ namespace Coldairarrow.Web
             {
                 return;
             }
+
             //判断是否需要校验
-            List<string> attrList = FilterHelper.GetFilterList(filterContext);
-            bool needCheck = attrList.Contains(typeof(CheckUrlPermissionAttribute).FullName) && !attrList.Contains(typeof(IgnoreUrlPermissionAttribute).FullName);
-            if (!needCheck)
+            if (filterContext.ContainsFilter<IgnoreUrlPermissionAttribute>())
                 return;
 
             var allUrlPermissions = UrlPermissionManage.GetAllUrlPermissions();

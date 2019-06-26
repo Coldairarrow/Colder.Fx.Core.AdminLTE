@@ -1,21 +1,16 @@
 ﻿using Coldairarrow.Business.Base_SysManage;
 using Coldairarrow.Util;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
-using System.Collections.Generic;
 
 namespace Coldairarrow.Web
 {
     /*
-==== 签名算法 ====
+==== 签名校验 ====
 
-appId:AppAdmin
+为保证接口安全，每次请求必带以下header
 
-appSecret:oEt6sgjgPGeA5wFX
-
-每个接口必须参数
-
+| header名 | 类型 | 描述 |
 | appId | string | 应用Id |
 | time | string | 当前时间，格式为：2017-01-01 23:00:00 |
 | guid | string | GUID字符串,作为请求唯一标志,防止重复请求 |
@@ -26,20 +21,20 @@ appSecret:oEt6sgjgPGeA5wFX
 令:
 
 appId=xxx
-
 appSecret=xxx
-
 time=2017-01-01 23:00:00
+guid=d0595245-60db-495d-9c0e-fea931b8d69a
+请求的body={"aaa":"aaa"}
 
-1.对除签名外的所有请求参数按key做升序排列(字符串ASCII排序)
+1: 依次拼接appId+time+guid+body+appSecret得到xxx2017-01-01 23:00:00d0595245-60db-495d-9c0e-fea931b8d69a{"aaa":"aaa"}xxx
+2: 将上面拼接字符串进行MD5(32位)即可得到签名
+sign=MD5(xxx2017-01-01 23:00:00d0595245-60db-495d-9c0e-fea931b8d69a{"aaa":"aaa"}xxx)
+    =4e30f1eca521485c208f642a7d927ff0
+3: 在header中携带上述的appId、time、guid、sign即可
 
-例如：有c=3,b=2,a=1 三个业务参数，另需要加上校验签名参数appId和time， 按key排序后为：a=1，appId=xxx，b=2，c=3，time=2017-01-01 23:00:00。
-
-2 把参数名和参数值连接成字符串，得到拼装字符：a1appIdxxxb2c3guid33f01f62-8f82-42a6-a01f-97e96cf035abtime2017-01-01 23:00:00
-
-3 用申请到的appSecret连接到接拼装字符串尾部，然后进行32位MD5加密，最后将到得MD5加密摘要转化成大写,即得到签名sign
-
-示例：拼接字符串为a1appIdxxxb2c3guid33f01f62-8f82-42a6-a01f-97e96cf035abtime2017-01-01 23:00:00,appSecret为xxx,则sign=6318255C8C1453EAD251E944DF1BD28C     
+详细使用Demo请看:
+HttpHelper.SafeSignRequest
+/Demo/ApiSignDemo
     */
     /// <summary>
     /// 校验签名、十分严格
@@ -53,7 +48,7 @@ time=2017-01-01 23:00:00
         /// <param name="filterContext"></param>
         public void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            ICheckSignBusiness checkSignBusiness = AutofacHelper.GetService<ICheckSignBusiness>();
+            IBase_AppSecretBusiness appSecretBus = AutofacHelper.GetService<IBase_AppSecretBusiness>();
 
             //若为本地测试，则不需要校验
             if (GlobalSwitch.RunModel == RunModel.LocalTest)
@@ -62,17 +57,43 @@ time=2017-01-01 23:00:00
             }
 
             //判断是否需要签名
-            List<string> attrList = FilterHelper.GetFilterList(filterContext);
-            bool needSign = attrList.Contains(typeof(CheckSignAttribute).FullName) && !attrList.Contains(typeof(IgnoreSignAttribute).FullName);
-
-            //不需要签名
-            if (!needSign)
+            if (filterContext.ContainsFilter<IgnoreSignAttribute>())
                 return;
 
-            //是否安全
-            var isSuccess = checkSignBusiness.IsSecurity(filterContext.HttpContext);
-            if (isSuccess)
-                return;
+            var request = filterContext.HttpContext.Request;
+            string appId = request.Headers["appId"].ToString();
+            if (appId.IsNullOrEmpty())
+                throw new Exception("缺少header:appId");
+
+            string time = request.Headers["time"].ToString();
+            if (time.IsNullOrEmpty())
+                throw new Exception("缺少header:time");
+            if (time.ToDateTime() < DateTime.Now.AddMinutes(-5) || time.ToDateTime() > DateTime.Now.AddMinutes(5))
+                throw new Exception("time过期");
+
+            string guid = request.Headers["guid"].ToString();
+            if (guid.IsNullOrEmpty())
+                throw new Exception("缺少header:guid");
+
+            string guidKey = $"{GlobalSwitch.ProjectName}_apiGuid_{guid}";
+            if (CacheHelper.Cache.GetCache(guidKey).IsNullOrEmpty())
+                CacheHelper.Cache.SetCache(guidKey, "1", new TimeSpan(0, 10, 0));
+            else
+                throw new Exception("禁止重复调用!");
+
+            string body = request.Body.ReadToString();
+
+            string sign = request.Headers["sign"].ToString();
+            if (sign.IsNullOrEmpty())
+                throw new Exception("缺少header:sign");
+
+            string appSecret = appSecretBus.GetAppSecret(appId);
+            if (appSecret.IsNullOrEmpty())
+                throw new Exception("header:appId无效");
+
+            string newSign = HttpHelper.BuildApiSign(appId, appSecret, guid, time.ToDateTime(), body);
+            if (sign != newSign)
+                throw new Exception("header:sign签名错误");
         }
 
         /// <summary>

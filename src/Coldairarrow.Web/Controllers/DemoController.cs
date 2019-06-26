@@ -46,9 +46,20 @@ namespace Coldairarrow.Web.Controllers
             return View();
         }
 
+        public ActionResult ApiSignDemo()
+        {
+            return View();
+        }
+
         #endregion
 
         #region 接口
+
+        [CheckSign]
+        public IActionResult ApiSign(string userId)
+        {
+            return Success(userId);
+        }
 
         #endregion
     }

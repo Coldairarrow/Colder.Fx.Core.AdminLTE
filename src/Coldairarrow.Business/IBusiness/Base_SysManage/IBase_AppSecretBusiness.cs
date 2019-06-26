@@ -8,6 +8,7 @@ namespace Coldairarrow.Business.Base_SysManage
     {
         List<Base_AppSecret> GetDataList(Pagination pagination, string keyword);
         Base_AppSecret GetTheData(string id);
+        string GetAppSecret(string appId);
         void AddData(Base_AppSecret newData);
         void UpdateData(Base_AppSecret theData);
         void DeleteData(List<string> ids);
