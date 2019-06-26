@@ -69,12 +69,10 @@ time=2017-01-01 23:00:00
             if (!needSign)
                 return;
 
-            //需要签名
-            var checkSignRes = checkSignBusiness.IsSecurity(filterContext.HttpContext);
-            if (!checkSignRes.Success)
-            {
-                filterContext.Result = new ContentResult() { Content = checkSignRes.ToJson() };
-            }
+            //是否安全
+            var isSuccess = checkSignBusiness.IsSecurity(filterContext.HttpContext);
+            if (isSuccess)
+                return;
         }
 
         /// <summary>

@@ -9,6 +9,7 @@ using Coldairarrow.Util;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
@@ -53,6 +54,13 @@ namespace Coldairarrow.Web
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            //Request.BodyÖØÓÃ
+            app.Use(next => context =>
+            {
+                context.Request.EnableRewind();
+
+                return next(context);
+            });
             app.UseDeveloperExceptionPage();
             app.UseStaticFiles();
             app.UseMvc(routes =>

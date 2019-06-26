@@ -1,6 +1,8 @@
 ﻿using Coldairarrow.Entity.Base_SysManage;
 using Coldairarrow.Util;
+using Microsoft.AspNetCore.Http.Extensions;
 using System;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Coldairarrow.Business
@@ -58,6 +60,11 @@ namespace Coldairarrow.Business
         public void HandleException(Exception ex)
         {
             string msg = ExceptionHelper.GetExceptionAllMsg(ex);
+            msg += $@"
+请求方法:{HttpContextCore.Current.Request.Method}
+请求url:{HttpContextCore.Current.Request.GetDisplayUrl()}
+请求body:{HttpContextCore.Current.Request.Body.ReadToString(Encoding.UTF8)}";
+
             WriteSysLog(msg, EnumType.LogType.系统异常);
         }
     }

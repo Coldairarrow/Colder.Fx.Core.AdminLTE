@@ -80,7 +80,12 @@
             columns: [
                 //{ title: 'ck', field: 'ck', checkbox: true, width: '3%' },
                 { title: '日志类型', field: 'LogType', width: '10%' },
-                { title: '日志内容', field: 'LogContent', width: '60%' },
+                {
+                    title: '日志内容', field: 'LogContent', width: '60%', formatter: function (value) {
+
+                        return (value || '').replace(/\n/g, "<br />");
+                    }
+                },
                 { title: '操作员用户名', field: 'OpUserName', width: '5%' },
                 { title: '日志记录时间', field: 'OpTime', width: '10%' }
             ],

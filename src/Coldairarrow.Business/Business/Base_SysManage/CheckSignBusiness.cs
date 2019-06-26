@@ -14,37 +14,30 @@ namespace Coldairarrow.Business.Base_SysManage
         /// 判断是否有权限操作接口
         /// </summary>
         /// <returns></returns>
-        public AjaxResult IsSecurity(HttpContext context)
+        public bool IsSecurity(HttpContext context)
         {
-            try
-            {
-                var request = context.Request;
-                var allRequestParams = GetAllRequestParams(context);
-                if (!allRequestParams.ContainsKey("appId"))
-                    return new ErrorResult("签名校验失败：缺少appId参数");
-                if (!allRequestParams.ContainsKey("sign"))
-                    return new ErrorResult("签名校验失败：缺少sign签名参数");
-                if (!allRequestParams.ContainsKey("time"))
-                    return new ErrorResult("签名校验失败：缺少time时间参数");
-                if (!allRequestParams.ContainsKey("guid"))
-                    return new ErrorResult("签名校验失败：缺少guid参数");
+            var request = context.Request;
+            var allRequestParams = GetAllRequestParams(context);
+            if (!allRequestParams.ContainsKey("appId"))
+                throw new Exception("签名校验失败：缺少appId参数");
+            if (!allRequestParams.ContainsKey("sign"))
+                throw new Exception("签名校验失败：缺少sign签名参数");
+            if (!allRequestParams.ContainsKey("time"))
+                throw new Exception("签名校验失败：缺少time时间参数");
+            if (!allRequestParams.ContainsKey("guid"))
+                throw new Exception("签名校验失败：缺少guid参数");
 
-                string guid = allRequestParams["guid"]?.ToString();
-                string cacheKey = $"{GlobalSwitch.ProjectName}_requestGuid_{guid}";
-                if (CacheHelper.Cache.ContainsKey(cacheKey))
-                    return new ErrorResult("非法重复请求!");
-                else
-                    CacheHelper.Cache.SetCache(cacheKey, "1", new TimeSpan(0, 10, 0));
+            string guid = allRequestParams["guid"]?.ToString();
+            string cacheKey = $"{GlobalSwitch.ProjectName}_requestGuid_{guid}";
+            if (CacheHelper.Cache.ContainsKey(cacheKey))
+                throw new Exception("非法重复请求!");
+            else
+                CacheHelper.Cache.SetCache(cacheKey, "1", new TimeSpan(0, 10, 0));
 
-                string appId = allRequestParams["appId"]?.ToString();
-                string appSecret = GetAppSecret(appId);
-                return CheckSign(allRequestParams, appSecret);
-            }
-            catch (Exception ex)
-            {
-                WriteSysLog($"签名校验异常:{ExceptionHelper.GetExceptionAllMsg(ex)}", EnumType.LogType.系统异常);
-                return new ErrorResult("签名校验异常,请查看系统异常日志！");
-            }
+            string appId = allRequestParams["appId"]?.ToString();
+            string appSecret = GetAppSecret(appId);
+
+            return CheckSign(allRequestParams, appSecret);
         }
 
         /// <summary>
@@ -73,13 +66,13 @@ namespace Coldairarrow.Business.Base_SysManage
         /// <param name="allRequestParames">所有的请求参数</param>
         /// <param name="appSecret">应用密钥</param>
         /// <returns></returns>
-        private AjaxResult CheckSign(Dictionary<string, object> allRequestParames, string appSecret)
+        private bool CheckSign(Dictionary<string, object> allRequestParames, string appSecret)
         {
             //检验签名是否过期
             DateTime now = DateTime.Now;
             DateTime requestTime = Convert.ToDateTime(allRequestParames["time"]?.ToString());
             if (requestTime < now.AddMinutes(-5) || requestTime > now.AddMinutes(5))
-                return new ErrorResult("签名校验失败：time时间参数过期,请校准时间");
+                throw new Exception("签名校验失败：time时间参数过期,请校准时间");
 
             //检验签名是否有效
             string oldSign = allRequestParames["sign"]?.ToString();
@@ -92,9 +85,9 @@ namespace Coldairarrow.Business.Base_SysManage
             parames.Remove("sign");
             string newSign = BuildSign(parames, appSecret);
             if (newSign != oldSign)
-                return new ErrorResult("签名校验失败：sign签名参数校验失败,请仔细核对签名算法");
-
-            return Success();
+                throw new Exception("签名校验失败：sign签名参数校验失败,请仔细核对签名算法");
+            else
+                return true;
         }
 
         /// <summary>
