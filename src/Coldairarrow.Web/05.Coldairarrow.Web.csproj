@@ -133,9 +133,6 @@
     <Content Update="Views\Test\Index.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Views\Test\RequestDemo.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
     <Content Update="wwwroot\Download\_1.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
