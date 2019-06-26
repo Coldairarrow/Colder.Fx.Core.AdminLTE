@@ -77,21 +77,21 @@ namespace System.Collections.Generic
         }
         public void Insert(int index, T item)
         {
-            using (_lock.Read())
+            using (_lock.Write())
             {
                 _list.Insert(index, item);
             }
         }
         public bool Remove(T item)
         {
-            using (_lock.Read())
+            using (_lock.Write())
             {
                 return _list.Remove(item);
             }
         }
         public void RemoveAt(int index)
         {
-            using (_lock.Read())
+            using (_lock.Write())
             {
                 _list.RemoveAt(index);
             }
