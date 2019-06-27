@@ -3,8 +3,10 @@ using Autofac.Extras.DynamicProxy;
 using Coldairarrow.DataRepository;
 using Coldairarrow.Util;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Coldairarrow.Console1
 {
@@ -49,6 +51,28 @@ namespace Coldairarrow.Console1
         {
             //var db = DbFactory.GetRepository();
             //db.HandleSqlLog = Console.WriteLine;
+            List<Task> tasks = new List<Task>();
+            LoopHelper.Loop(4, () =>
+            {
+                tasks.Add(Task.Run(() =>
+                {
+                    LoopHelper.Loop(100000, () =>
+                    {
+                        try
+                        {
+                            string key = Guid.NewGuid().ToString();
+                            CacheHelper.Cache.SetCache(key, key, new TimeSpan(0, 10, 0));
+                            key = CacheHelper.Cache.GetCache<string>(key);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
+                    });
+                }));
+            });
+
+            Task.WaitAll(tasks.ToArray());
 
             Console.WriteLine("完成");
             Console.ReadLine();
