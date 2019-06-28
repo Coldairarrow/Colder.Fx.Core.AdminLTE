@@ -7,11 +7,14 @@ class Example
 {
     public class CustomTarget : TargetWithLayout
     {
+        public CustomTarget(string name)
+        {
+            Name = name;
+        }
         protected override void Write(LogEventInfo logEvent)
         {
-            string logMessage = this.Layout.Render(logEvent);
-
-            Console.WriteLine(logMessage);
+            string msg = Layout.Render(logEvent);
+            Console.WriteLine($"自定义日志:{msg}");
         }
     }
     static void Main(string[] args)
@@ -20,29 +23,35 @@ class Example
         var config = new LoggingConfiguration();
 
         // Step 2. Create targets
+        string layout = @"${date:format=yyyy-MM-dd HH\:mm\:ss}|${level}|${event-properties:item=LogType}|${message} ";
         var consoleTarget = new ColoredConsoleTarget("控制台日志")
         {
-            Layout = @"${date:format=HH\:mm\:ss} ${level} ${message} ${exception}"
+            Layout = layout
         };
         config.AddTarget(consoleTarget);
+        config.AddRuleForAllLevels(consoleTarget);
 
-        var fileTarget = new FileTarget("文件日志")
+        var fileTarget = new FileTarget("控制台日志")
         {
-            FileName = $"${{basedir}}/A_logs/{DateTime.Now.ToString("yyyy-MM-dd")}.txt",
-            Layout = "${longdate} ${level} ${message}  ${exception}"
+            FileName = $"${{basedir}}/A_logs/{DateTime.Now.ToString("yyyy-MM")}/{DateTime.Now.ToString("yyyy-MM-dd")}.txt",
+            Layout = layout
         };
         config.AddTarget(fileTarget);
+        config.AddRuleForAllLevels(fileTarget);
 
-        // Step 3. Define rules
-        //config.AddRuleForAllLevels
-        config.AddRuleForOneLevel(LogLevel.Error, fileTarget); // only errors to file
-        config.AddRuleForAllLevels(consoleTarget); // all to console
+        var customTarget = new CustomTarget("自定义")
+        {
+            Layout = layout
+        };
+        config.AddTarget(customTarget);
+        config.AddRuleForAllLevels(customTarget);
 
-        // Step 4. Activate the configuration
         LogManager.Configuration = config;
-
-        // Example usage
         Logger logger = LogManager.GetLogger("Example");
+
+        LogEventInfo logEventInfo = new LogEventInfo(LogLevel.Error, "测试", "测试");
+        logEventInfo.Properties["LogType"] = "日志类型";
+        logger.Log(logEventInfo);
         logger.Trace("trace log message");
         logger.Debug("debug log message");
         logger.Info("info log message");

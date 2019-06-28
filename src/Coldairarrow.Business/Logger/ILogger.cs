@@ -12,6 +12,7 @@ namespace Coldairarrow.Business
             Pagination pagination,
             string logContent,
             string logType,
+            string level,
             string opUserName,
             DateTime? startTime,
             DateTime? endTime);

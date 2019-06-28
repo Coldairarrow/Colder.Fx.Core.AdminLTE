@@ -23,6 +23,7 @@ namespace Coldairarrow.Business.Base_SysManage
             Pagination pagination,
             string logContent,
             string logType,
+            string level,
             string opUserName,
             DateTime? startTime,
             DateTime? endTime

@@ -29,7 +29,14 @@ namespace Coldairarrow.Business
         }
         private static ConnectionSettings _connectionSettings { get; set; }
         private static ElasticClient _elasticClient { get; set; }
-        public List<Base_SysLog> GetLogList(Pagination pagination, string logContent, string logType, string opUserName, DateTime? startTime, DateTime? endTime)
+        public List<Base_SysLog> GetLogList(
+            Pagination pagination, 
+            string logContent, 
+            string logType,
+            string level,
+            string opUserName, 
+            DateTime? startTime, 
+            DateTime? endTime)
         {
             var client = GetElasticClient();
             var filters = new List<Func<QueryContainerDescriptor<Base_SysLog>, QueryContainer>>();
@@ -37,6 +44,8 @@ namespace Coldairarrow.Business
                 filters.Add(q => q.Wildcard(w => w.Field(f => f.LogContent).Value($"*{logContent}*")));
             if (!logType.IsNullOrEmpty())
                 filters.Add(q => q.Terms(t => t.Field(f => f.LogType).Terms(logType)));
+            if (!level.IsNullOrEmpty())
+                filters.Add(q => q.Terms(t => t.Field(f => f.Level).Terms(level)));
             if (!opUserName.IsNullOrEmpty())
                 filters.Add(q => q.Wildcard(w => w.Field(f => f.OpUserName).Value($"*{opUserName}*")));
             if (!startTime.IsNullOrEmpty())
