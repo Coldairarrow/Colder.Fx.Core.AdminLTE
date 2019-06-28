@@ -2,15 +2,18 @@
 using Coldairarrow.Util;
 using Elasticsearch.Net;
 using Nest;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Coldairarrow.Business
 {
-    class ElasticSearchLogger : ILogger
+    public class ElasticSearchTarget : BaseTarget, ILogSearcher
     {
-        static ElasticSearchLogger()
+        #region 构造函数
+
+        static ElasticSearchTarget()
         {
             string index = $"{GlobalSwitch.ProjectName}.{typeof(Base_SysLog).Name}".ToLower();
 
@@ -27,15 +30,33 @@ namespace Coldairarrow.Business
                 var res = _elasticClient.CreateIndex(descriptor);
             }
         }
+
+        #endregion
+
+        #region 私有成员
+
         private static ConnectionSettings _connectionSettings { get; set; }
         private static ElasticClient _elasticClient { get; set; }
+        protected override void Write(LogEventInfo logEvent)
+        {
+            GetElasticClient().IndexDocument(GetBase_SysLogInfo(logEvent));
+        }
+        private ElasticClient GetElasticClient()
+        {
+            return _elasticClient;
+        }
+
+        #endregion
+
+        #region 外部接口
+
         public List<Base_SysLog> GetLogList(
-            Pagination pagination, 
-            string logContent, 
+            Pagination pagination,
+            string logContent,
             string logType,
             string level,
-            string opUserName, 
-            DateTime? startTime, 
+            string opUserName,
+            DateTime? startTime,
             DateTime? endTime)
         {
             var client = GetElasticClient();
@@ -66,14 +87,7 @@ namespace Coldairarrow.Business
 
             return result.Documents.ToList();
         }
-        public void WriteSysLog(Base_SysLog log)
-        {
-            GetElasticClient().IndexDocument(log);
-        }
 
-        private ElasticClient GetElasticClient()
-        {
-            return _elasticClient;
-        }
+        #endregion
     }
 }

@@ -29,7 +29,16 @@ namespace Coldairarrow.Business.Base_SysManage
             DateTime? startTime,
             DateTime? endTime)
         {
-            return LoggerFactory.GetLogger().GetLogList(pagination, logContent, logType,level, opUserName, startTime, endTime);
+            ILogSearcher logSearcher = null;
+
+            if (GlobalSwitch.LoggerType.HasFlag(LoggerType.RDBMS))
+                logSearcher = new RDBMSTarget();
+            else if (GlobalSwitch.LoggerType.HasFlag(LoggerType.ElasticSearch))
+                logSearcher = new ElasticSearchTarget();
+            else
+                throw new Exception("请指定日志类型为RDBMS或ElasticSearch!");
+
+            return logSearcher.GetLogList(pagination, logContent, logType, level, opUserName, startTime, endTime);
         }
 
         #endregion
