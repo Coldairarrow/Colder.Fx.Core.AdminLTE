@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace Coldairarrow.Web.Areas.Base_SysManage.Controllers
 {
+    [Area("Base_SysManage")]
     public class CommonController : BaseController
     {
         public ActionResult ShowBigImg(string url)

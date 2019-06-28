@@ -26,7 +26,7 @@ namespace Coldairarrow.Web.Controllers
             return View();
         }
 
-        public ActionResult UploadImgForm()
+        public ActionResult UploadFile()
         {
             return View();
         }
