@@ -53,8 +53,6 @@ namespace Coldairarrow.Console1
             //db.HandleSqlLog = Console.WriteLine;
 
             DateTime time = DateTime.Now;
-            Console.WriteLine(TimeZone.CurrentTimeZone.ToLocalTime(time));
-            Console.WriteLine(TimeZoneInfo.ConvertTime(time,TimeZoneInfo.Local));
 
             Console.WriteLine("完成");
             Console.ReadLine();

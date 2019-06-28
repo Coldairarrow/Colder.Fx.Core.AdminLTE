@@ -16,7 +16,7 @@ namespace Coldairarrow.Util
             var newNum = Convert.ToInt64(numBin, 2);
             long timestamp = Convert.ToInt64(new string(numBin.Copy(1, 41).ToArray()), 2) + IdWorker.Twepoch;
             DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(timestamp);
-            Time = TimeZone.CurrentTimeZone.ToLocalTime(dateTime);
+            Time = dateTime.ToLocalTime();
         }
         static SnowflakeId()
         {
