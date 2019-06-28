@@ -1,61 +1,63 @@
-﻿using Autofac;
-using Autofac.Extras.DynamicProxy;
-using Coldairarrow.DataRepository;
-using Coldairarrow.Util;
+﻿using NLog;
+using NLog.Targets;
+using NLog.Config;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 
-namespace Coldairarrow.Console1
+class Example
 {
-    class Program
+    public class CustomTarget : TargetWithLayout
     {
-        static Program()
+        protected override void Write(LogEventInfo logEvent)
         {
-            var builder = new ContainerBuilder();
+            string logMessage = this.Layout.Render(logEvent);
 
-            var baseType = typeof(IDependency);
-            var baseTypeCircle = typeof(ICircleDependency);
-
-            //Coldairarrow相关程序集
-            var assemblys = Assembly.GetEntryAssembly().GetReferencedAssemblies()
-                .Select(Assembly.Load)
-                .Cast<Assembly>()
-                .Where(x => x.FullName.Contains("Coldairarrow")).ToList();
-
-            //自动注入IDependency接口,支持AOP,生命周期为InstancePerDependency
-            builder.RegisterAssemblyTypes(assemblys.ToArray())
-                .Where(x => baseType.IsAssignableFrom(x) && x != baseType)
-                .AsImplementedInterfaces()
-                .PropertiesAutowired()
-                .InstancePerDependency()
-                .EnableInterfaceInterceptors()
-                .InterceptedBy(typeof(Interceptor));
-
-            //自动注入ICircleDependency接口,循环依赖注入,不支持AOP,生命周期为InstancePerLifetimeScope
-            builder.RegisterAssemblyTypes(assemblys.ToArray())
-                .Where(x => baseTypeCircle.IsAssignableFrom(x) && x != baseTypeCircle)
-                .AsImplementedInterfaces()
-                .PropertiesAutowired(PropertyWiringOptions.AllowCircularDependencies)
-                .InstancePerLifetimeScope();
-
-            //AOP
-            builder.RegisterType<Interceptor>();
-
-            AutofacHelper.Container = builder.Build();
+            Console.WriteLine(logMessage);
         }
+    }
+    static void Main(string[] args)
+    {
+        // Step 1. Create configuration object 
+        var config = new LoggingConfiguration();
 
-        static void Main(string[] args)
+        // Step 2. Create targets
+        var consoleTarget = new ColoredConsoleTarget("控制台日志")
         {
-            //var db = DbFactory.GetRepository();
-            //db.HandleSqlLog = Console.WriteLine;
+            Layout = @"${date:format=HH\:mm\:ss} ${level} ${message} ${exception}"
+        };
+        config.AddTarget(consoleTarget);
 
-            DateTime time = DateTime.Now;
+        var fileTarget = new FileTarget("文件日志")
+        {
+            FileName = $"${{basedir}}/A_logs/{DateTime.Now.ToString("yyyy-MM-dd")}.txt",
+            Layout = "${longdate} ${level} ${message}  ${exception}"
+        };
+        config.AddTarget(fileTarget);
 
-            Console.WriteLine("完成");
-            Console.ReadLine();
+        // Step 3. Define rules
+        //config.AddRuleForAllLevels
+        config.AddRuleForOneLevel(LogLevel.Error, fileTarget); // only errors to file
+        config.AddRuleForAllLevels(consoleTarget); // all to console
+
+        // Step 4. Activate the configuration
+        LogManager.Configuration = config;
+
+        // Example usage
+        Logger logger = LogManager.GetLogger("Example");
+        logger.Trace("trace log message");
+        logger.Debug("debug log message");
+        logger.Info("info log message");
+        logger.Warn("warn log message");
+        logger.Error("error log message");
+        logger.Fatal("fatal log message");
+        //Example of logging exceptions
+        try
+        {
+            throw new Exception("1111111111111");
+        }
+        catch (Exception ex)
+        {
+            logger.Error(ex, "ow noos!");
+            //throw;
         }
     }
 }
