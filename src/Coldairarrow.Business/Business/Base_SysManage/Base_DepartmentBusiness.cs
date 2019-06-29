@@ -45,20 +45,20 @@ namespace Coldairarrow.Business.Base_SysManage
         }
 
         [DataRepeatValidate(new string[] { "Name" }, new string[] { "部门名" })]
-        [DataAddLog(EnumType.LogType.部门管理, "部门名", "Name")]
+        [DataAddLog(LogType.部门管理, "部门名", "Name")]
         public void AddData(Base_Department newData)
         {
             Insert(newData);
         }
 
         [DataRepeatValidate(new string[] { "Name" }, new string[] { "部门名" })]
-        [DataEditLog(EnumType.LogType.部门管理, "部门名", "Name")]
+        [DataEditLog(LogType.部门管理, "部门名", "Name")]
         public void UpdateData(Base_Department theData)
         {
             Update(theData);
         }
 
-        [DataDeleteLog(EnumType.LogType.部门管理, "部门名", "Name")]
+        [DataDeleteLog(LogType.部门管理, "部门名", "Name")]
         public void DeleteData(List<string> ids)
         {
             Delete(ids);

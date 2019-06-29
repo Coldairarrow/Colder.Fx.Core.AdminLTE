@@ -1,6 +1,5 @@
 ﻿using Castle.DynamicProxy;
 using Coldairarrow.Util;
-using static Coldairarrow.Entity.Base_SysManage.EnumType;
 
 namespace Coldairarrow.Business
 {
@@ -14,7 +13,7 @@ namespace Coldairarrow.Business
         public override void OnActionExecuted(IInvocation invocation)
         {
             var obj = invocation.Arguments[0];
-            BusHelper.WriteSysLog($"修改{_dataName}:{obj.GetPropertyValue(_nameField)?.ToString()}", _logType);
+            Logger.Info(_logType, $"修改{_dataName}:{obj.GetPropertyValue(_nameField)?.ToString()}");
         }
 
         public override void OnActionExecuting(IInvocation invocation)

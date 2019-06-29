@@ -34,7 +34,7 @@ namespace Coldairarrow.Business.Base_SysManage
             return _dataPermission.GetIQ_Base_User(Service);
         }
 
-        protected override EnumType.LogType LogType => EnumType.LogType.系统用户管理;
+        protected override LogType LogType => LogType.系统用户管理;
 
         #endregion
 
@@ -101,16 +101,18 @@ namespace Coldairarrow.Business.Base_SysManage
             return _sysUserCache.GetCache(userId);
         }
 
-        [DataAddLog(EnumType.LogType.系统用户管理, "用户", "RealName")]
+        [DataAddLog(LogType.系统用户管理, "用户", "RealName")]
         [DataRepeatValidate(
             new string[] { "UserName" },
             new string[] { "用户名" })]
-        public void AddData(Base_User newData)
+        public AjaxResult AddData(Base_User newData)
         {
             Insert(newData);
+
+            return Success();
         }
 
-        [DataEditLog(EnumType.LogType.系统用户管理, "用户", "RealName")]
+        [DataEditLog(LogType.系统用户管理, "用户", "RealName")]
         [DataRepeatValidate(
             new string[] { "UserName" },
             new string[] { "用户名" })]
@@ -123,7 +125,7 @@ namespace Coldairarrow.Business.Base_SysManage
             _sysUserCache.UpdateCache(theData.Id);
         }
 
-        [DataDeleteLog(EnumType.LogType.系统用户管理, "用户", "RealName")]
+        [DataDeleteLog(LogType.系统用户管理, "用户", "RealName")]
         public void DeleteData(List<string> ids)
         {
             var adminUser = GetTheInfo("Admin");

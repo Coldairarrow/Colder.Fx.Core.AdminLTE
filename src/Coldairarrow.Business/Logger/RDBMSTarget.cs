@@ -26,6 +26,8 @@ namespace Coldairarrow.Business
                 whereExp = whereExp.And(x => x.LogContent.Contains(logContent));
             if (!logType.IsNullOrEmpty())
                 whereExp = whereExp.And(x => x.LogType == logType);
+            if (!level.IsNullOrEmpty())
+                whereExp = whereExp.And(x => x.Level == level);
             if (!opUserName.IsNullOrEmpty())
                 whereExp = whereExp.And(x => x.OpUserName.Contains(opUserName));
             if (!startTime.IsNullOrEmpty())

@@ -10,6 +10,18 @@
                 <input type="text" class="form-control input-sm" name="logContent">
             </div>
             <div class="form-group">
+                <label>日志级别</label>
+                <select class="selectpicker" name="level" data-style="btn-default btn-sm" data-width="100px">
+                    <option value="">请选择</option>
+                    <option value="Trace">Trace</option>
+                    <option value="Debug">Debug</option>
+                    <option value="Info">Info</option>
+                    <option value="Warn">Warn</option>
+                    <option value="Error">Error</option>
+                    <option value="Fatal">Fatal</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label>日志类别</label>
                 <select class="selectpicker" id="logType" name="logType" data-style="btn-default btn-sm" data-width="100px">
                     <option value="">请选择</option>
@@ -79,6 +91,17 @@
             pageList: [10, 30, 60, 100],
             columns: [
                 //{ title: 'ck', field: 'ck', checkbox: true, width: '3%' },
+                {
+                    title: '日志级别', field: 'Level', width: '5%', formatter: function (value) {
+                        if (value == 'Warn') {
+                            return '<span style="color:#FF7F00">{0}</span>'.format(value);
+                        } else if (value == 'Error' || value == 'Fatal') {
+                            return '<span style="color:#FF0000">{0}</span>'.format(value);
+                        } else {
+                            return value;
+                        }
+                    }
+                },
                 { title: '日志类型', field: 'LogType', width: '10%' },
                 {
                     title: '日志内容', field: 'LogContent', width: '60%', formatter: function (value) {
@@ -94,6 +117,20 @@
                 $.extend(params, searchParams);
 
                 return params;
+            },
+            //自定义字体颜色，或者背景颜色
+            rowStyle: function (row, index) {
+                var color = '';
+                var value = row['Level'];
+                if (value == 'Warn') {
+                    color = '#FF7F00';
+                } else if (value == 'Error' || value == 'Fatal') {
+                    color = '#ed5565';
+                }
+
+                var style = {};
+                style = { css: { 'color': color } };
+                return style;
             }
         });
     }

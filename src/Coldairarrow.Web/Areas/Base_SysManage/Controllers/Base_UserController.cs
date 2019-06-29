@@ -78,7 +78,9 @@ namespace Coldairarrow.Web.Areas.Base_SysManage.Controllers
             {
                 theData.Id = IdHelper.GetId();
 
-                _sysUserBus.AddData(theData);
+                var res= _sysUserBus.AddData(theData);
+
+                return JsonContent(res.ToJson());
             }
             else
             {

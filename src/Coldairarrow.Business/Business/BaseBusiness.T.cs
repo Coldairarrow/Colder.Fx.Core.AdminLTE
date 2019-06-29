@@ -1,5 +1,4 @@
 ﻿using Coldairarrow.DataRepository;
-using Coldairarrow.Entity.Base_SysManage;
 using Coldairarrow.Util;
 using System;
 using System.Collections.Generic;
@@ -20,7 +19,7 @@ namespace Coldairarrow.Business
     {
         #region DI
 
-        public IBusHelper BusHelper { protected get; set; }
+        public ILogger Logger { protected get; set; }
 
         #endregion
 
@@ -560,7 +559,7 @@ namespace Coldairarrow.Business
 
         #region 其它操作
 
-        protected virtual EnumType.LogType LogType { get => throw new Exception("请在子类重写"); }
+        protected virtual LogType LogType { get => throw new Exception("请在子类重写"); }
 
         protected void WriteSysLog(string logContent)
         {
@@ -572,18 +571,9 @@ namespace Coldairarrow.Business
         /// </summary>
         /// <param name="logContent">日志内容</param>
         /// <param name="logType">日志类型</param>
-        public void WriteSysLog(string logContent, EnumType.LogType logType)
+        public void WriteSysLog(string logContent, LogType logType)
         {
-            BusHelper.WriteSysLog(logContent, logType);
-        }
-
-        /// <summary>
-        /// 处理系统异常
-        /// </summary>
-        /// <param name="ex">异常对象</param>
-        public void HandleException(Exception ex)
-        {
-            BusHelper.HandleException(ex);
+            Logger.Info(logType, logContent);
         }
 
         /// <summary>

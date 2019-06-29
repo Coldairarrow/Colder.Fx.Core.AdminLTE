@@ -1,5 +1,4 @@
 using Coldairarrow.Business.Base_SysManage;
-using Coldairarrow.Entity.Base_SysManage;
 using Coldairarrow.Util;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -46,11 +45,12 @@ namespace Coldairarrow.Web.Areas.Base_SysManage.Controllers
             Pagination pagination,
             string logContent,
             string logType,
+            string level,
             string opUserName,
             DateTime? startTime,
             DateTime? endTime)
         {
-            var dataList = _sysLogBus.GetLogList(pagination, logContent, logType, opUserName, startTime, endTime);
+            var dataList = _sysLogBus.GetLogList(pagination, logContent, logType, level, opUserName, startTime, endTime);
 
             return Content(pagination.BuildTableResult_DataGrid(dataList).ToJson());
         }
@@ -59,7 +59,7 @@ namespace Coldairarrow.Web.Areas.Base_SysManage.Controllers
         {
             List<object> logTypeList = new List<object>();
 
-            Enum.GetNames(typeof(EnumType.LogType)).ForEach(aName =>
+            Enum.GetNames(typeof(LogType)).ForEach(aName =>
             {
                 logTypeList.Add(new { Name = aName, Value = aName });
             });

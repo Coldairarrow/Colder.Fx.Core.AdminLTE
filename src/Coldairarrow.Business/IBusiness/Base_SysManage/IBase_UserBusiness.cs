@@ -9,7 +9,7 @@ namespace Coldairarrow.Business.Base_SysManage
         List<Base_UserDTO> GetDataList(Pagination pagination, bool all, string userId = null, string keyword = null);
         Base_User GetTheData(string id);
         Base_UserDTO GetTheInfo(string userId);
-        void AddData(Base_User newData);
+        AjaxResult AddData(Base_User newData);
         void UpdateData(Base_User theData);
         void DeleteData(List<string> ids);
         void SetUserRole(string userId, List<string> roleIds);

@@ -3,7 +3,6 @@ using Coldairarrow.Util;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using static Coldairarrow.Entity.Base_SysManage.EnumType;
 
 namespace Coldairarrow.Business
 {
@@ -26,7 +25,7 @@ namespace Coldairarrow.Business
         public override void OnActionExecuted(IInvocation invocation)
         {
             string names = string.Join(",", _deleteList.Select(x => x.GetPropertyValue(_nameField)?.ToString()));
-            BusHelper.WriteSysLog($"删除{_dataName}:{names}", _logType, _deleteList.ToJson());
+            Logger.Info(_logType, $"删除{_dataName}:{names}", _deleteList.ToJson());
         }
     }
 }
