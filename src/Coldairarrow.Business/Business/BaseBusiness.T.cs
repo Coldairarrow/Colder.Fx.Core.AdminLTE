@@ -559,52 +559,6 @@ namespace Coldairarrow.Business
 
         #region 其它操作
 
-        protected virtual LogType LogType { get => throw new Exception("请在子类重写"); }
-
-        protected void WriteSysLog(string logContent)
-        {
-            WriteSysLog(logContent, LogType);
-        }
-
-        /// <summary>
-        /// 写入日志
-        /// </summary>
-        /// <param name="logContent">日志内容</param>
-        /// <param name="logType">日志类型</param>
-        public void WriteSysLog(string logContent, LogType logType)
-        {
-            Logger.Info(logType, logContent);
-        }
-
-        /// <summary>
-        /// 校验重复的数据字段
-        /// </summary>
-        /// <param name="data">校验的数据</param>
-        public void CheckRepeatProperty(T data)
-        {
-            CheckRepeatProperty(data, CheckRepeatPropertyConfig);
-        }
-
-        /// <summary>
-        /// 校验重复的数据字段
-        /// </summary>
-        /// <param name="data">校验的数据</param>
-        /// <param name="properties">校验的属性，Key为字段名，Value为重复后的提示信息</param>
-        public void CheckRepeatProperty(T data, Dictionary<string, string> properties)
-        {
-            foreach (var aProperty in properties)
-            {
-                if (!data.GetPropertyValue(aProperty.Key).IsNullOrEmpty())
-                {
-                    int count = GetIQueryable().Where($"Id!=@0&&{aProperty.Key}==@1", data.GetPropertyValue("Id"), data.GetPropertyValue(aProperty.Key)).Count();
-                    if (count > 0)
-                        throw new Exception(aProperty.Value);
-                }
-            }
-        }
-
-        public virtual Dictionary<string, string> CheckRepeatPropertyConfig { get; } = new Dictionary<string, string>();
-
         #endregion
 
         #region Dispose

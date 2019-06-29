@@ -5,7 +5,7 @@ namespace Coldairarrow.Business
 {
     public abstract class WriteDataLogAttribute : BaseFilterAttribute
     {
-        public WriteDataLogAttribute(LogType logType, string dataName, string nameField)
+        public WriteDataLogAttribute(LogType logType, string nameField, string dataName)
         {
             _logType = logType;
             _dataName = dataName;

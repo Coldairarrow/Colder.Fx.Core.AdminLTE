@@ -71,18 +71,19 @@ namespace Coldairarrow.Web.Areas.Base_SysManage.Controllers
         /// <param name="theData">保存的数据</param>
         public ActionResult SaveData(Base_SysRole theData)
         {
+            AjaxResult res;
             if (theData.Id.IsNullOrEmpty())
             {
                 theData.Id = IdHelper.GetId();
 
-                _sysRoleBus.AddData(theData);
+                res = _sysRoleBus.AddData(theData);
             }
             else
             {
-                _sysRoleBus.UpdateData(theData);
+                res = _sysRoleBus.UpdateData(theData);
             }
 
-            return Success();
+            return JsonContent(res.ToJson());
         }
 
         /// <summary>
@@ -91,11 +92,12 @@ namespace Coldairarrow.Web.Areas.Base_SysManage.Controllers
         /// <param name="theData">删除的数据</param>
         public ActionResult DeleteData(string ids)
         {
-            _sysRoleBus.DeleteData(ids.ToList<string>());
+            var res = _sysRoleBus.DeleteData(ids.ToList<string>());
 
-            _permissionManage.ClearUserPermissionCache();
+            if (res.Success)
+                _permissionManage.ClearUserPermissionCache();
 
-            return Success("删除成功！");
+            return JsonContent(res.ToJson());
         }
 
         /// <summary>

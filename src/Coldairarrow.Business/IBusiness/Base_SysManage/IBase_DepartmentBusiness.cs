@@ -9,8 +9,8 @@ namespace Coldairarrow.Business.Base_SysManage
         List<Base_Department> GetDataList(Pagination pagination, string departmentName = null);
         Base_Department GetTheData(string id);
         List<string> GetChildrenIds(string departmentId);
-        void AddData(Base_Department newData);
-        void UpdateData(Base_Department theData);
-        void DeleteData(List<string> ids);
+        AjaxResult AddData(Base_Department newData);
+        AjaxResult UpdateData(Base_Department theData);
+        AjaxResult DeleteData(List<string> ids);
     }
 }

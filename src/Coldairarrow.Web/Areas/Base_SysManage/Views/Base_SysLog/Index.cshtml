@@ -91,17 +91,7 @@
             pageList: [10, 30, 60, 100],
             columns: [
                 //{ title: 'ck', field: 'ck', checkbox: true, width: '3%' },
-                {
-                    title: '日志级别', field: 'Level', width: '5%', formatter: function (value) {
-                        if (value == 'Warn') {
-                            return '<span style="color:#FF7F00">{0}</span>'.format(value);
-                        } else if (value == 'Error' || value == 'Fatal') {
-                            return '<span style="color:#FF0000">{0}</span>'.format(value);
-                        } else {
-                            return value;
-                        }
-                    }
-                },
+                { title: '日志级别', field: 'Level', width: '5%' },
                 { title: '日志类型', field: 'LogType', width: '10%' },
                 {
                     title: '日志内容', field: 'LogContent', width: '60%', formatter: function (value) {

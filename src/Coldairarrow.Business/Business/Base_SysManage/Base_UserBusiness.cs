@@ -34,8 +34,6 @@ namespace Coldairarrow.Business.Base_SysManage
             return _dataPermission.GetIQ_Base_User(Service);
         }
 
-        protected override LogType LogType => LogType.系统用户管理;
-
         #endregion
 
         #region 外部接口
@@ -101,7 +99,7 @@ namespace Coldairarrow.Business.Base_SysManage
             return _sysUserCache.GetCache(userId);
         }
 
-        [DataAddLog(LogType.系统用户管理, "用户", "RealName")]
+        [DataAddLog(LogType.系统用户管理, "RealName", "用户")]
         [DataRepeatValidate(
             new string[] { "UserName" },
             new string[] { "用户名" })]
@@ -112,32 +110,36 @@ namespace Coldairarrow.Business.Base_SysManage
             return Success();
         }
 
-        [DataEditLog(LogType.系统用户管理, "用户", "RealName")]
+        [DataEditLog(LogType.系统用户管理, "RealName", "用户")]
         [DataRepeatValidate(
             new string[] { "UserName" },
             new string[] { "用户名" })]
-        public void UpdateData(Base_User theData)
+        public AjaxResult UpdateData(Base_User theData)
         {
             if (theData.Id == "Admin" && _operator.UserId != theData.Id)
-                throw new Exception("禁止更改超级管理员！");
+                return new ErrorResult("禁止更改超级管理员！");
 
             Update(theData);
             _sysUserCache.UpdateCache(theData.Id);
+
+            return Success();
         }
 
-        [DataDeleteLog(LogType.系统用户管理, "用户", "RealName")]
-        public void DeleteData(List<string> ids)
+        [DataDeleteLog(LogType.系统用户管理, "RealName", "用户")]
+        public AjaxResult DeleteData(List<string> ids)
         {
             var adminUser = GetTheInfo("Admin");
             if (ids.Contains(adminUser.Id))
-                throw new Exception("超级管理员是内置账号,禁止删除！");
+                return new ErrorResult("超级管理员是内置账号,禁止删除！");
             var userIds = GetIQueryable().Where(x => ids.Contains(x.Id)).Select(x => x.Id).ToList();
 
             Delete(ids);
             _sysUserCache.UpdateCache(userIds);
+
+            return Success();
         }
 
-        public void SetUserRole(string userId, List<string> roleIds)
+        public AjaxResult SetUserRole(string userId, List<string> roleIds)
         {
             Service.Delete<Base_UserRoleMap>(x => x.UserId == userId);
             var insertList = roleIds.Select(x => new Base_UserRoleMap
@@ -150,6 +152,8 @@ namespace Coldairarrow.Business.Base_SysManage
             Service.Insert(insertList);
             _sysUserCache.UpdateCache(userId);
             _permissionManage.UpdateUserPermissionCache(userId);
+
+            return Success();
         }
 
         public List<string> GetUserRoleIds(string userId)

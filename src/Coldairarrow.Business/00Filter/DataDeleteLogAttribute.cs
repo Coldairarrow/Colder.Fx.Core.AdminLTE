@@ -8,8 +8,8 @@ namespace Coldairarrow.Business
 {
     public class DataDeleteLogAttribute : WriteDataLogAttribute
     {
-        public DataDeleteLogAttribute(LogType logType, string dataName, string nameField)
-            : base(logType, dataName, nameField)
+        public DataDeleteLogAttribute(LogType logType, string nameField, string dataName)
+            : base(logType, nameField, dataName)
         {
         }
 
@@ -24,8 +24,11 @@ namespace Coldairarrow.Business
 
         public override void OnActionExecuted(IInvocation invocation)
         {
-            string names = string.Join(",", _deleteList.Select(x => x.GetPropertyValue(_nameField)?.ToString()));
-            Logger.Info(_logType, $"删除{_dataName}:{names}", _deleteList.ToJson());
+            if ((invocation.ReturnValue as AjaxResult).Success)
+            {
+                string names = string.Join(",", _deleteList.Select(x => x.GetPropertyValue(_nameField)?.ToString()));
+                Logger.Info(_logType, $"删除{_dataName}:{names}", _deleteList.ToJson());
+            }
         }
     }
 }

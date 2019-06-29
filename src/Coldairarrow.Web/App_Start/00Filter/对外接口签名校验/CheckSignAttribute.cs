@@ -1,5 +1,6 @@
 ﻿using Coldairarrow.Business.Base_SysManage;
 using Coldairarrow.Util;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
 
@@ -63,37 +64,71 @@ HttpHelper.SafeSignRequest
             var request = filterContext.HttpContext.Request;
             string appId = request.Headers["appId"].ToString();
             if (appId.IsNullOrEmpty())
-                throw new Exception("缺少header:appId");
-
+            {
+                ReturnError("缺少header:appId");
+                return;
+            }
             string time = request.Headers["time"].ToString();
             if (time.IsNullOrEmpty())
-                throw new Exception("缺少header:time");
+            {
+                ReturnError("缺少header:time");
+                return;
+            }
             if (time.ToDateTime() < DateTime.Now.AddMinutes(-5) || time.ToDateTime() > DateTime.Now.AddMinutes(5))
-                throw new Exception("time过期");
+            {
+                ReturnError("time过期");
+                return;
+            }
 
             string guid = request.Headers["guid"].ToString();
             if (guid.IsNullOrEmpty())
-                throw new Exception("缺少header:guid");
+            {
+                ReturnError("缺少header:guid");
+                return;
+            }
 
             string guidKey = $"{GlobalSwitch.ProjectName}_apiGuid_{guid}";
             if (CacheHelper.Cache.GetCache(guidKey).IsNullOrEmpty())
                 CacheHelper.Cache.SetCache(guidKey, "1", new TimeSpan(0, 10, 0));
             else
-                throw new Exception("禁止重复调用!");
+            {
+                ReturnError("禁止重复调用!");
+                return;
+            }
 
             string body = request.Body.ReadToString();
 
             string sign = request.Headers["sign"].ToString();
             if (sign.IsNullOrEmpty())
-                throw new Exception("缺少header:sign");
+            {
+                ReturnError("缺少header:sign");
+                return;
+            }
 
             string appSecret = appSecretBus.GetAppSecret(appId);
             if (appSecret.IsNullOrEmpty())
-                throw new Exception("header:appId无效");
+            {
+                ReturnError("header:appId无效");
+                return;
+            }
 
             string newSign = HttpHelper.BuildApiSign(appId, appSecret, guid, time.ToDateTime(), body);
             if (sign != newSign)
-                throw new Exception("header:sign签名错误");
+            {
+                ReturnError("header:sign签名错误");
+                return;
+            }
+
+            void ReturnError(string msg)
+            {
+                AjaxResult res = new AjaxResult
+                {
+                    Success = false,
+                    Msg = msg
+                };
+
+                filterContext.Result = new ContentResult { Content = res.ToJson(), ContentType = "application/json;charset=utf-8" };
+            }
         }
 
         /// <summary>
