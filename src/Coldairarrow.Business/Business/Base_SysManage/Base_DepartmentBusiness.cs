@@ -45,23 +45,32 @@ namespace Coldairarrow.Business.Base_SysManage
         }
 
         [DataRepeatValidate(new string[] { "Name" }, new string[] { "部门名" })]
-        [DataAddLog(EnumType.LogType.部门管理, "部门名", "Name")]
-        public void AddData(Base_Department newData)
+        [DataAddLog(LogType.部门管理, "Name", "部门名")]
+        public AjaxResult AddData(Base_Department newData)
         {
             Insert(newData);
+
+            return Success();
         }
 
         [DataRepeatValidate(new string[] { "Name" }, new string[] { "部门名" })]
-        [DataEditLog(EnumType.LogType.部门管理, "部门名", "Name")]
-        public void UpdateData(Base_Department theData)
+        [DataEditLog(LogType.部门管理, "Name", "部门名")]
+        public AjaxResult UpdateData(Base_Department theData)
         {
             Update(theData);
+
+            return Success();
         }
 
-        [DataDeleteLog(EnumType.LogType.部门管理, "部门名", "Name")]
-        public void DeleteData(List<string> ids)
+        [DataDeleteLog(LogType.部门管理, "Name", "部门名")]
+        public AjaxResult DeleteData(List<string> ids)
         {
+            if (GetIQueryable().Any(x => ids.Contains(x.ParentId)))
+                return Error("禁止删除！请先删除所有子级！");
+
             Delete(ids);
+
+            return Success();
         }
 
         #endregion

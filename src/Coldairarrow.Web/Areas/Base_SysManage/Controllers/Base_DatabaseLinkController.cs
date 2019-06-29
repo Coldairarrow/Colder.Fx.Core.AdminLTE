@@ -54,18 +54,19 @@ namespace Coldairarrow.Web.Areas.Base_SysManage.Controllers
         /// <param name="theData">保存的数据</param>
         public ActionResult SaveData(Base_DatabaseLink theData)
         {
-            if(theData.Id.IsNullOrEmpty())
+            AjaxResult res;
+            if (theData.Id.IsNullOrEmpty())
             {
                 theData.Id = IdHelper.GetId();
 
-                _dbLinkBus.AddData(theData);
+                res = _dbLinkBus.AddData(theData);
             }
             else
             {
-                _dbLinkBus.UpdateData(theData);
+                res = _dbLinkBus.UpdateData(theData);
             }
 
-            return Success();
+            return JsonContent(res.ToJson());
         }
 
         /// <summary>
@@ -74,9 +75,9 @@ namespace Coldairarrow.Web.Areas.Base_SysManage.Controllers
         /// <param name="theData">删除的数据</param>
         public ActionResult DeleteData(string ids)
         {
-            _dbLinkBus.DeleteData(ids.ToList<string>());
+            var res = _dbLinkBus.DeleteData(ids.ToList<string>());
 
-            return Success("删除成功！");
+            return JsonContent(res.ToJson());
         }
 
         #endregion

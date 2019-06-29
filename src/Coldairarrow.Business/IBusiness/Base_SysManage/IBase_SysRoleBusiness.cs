@@ -10,10 +10,10 @@ namespace Coldairarrow.Business.Base_SysManage
         List<Base_SysRoleDTO> GetDataList(Pagination pagination, string roldId = null, string roleName = null);
         Base_SysRole GetTheData(string id);
         Base_SysRoleDTO GetTheInfo(string id);
-        void AddData(Base_SysRole newData);
-        void UpdateData(Base_SysRole theData);
-        void DeleteData(List<string> ids);
-        void SavePermission(string roleId, List<string> permissions);
+        AjaxResult AddData(Base_SysRole newData);
+        AjaxResult UpdateData(Base_SysRole theData);
+        AjaxResult DeleteData(List<string> ids);
+        AjaxResult SavePermission(string roleId, List<string> permissions);
     }
 
     public class Base_SysRoleDTO : Base_SysRole

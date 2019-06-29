@@ -3,7 +3,6 @@ using Coldairarrow.Util;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Coldairarrow.Web
@@ -48,7 +47,7 @@ namespace Coldairarrow.Web
                     Success = false,
                     Msg = "权限不足！无法访问！"
                 };
-                filterContext.Result = new ContentResult { Content = res.ToJson() };
+                filterContext.Result = new ContentResult { Content = res.ToJson(), ContentType = "application/json;charset=utf-8" };
             }
         }
 

@@ -20,7 +20,7 @@ namespace Coldairarrow.Web
         public void OnActionExecuting(ActionExecutingContext filterContext)
         {
             IOperator Operator = AutofacHelper.GetService<IOperator>();
-            IBusHelper BusHelper = AutofacHelper.GetService<IBusHelper>();
+            ILogger logger = AutofacHelper.GetService<ILogger>();
 
             var request = filterContext.HttpContext.Request;
 
@@ -44,7 +44,7 @@ namespace Coldairarrow.Web
             }
             catch (Exception ex)
             {
-                BusHelper.HandleException(ex);
+                logger.Error(ex);
                 RedirectToLogin();
             }
 

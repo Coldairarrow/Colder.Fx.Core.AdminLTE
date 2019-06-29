@@ -1,19 +1,24 @@
-﻿using Coldairarrow.Entity.Base_SysManage;
-using Coldairarrow.Util;
+﻿using Coldairarrow.Util;
 using System;
-using System.Collections.Generic;
 
 namespace Coldairarrow.Business
 {
-    interface ILogger
+    public interface ILogger
     {
-        void WriteSysLog(Base_SysLog log);
-        List<Base_SysLog> GetLogList(
-            Pagination pagination,
-            string logContent,
-            string logType,
-            string opUserName,
-            DateTime? startTime,
-            DateTime? endTime);
+        void Log(LogLevel logLevel, LogType logType, string msg);
+        void Log(LogLevel logLevel, LogType logType, string msg, string data);
+        void Trace(LogType logType, string msg);
+        void Trace(LogType logType, string msg, string data);
+        void Debug(LogType logType, string msg);
+        void Debug(LogType logType, string msg, string data);
+        void Info(LogType logType, string msg);
+        void Info(LogType logType, string msg, string data);
+        void Warn(LogType logType, string msg);
+        void Warn(LogType logType, string msg, string data);
+        void Error(LogType logType, string msg);
+        void Error(LogType logType, string msg, string data);
+        void Error(Exception ex);
+        void Fatal(LogType logType, string msg);
+        void Fatal(LogType logType, string msg, string data);
     }
 }

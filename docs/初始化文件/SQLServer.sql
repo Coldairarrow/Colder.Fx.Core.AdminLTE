@@ -4,14 +4,14 @@ Navicat SQL Server Data Transfer
 Source Server         : .@SQLServer
 Source Server Version : 105000
 Source Host           : .:1433
-Source Database       : Colder.Fx.Net.AdminLTE
+Source Database       : Colder.Fx.Core.AdminLTE
 Source Schema         : dbo
 
 Target Server Type    : SQL Server
 Target Server Version : 105000
 File Encoding         : 65001
 
-Date: 2019-06-15 21:32:03
+Date: 2019-06-29 20:02:27
 */
 
 
@@ -528,7 +528,8 @@ CREATE TABLE [Base_SysLog] (
 [LogContent] varchar(MAX) NULL ,
 [OpUserName] varchar(255) NULL ,
 [OpTime] datetime NULL ,
-[Data] text NULL 
+[Data] text NULL ,
+[Level] varchar(255) NULL 
 )
 
 
@@ -628,6 +629,20 @@ EXEC sp_addextendedproperty @name = N'MS_Description', @value = N'数据备份'
 , @level0type = 'SCHEMA', @level0name = N'dbo'
 , @level1type = 'TABLE', @level1name = N'Base_SysLog'
 , @level2type = 'COLUMN', @level2name = N'Data'
+GO
+IF ((SELECT COUNT(*) from fn_listextendedproperty('MS_Description', 
+'SCHEMA', N'dbo', 
+'TABLE', N'Base_SysLog', 
+'COLUMN', N'Level')) > 0) 
+EXEC sp_updateextendedproperty @name = N'MS_Description', @value = N'日志级别'
+, @level0type = 'SCHEMA', @level0name = N'dbo'
+, @level1type = 'TABLE', @level1name = N'Base_SysLog'
+, @level2type = 'COLUMN', @level2name = N'Level'
+ELSE
+EXEC sp_addextendedproperty @name = N'MS_Description', @value = N'日志级别'
+, @level0type = 'SCHEMA', @level0name = N'dbo'
+, @level1type = 'TABLE', @level1name = N'Base_SysLog'
+, @level2type = 'COLUMN', @level2name = N'Level'
 GO
 
 -- ----------------------------
@@ -744,7 +759,7 @@ GO
 -- ----------------------------
 BEGIN TRANSACTION
 GO
-INSERT INTO [Base_UnitTest] ([Id], [UserId], [UserName], [Age]) VALUES (N'10', null, null, null), (N'1139855817357529088', N'1139855817357529089', N'超级管理员', N'22'), (N'6a1230b5-43fa-4d4c-8c3e-59f8e10d89a1', N'Admin', N'超级管理员', N'22')
+INSERT INTO [Base_UnitTest] ([Id], [UserId], [UserName], [Age]) VALUES (N'8f3f78cb-8744-4453-b966-866030cc6c3c', N'2', N'190c2e3d-c3e1-4324-b61d-5f120696da10', null), (N'c20126d4-f895-476d-8dde-d9ba403f1d1c', N'1', N'e5ae00c6-f2fb-4955-9398-3b3b3645d8c8', null)
 GO
 GO
 COMMIT TRANSACTION
@@ -881,7 +896,7 @@ GO
 -- ----------------------------
 BEGIN TRANSACTION
 GO
-INSERT INTO [Base_User] ([Id], [UserName], [Password], [RealName], [Sex], [Birthday], [DepartmentId]) VALUES (N'1133345545746780160', N'xiaoming', N'e10adc3949ba59abbe56e057f20f883e', N'xiaoming', N'1', null, N'1139811435694657536'), (N'Admin', N'Admin', N'e10adc3949ba59abbe56e057f20f883e', N'超级管理员', N'1', N'2017-12-15', N'1139811378824089600')
+INSERT INTO [Base_User] ([Id], [UserName], [Password], [RealName], [Sex], [Birthday], [DepartmentId]) VALUES (N'1133345545746780160', N'xiaoming', N'e10adc3949ba59abbe56e057f20f883e', N'xiaoming', N'10000', null, N'1139811435694657536'), (N'Admin', N'Admin', N'e10adc3949ba59abbe56e057f20f883e', N'超级管理员', N'1', N'2017-12-15', N'1139811378824089600')
 GO
 GO
 COMMIT TRANSACTION

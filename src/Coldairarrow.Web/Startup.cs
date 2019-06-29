@@ -81,6 +81,7 @@ namespace Coldairarrow.Web
 
             InitEF();
             InitAutoMapper();
+            InitLogger();
         }
 
         private void InitEF()
@@ -148,6 +149,14 @@ namespace Coldairarrow.Web
                 cfg.CreateMap<Base_User, Base_UserDTO>();
                 cfg.CreateMap<Base_SysRole, Base_SysRoleDTO>();
             });
+        }
+
+        /// <summary>
+        /// ≥ı ºªØLogger
+        /// </summary>
+        private void InitLogger()
+        {
+            return;
         }
     }
 }

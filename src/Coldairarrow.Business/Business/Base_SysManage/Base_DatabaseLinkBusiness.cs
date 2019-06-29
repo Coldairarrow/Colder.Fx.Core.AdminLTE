@@ -28,26 +28,32 @@ namespace Coldairarrow.Business.Base_SysManage
         /// 添加数据
         /// </summary>
         /// <param name="newData">数据</param>
-        public void AddData(Base_DatabaseLink newData)
+        public AjaxResult AddData(Base_DatabaseLink newData)
         {
             Insert(newData);
+
+            return Success();
         }
 
         /// <summary>
         /// 更新数据
         /// </summary>
-        public void UpdateData(Base_DatabaseLink theData)
+        public AjaxResult UpdateData(Base_DatabaseLink theData)
         {
             Update(theData);
+
+            return Success();
         }
 
         /// <summary>
         /// 删除数据
         /// </summary>
         /// <param name="theData">删除的数据</param>
-        public void DeleteData(List<string> ids)
+        public AjaxResult DeleteData(List<string> ids)
         {
             Delete(ids);
+
+            return Success();
         }
 
         #endregion

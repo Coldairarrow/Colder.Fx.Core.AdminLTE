@@ -15,10 +15,13 @@ namespace Coldairarrow.Util
                 .ToList();
 
             //执行前
-            allFilers.ForEach(aFiler =>
+            foreach(var aFiler in allFilers)
             {
                 aFiler.OnActionExecuting(invocation);
-            });
+
+                if (!invocation.ReturnValue.IsNullOrEmpty())
+                    return;
+            }
 
             //执行
             invocation.Proceed();

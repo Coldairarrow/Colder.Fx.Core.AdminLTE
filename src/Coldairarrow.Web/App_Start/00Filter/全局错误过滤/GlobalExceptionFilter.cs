@@ -9,10 +9,10 @@ namespace Coldairarrow.Web
     {
         public void OnException(ExceptionContext context)
         {
-            IBusHelper BusHelper = AutofacHelper.GetService<IBusHelper>();
+            ILogger logger = AutofacHelper.GetService<ILogger>();
 
             var ex = context.Exception;
-            BusHelper.HandleException(ex);
+            logger.Error(ex);
 
             context.Result = new ContentResult
             {

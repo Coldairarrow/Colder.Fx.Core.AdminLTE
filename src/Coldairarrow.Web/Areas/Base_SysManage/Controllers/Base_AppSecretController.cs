@@ -63,18 +63,19 @@ namespace Coldairarrow.Web.Areas.Base_SysManage.Controllers
         /// <param name="theData">保存的数据</param>
         public ActionResult SaveData(Base_AppSecret theData)
         {
+            AjaxResult res;
             if (theData.Id.IsNullOrEmpty())
             {
                 theData.Id = IdHelper.GetId();
 
-                _appSecretBus.AddData(theData);
+                res = _appSecretBus.AddData(theData);
             }
             else
             {
-                _appSecretBus.UpdateData(theData);
+                res = _appSecretBus.UpdateData(theData);
             }
 
-            return Success();
+            return JsonContent(res.ToJson());
         }
 
         /// <summary>
@@ -83,9 +84,9 @@ namespace Coldairarrow.Web.Areas.Base_SysManage.Controllers
         /// <param name="theData">删除的数据</param>
         public ActionResult DeleteData(string ids)
         {
-            _appSecretBus.DeleteData(ids.ToList<string>());
+            var res = _appSecretBus.DeleteData(ids.ToList<string>());
 
-            return Success("删除成功！");
+            return JsonContent(res.ToJson());
         }
 
         public ActionResult SavePermission(string appId, string permissions)

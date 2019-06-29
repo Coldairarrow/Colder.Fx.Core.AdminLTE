@@ -71,6 +71,7 @@ namespace Coldairarrow.Web.Areas.Base_SysManage.Controllers
 
         public ActionResult SaveData(Base_User theData, string Pwd, string RoleIdList)
         {
+            AjaxResult res;
             if (!Pwd.IsNullOrEmpty())
                 theData.Password = Pwd.ToMD5String();
 
@@ -78,20 +79,20 @@ namespace Coldairarrow.Web.Areas.Base_SysManage.Controllers
             {
                 theData.Id = IdHelper.GetId();
 
-                _sysUserBus.AddData(theData);
+                res = _sysUserBus.AddData(theData);
             }
             else
             {
-                _sysUserBus.UpdateData(theData);
+                res = _sysUserBus.UpdateData(theData);
             }
 
             //角色设置
-            if (!RoleIdList.IsNullOrEmpty())
+            if (!RoleIdList.IsNullOrEmpty() && res.Success)
             {
                 _sysUserBus.SetUserRole(theData.Id, RoleIdList.ToList<string>());
             }
 
-            return Success();
+            return JsonContent(res.ToJson());
         }
 
         /// <summary>
@@ -100,9 +101,9 @@ namespace Coldairarrow.Web.Areas.Base_SysManage.Controllers
         /// <param name="theData">删除的数据</param>
         public ActionResult DeleteData(string ids)
         {
-            _sysUserBus.DeleteData(ids.ToList<string>());
+            var res = _sysUserBus.DeleteData(ids.ToList<string>());
 
-            return Success("删除成功！");
+            return JsonContent(res.ToJson());
         }
 
         /// <summary>

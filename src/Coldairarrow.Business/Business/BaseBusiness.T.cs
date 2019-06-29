@@ -1,5 +1,4 @@
 ﻿using Coldairarrow.DataRepository;
-using Coldairarrow.Entity.Base_SysManage;
 using Coldairarrow.Util;
 using System;
 using System.Collections.Generic;
@@ -20,7 +19,7 @@ namespace Coldairarrow.Business
     {
         #region DI
 
-        public IBusHelper BusHelper { protected get; set; }
+        public ILogger Logger { protected get; set; }
 
         #endregion
 
@@ -559,61 +558,6 @@ namespace Coldairarrow.Business
         #endregion
 
         #region 其它操作
-
-        protected virtual EnumType.LogType LogType { get => throw new Exception("请在子类重写"); }
-
-        protected void WriteSysLog(string logContent)
-        {
-            WriteSysLog(logContent, LogType);
-        }
-
-        /// <summary>
-        /// 写入日志
-        /// </summary>
-        /// <param name="logContent">日志内容</param>
-        /// <param name="logType">日志类型</param>
-        public void WriteSysLog(string logContent, EnumType.LogType logType)
-        {
-            BusHelper.WriteSysLog(logContent, logType);
-        }
-
-        /// <summary>
-        /// 处理系统异常
-        /// </summary>
-        /// <param name="ex">异常对象</param>
-        public void HandleException(Exception ex)
-        {
-            BusHelper.HandleException(ex);
-        }
-
-        /// <summary>
-        /// 校验重复的数据字段
-        /// </summary>
-        /// <param name="data">校验的数据</param>
-        public void CheckRepeatProperty(T data)
-        {
-            CheckRepeatProperty(data, CheckRepeatPropertyConfig);
-        }
-
-        /// <summary>
-        /// 校验重复的数据字段
-        /// </summary>
-        /// <param name="data">校验的数据</param>
-        /// <param name="properties">校验的属性，Key为字段名，Value为重复后的提示信息</param>
-        public void CheckRepeatProperty(T data, Dictionary<string, string> properties)
-        {
-            foreach (var aProperty in properties)
-            {
-                if (!data.GetPropertyValue(aProperty.Key).IsNullOrEmpty())
-                {
-                    int count = GetIQueryable().Where($"Id!=@0&&{aProperty.Key}==@1", data.GetPropertyValue("Id"), data.GetPropertyValue(aProperty.Key)).Count();
-                    if (count > 0)
-                        throw new Exception(aProperty.Value);
-                }
-            }
-        }
-
-        public virtual Dictionary<string, string> CheckRepeatPropertyConfig { get; } = new Dictionary<string, string>();
 
         #endregion
 

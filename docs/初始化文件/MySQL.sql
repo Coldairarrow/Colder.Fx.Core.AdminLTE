@@ -171,6 +171,7 @@ CREATE TABLE `Base_SysLog` (
 `OpUserName`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '操作员用户名' ,
 `OpTime`  datetime NULL DEFAULT NULL COMMENT '日志记录时间' ,
 `Data`  longtext CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '数据备份' ,
+`Level`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '日志级别' ,
 PRIMARY KEY (`Id`),
 INDEX `OpTime` (`OpTime`) USING BTREE ,
 INDEX `LogType` (`LogType`) USING BTREE 

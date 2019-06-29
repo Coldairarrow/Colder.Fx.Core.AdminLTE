@@ -1,9 +1,6 @@
-﻿using Coldairarrow.Business;
-using Coldairarrow.Entity.Base_SysManage;
-using Coldairarrow.Util;
+﻿using Coldairarrow.Util;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using System;
 using System.Linq;
 using System.Text;
 
@@ -14,8 +11,6 @@ namespace Coldairarrow.Web
     /// </summary>
     public class BaseController : Controller
     {
-        public IBusHelper BusHelper { get; set; }
-
         /// <summary>
         /// 执行前调用
         /// </summary>
@@ -206,37 +201,6 @@ namespace Coldairarrow.Web
         public bool UrlContains(string subUrl)
         {
             return Request.Path.ToString().ToLower().Contains(subUrl.ToLower());
-        }
-
-        /// <summary>
-        /// 写入日志
-        /// </summary>
-        /// <param name="logContent">日志内容</param>
-        /// <param name="logType">日志类型</param>
-        public void WriteSysLog(string logContent, EnumType.LogType logType)
-        {
-            BusHelper.WriteSysLog(logContent, logType);
-        }
-
-        /// <summary>
-        /// 写入日志
-        /// </summary>
-        /// <param name="logContent">日志内容</param>
-        public void WriteSysLog(string logContent)
-        {
-            WriteSysLog(logContent, LogType);
-        }
-
-        /// <summary>
-        /// 日志类型
-        /// 注：可通过具体控制器重写
-        /// </summary>
-        public virtual EnumType.LogType LogType
-        {
-            get
-            {
-                throw new Exception("请在子类重写日志类型");
-            }
         }
     }
 }

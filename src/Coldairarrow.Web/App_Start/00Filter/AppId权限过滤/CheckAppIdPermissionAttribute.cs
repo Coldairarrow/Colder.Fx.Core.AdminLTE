@@ -3,7 +3,6 @@ using Coldairarrow.Util;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Coldairarrow.Web
@@ -38,6 +37,8 @@ namespace Coldairarrow.Web
                 res.Success = false;
                 res.Msg = "缺少appId参数！";
                 filterContext.Result = new ContentResult { Content = res.ToJson() };
+
+                return;
             }
             string appId = allRequestParams["appId"]?.ToString();
             var allUrlPermissions = UrlPermissionManage.GetAllUrlPermissions();

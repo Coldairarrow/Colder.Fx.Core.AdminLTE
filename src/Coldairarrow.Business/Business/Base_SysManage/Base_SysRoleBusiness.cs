@@ -57,27 +57,37 @@ namespace Coldairarrow.Business.Base_SysManage
         /// 添加数据
         /// </summary>
         /// <param name="newData">数据</param>
-        public void AddData(Base_SysRole newData)
+        [DataAddLog(LogType.系统角色管理, "RoleName", "角色")]
+        [DataRepeatValidate(new string[] { "RoleName" }, new string[] { "角色名" })]
+        public AjaxResult AddData(Base_SysRole newData)
         {
             Insert(newData);
+
+            return Success();
         }
 
         /// <summary>
         /// 更新数据
         /// </summary>
-        public void UpdateData(Base_SysRole theData)
+        [DataEditLog(LogType.系统角色管理, "RoleName", "角色")]
+        [DataRepeatValidate(new string[] { "RoleName" }, new string[] { "角色名" })]
+        public AjaxResult UpdateData(Base_SysRole theData)
         {
             Update(theData);
+
+            return Success();
         }
 
         /// <summary>
         /// 删除数据
         /// </summary>
         /// <param name="theData">删除的数据</param>
-        public void DeleteData(List<string> ids)
+        [DataDeleteLog(LogType.系统角色管理, "RoleName", "角色")]
+        public AjaxResult DeleteData(List<string> ids)
         {
-            //删除角色
             Delete(ids);
+
+            return Success();
         }
 
         /// <summary>
@@ -85,7 +95,7 @@ namespace Coldairarrow.Business.Base_SysManage
         /// </summary>
         /// <param name="roleId">角色Id</param>
         /// <param name="permissions">权限值</param>
-        public void SavePermission(string roleId, List<string> permissions)
+        public AjaxResult SavePermission(string roleId, List<string> permissions)
         {
             Service.Delete<Base_PermissionRole>(x => x.RoleId == roleId);
             List<Base_PermissionRole> insertList = new List<Base_PermissionRole>();
@@ -101,6 +111,8 @@ namespace Coldairarrow.Business.Base_SysManage
 
             Service.Insert(insertList);
             _permissionManage.ClearUserPermissionCache();
+
+            return Success();
         }
 
         #endregion

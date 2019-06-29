@@ -173,7 +173,8 @@ CREATE TABLE "Base_SysLog" (
 "LogContent" CLOB NULL ,
 "OpUserName" VARCHAR2(255 CHAR) NULL ,
 "OpTime" DATE NULL ,
-"Data" CLOB NULL 
+"Data" CLOB NULL ,
+"Level" VARCHAR2(50 CHAR) NULL ,
 )
 LOGGING
 NOCOMPRESS
@@ -187,6 +188,7 @@ COMMENT ON COLUMN "Base_SysLog"."LogContent" IS '日志内容';
 COMMENT ON COLUMN "Base_SysLog"."OpUserName" IS '操作员用户名';
 COMMENT ON COLUMN "Base_SysLog"."OpTime" IS '日志记录时间';
 COMMENT ON COLUMN "Base_SysLog"."Data" IS '数据备份';
+COMMENT ON COLUMN "Base_SysLog"."Level" IS '日志级别';
 
 -- ----------------------------
 -- Records of Base_SysLog

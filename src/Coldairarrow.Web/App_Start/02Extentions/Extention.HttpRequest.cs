@@ -5,6 +5,11 @@
     /// </summary>
     public static partial class Extention
     {
+        /// <summary>
+        /// 判断是否为AJAX请求
+        /// </summary>
+        /// <param name="req"></param>
+        /// <returns></returns>
         public static bool IsAjaxRequest(this HttpRequest req)
         {
             bool result = false;

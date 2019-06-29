@@ -45,10 +45,12 @@ namespace Coldairarrow.Business.Base_SysManage
         /// <param name="newData">数据</param>
         [DataRepeatValidate(new string[] { "AppId" },
             new string[] { "应用Id" })]
-        [DataAddLog(EnumType.LogType.接口密钥管理, "应用Id", "AppId")]
-        public void AddData(Base_AppSecret newData)
+        [DataAddLog(LogType.接口密钥管理, "AppId", "应用Id")]
+        public AjaxResult AddData(Base_AppSecret newData)
         {
             Insert(newData);
+
+            return Success();
         }
 
         /// <summary>
@@ -56,10 +58,12 @@ namespace Coldairarrow.Business.Base_SysManage
         /// </summary>
         [DataRepeatValidate(new string[] { "AppId" },
             new string[] { "应用Id" })]
-        [DataEditLog(EnumType.LogType.接口密钥管理, "应用Id", "AppId")]
-        public void UpdateData(Base_AppSecret theData)
+        [DataEditLog(LogType.接口密钥管理, "AppId", "应用Id")]
+        public AjaxResult UpdateData(Base_AppSecret theData)
         {
             Update(theData);
+
+            return Success();
         }
 
         /// <summary>
@@ -67,10 +71,12 @@ namespace Coldairarrow.Business.Base_SysManage
         /// </summary>
         /// <param name="theData">删除的数据</param>
         /// 
-        [DataDeleteLog(EnumType.LogType.接口密钥管理, "应用Id", "AppId")]
-        public void DeleteData(List<string> ids)
+        [DataDeleteLog(LogType.接口密钥管理, "AppId", "应用Id")]
+        public AjaxResult DeleteData(List<string> ids)
         {
             Delete(ids);
+
+            return Success();
         }
 
         /// <summary>
@@ -78,7 +84,7 @@ namespace Coldairarrow.Business.Base_SysManage
         /// </summary>
         /// <param name="appId">应用Id</param>
         /// <param name="permissions">权限值</param>
-        public void SavePermission(string appId, List<string> permissions)
+        public AjaxResult SavePermission(string appId, List<string> permissions)
         {
             Service.Delete<Base_PermissionAppId>(x => x.AppId == appId);
 
@@ -94,6 +100,8 @@ namespace Coldairarrow.Business.Base_SysManage
             });
 
             Service.Insert(insertList);
+
+            return Success();
         }
 
         #endregion
