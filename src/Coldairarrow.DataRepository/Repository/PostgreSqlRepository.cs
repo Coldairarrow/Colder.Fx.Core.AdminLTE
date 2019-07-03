@@ -27,6 +27,16 @@ namespace Coldairarrow.DataRepository
 
         #endregion
 
+        #region 私有成员
+
+        protected override string FormatFieldName(string name)
+        {
+            return $"\"{name}\"";
+        }
+
+        #endregion
+
+
         #region 插入数据
 
         /// <summary>

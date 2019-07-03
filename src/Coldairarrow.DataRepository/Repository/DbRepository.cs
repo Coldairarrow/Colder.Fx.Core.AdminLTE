@@ -10,6 +10,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Coldairarrow.DataRepository
 {
@@ -525,7 +526,11 @@ namespace Coldairarrow.DataRepository
 
             List<KeyValuePair<string, object>> parameterList = new List<KeyValuePair<string, object>>();
             var querySql = GetIQueryable<T>().Where(where).ToSql();
-            string whereSql = querySql.sql.Split(new string[] { "WHERE" }, StringSplitOptions.None)[1].Replace($"{FormatFieldName("x")}.", "");
+            string theQSql = querySql.sql.Replace("\r\n", "\n").Replace("\n", " ");
+            string pattern = "^SELECT.*?FROM.*? AS (.*?) WHERE .*?$";
+            var match = Regex.Match(theQSql, pattern);
+            string asTmp = match.Groups[1]?.ToString();
+            string whereSql = querySql.sql.Split(new string[] { "WHERE" }, StringSplitOptions.None)[1].Replace($"{asTmp}.", "");
             parameterList.AddRange(querySql.parameters.ToArray());
 
             List<(string propertyName, object value)> propertySet = new List<(string propertyName, object value)>();
@@ -533,7 +538,8 @@ namespace Coldairarrow.DataRepository
             ((MemberInitExpression)set.Body).Bindings.ForEach(aBinding =>
             {
                 var propertyName = aBinding.Member.Name;
-                var propertyValue = (aBinding as MemberAssignment).Expression.GetConstantValue();
+                var theExpre = (aBinding as MemberAssignment).Expression;
+                var propertyValue = theExpre.GetMemberValue()?? theExpre.GetConstantValue();
                 propertySet.Add((propertyName, propertyValue));
             });
 

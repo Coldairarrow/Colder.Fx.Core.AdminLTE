@@ -133,7 +133,7 @@ namespace Coldairarrow.DataRepository
         /// <typeparam name="T">实体类型</typeparam>
         /// <param name="where">筛选条件</param>
         /// <param name="set">需要更新的字段设置</param>
-        /// <returns></returns>
+        /// <returns>影响条数</returns>
         int UpdateWhere_Sql<T>(Expression<Func<T, bool>> where, Expression<Func<T>> set) where T : class, new();
 
         #endregion
