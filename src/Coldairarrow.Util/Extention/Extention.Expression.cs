@@ -290,6 +290,18 @@ namespace Coldairarrow.Util
 
         #endregion
 
+        /// <summary>
+        /// 获取表达式中的固定值
+        /// </summary>
+        /// <param name="expression">表达式</param>
+        /// <returns></returns>
+        public static object GetConstantValue(this Expression expression)
+        {
+            var visitor = new GetConstantValueVisitor();
+            visitor.Visit(expression);
+            return visitor.ConstantValue;
+        }
+
         #region 私有成员
 
         private static Expression<TDelegate> GetExtendSelectExpre<TBase, TResult, TDelegate>(Expression<TDelegate> expression)
@@ -352,6 +364,17 @@ namespace Coldairarrow.Util
         protected override Expression VisitParameter(ParameterExpression p)
         {
             return Parameter;
+        }
+    }
+
+    class GetConstantValueVisitor : ExpressionVisitor
+    {
+        public object ConstantValue { get; set; }
+        protected override Expression VisitConstant(ConstantExpression node)
+        {
+            ConstantValue = node.Value;
+
+            return base.VisitConstant(node);
         }
     }
 }

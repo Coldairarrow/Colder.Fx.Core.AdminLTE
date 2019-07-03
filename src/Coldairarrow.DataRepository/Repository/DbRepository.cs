@@ -114,6 +114,14 @@ namespace Coldairarrow.DataRepository
             return this;
         }
         private Action<string> _HandleSqlLog { get; set; }
+        protected virtual string FormatFieldName(string name)
+        {
+            throw new NotImplementedException("请在子类实现!");
+        }
+        protected virtual string FormatParamterName(string name)
+        {
+            return $"@{name}";
+        }
 
         #endregion
 
@@ -508,6 +516,47 @@ namespace Coldairarrow.DataRepository
             var list = GetIQueryable<T>().Where(whereExpre).ToList();
             list.ForEach(aData => set(aData));
             Update(list);
+        }
+
+        public int UpdateWhere_Sql<T>(Expression<Func<T, bool>> where, Expression<Func<T>> set) where T : class, new()
+        {
+            string tableName = typeof(T).Name;
+            DbProviderFactory dbProviderFactory = DbProviderFactoryHelper.GetDbProviderFactory(DbType);
+
+            List<KeyValuePair<string, object>> parameterList = new List<KeyValuePair<string, object>>();
+            var querySql = GetIQueryable<T>().Where(where).ToSql();
+            string whereSql = querySql.sql.Split(new string[] { "WHERE" }, StringSplitOptions.None)[1].Replace($"{FormatFieldName("x")}.", "");
+            parameterList.AddRange(querySql.parameters.ToArray());
+
+            List<(string propertyName, object value)> propertySet = new List<(string propertyName, object value)>();
+            List<string> propertySetStr = new List<string>();
+            ((MemberInitExpression)set.Body).Bindings.ForEach(aBinding =>
+            {
+                var propertyName = aBinding.Member.Name;
+                var propertyValue = (aBinding as MemberAssignment).Expression.GetConstantValue();
+                propertySet.Add((propertyName, propertyValue));
+            });
+
+            propertySet.ForEach(aProperty =>
+            {
+                string paramterName = FormatParamterName($"p_{aProperty.propertyName}");
+                parameterList.Add(new KeyValuePair<string, object>(paramterName, aProperty.value));
+
+                propertySetStr.Add($" {FormatFieldName(aProperty.propertyName)} = {paramterName} ");
+            });
+
+            var paramters = parameterList.Select(x =>
+            {
+                var newParamter = dbProviderFactory.CreateParameter();
+                newParamter.ParameterName = x.Key;
+                newParamter.Value = x.Value;
+
+                return newParamter;
+            }).ToList();
+
+            string sql = $"UPDATE {FormatFieldName(tableName)} SET {string.Join(",", propertySetStr)} WHERE {whereSql}";
+
+            return ExecuteSql(sql, paramters);
         }
 
         #endregion

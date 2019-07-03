@@ -1,72 +1,28 @@
-﻿using NLog;
-using NLog.Targets;
-using NLog.Config;
+﻿using Coldairarrow.DataRepository;
+using Coldairarrow.Entity.Base_SysManage;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query.Internal;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using Coldairarrow.Util;
 
-class Example
+namespace Coldairarrow.Console1
 {
-    public class CustomTarget : TargetWithLayout
+    class Program
     {
-        public CustomTarget(string name)
+        static void Main(string[] args)
         {
-            Name = name;
-        }
-        protected override void Write(LogEventInfo logEvent)
-        {
-            string msg = Layout.Render(logEvent);
-            Console.WriteLine($"自定义日志:{msg}");
-        }
-    }
-    static void Main(string[] args)
-    {
-        // Step 1. Create configuration object 
-        var config = new LoggingConfiguration();
+            var db = DbFactory.GetRepository();
 
-        // Step 2. Create targets
-        string layout = @"${date:format=yyyy-MM-dd HH\:mm\:ss}|${level}|${event-properties:item=LogType}|${message} ";
-        var consoleTarget = new ColoredConsoleTarget("控制台日志")
-        {
-            Layout = layout
-        };
-        config.AddTarget(consoleTarget);
-        config.AddRuleForAllLevels(consoleTarget);
+            string userId = "1133345545746780160";
+            int count = db.UpdateWhere_Sql(x => x.Id == userId , () => new Base_User { Birthday = DateTime.Now,Sex=1 });
 
-        var fileTarget = new FileTarget("控制台日志")
-        {
-            FileName = $"${{basedir}}/A_logs/{DateTime.Now.ToString("yyyy-MM")}/{DateTime.Now.ToString("yyyy-MM-dd")}.txt",
-            Layout = layout
-        };
-        config.AddTarget(fileTarget);
-        config.AddRuleForAllLevels(fileTarget);
-
-        var customTarget = new CustomTarget("自定义")
-        {
-            Layout = layout
-        };
-        config.AddTarget(customTarget);
-        config.AddRuleForAllLevels(customTarget);
-
-        LogManager.Configuration = config;
-        Logger logger = LogManager.GetLogger("Example");
-
-        LogEventInfo logEventInfo = new LogEventInfo(LogLevel.Error, "测试", "测试");
-        logEventInfo.Properties["LogType"] = "日志类型";
-        logger.Log(logEventInfo);
-        logger.Trace("trace log message");
-        logger.Debug("debug log message");
-        logger.Info("info log message");
-        logger.Warn("warn log message");
-        logger.Error("error log message");
-        logger.Fatal("fatal log message");
-        //Example of logging exceptions
-        try
-        {
-            throw new Exception("1111111111111");
-        }
-        catch (Exception ex)
-        {
-            logger.Error(ex, "ow noos!");
-            //throw;
+            Console.WriteLine("完成");
+            Console.ReadLine();
         }
     }
 }

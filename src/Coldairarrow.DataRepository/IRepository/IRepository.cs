@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Coldairarrow.DataRepository
 {
@@ -123,6 +124,17 @@ namespace Coldairarrow.DataRepository
         /// <param name="entities">实体对象集合</param>
         /// <param name="properties">属性</param>
         void UpdateAny(List<object> entities, List<string> properties);
+
+        /// <summary>
+        /// 使用SQL语句按照条件更新
+        /// 用法:UpdateWhere_Sql"Base_User"(x=>x.Id == "Admin",()=>new Base_User { Name='xxx' })
+        /// 注：生成的SQL类似于UPDATE [TABLE] SET [Name] = 'xxx' WHERE [Id] = 'Admin'
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="where">筛选条件</param>
+        /// <param name="set">需要更新的字段设置</param>
+        /// <returns></returns>
+        int UpdateWhere_Sql<T>(Expression<Func<T, bool>> where, Expression<Func<T>> set) where T : class, new();
 
         #endregion
 
