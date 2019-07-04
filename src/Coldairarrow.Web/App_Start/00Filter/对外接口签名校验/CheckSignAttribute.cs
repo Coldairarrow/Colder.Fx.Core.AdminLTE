@@ -1,4 +1,5 @@
-﻿using Coldairarrow.Business.Base_SysManage;
+﻿using Coldairarrow.Business;
+using Coldairarrow.Business.Base_SysManage;
 using Coldairarrow.Util;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -22,9 +23,13 @@ namespace Coldairarrow.Web
 令:
 
 appId=xxx
+
 appSecret=xxx
+
 time=2017-01-01 23:00:00
+
 guid=d0595245-60db-495d-9c0e-fea931b8d69a
+
 请求的body={"aaa":"aaa"}
 
 1: 依次拼接appId+time+guid+body+appSecret得到xxx2017-01-01 23:00:00d0595245-60db-495d-9c0e-fea931b8d69a{"aaa":"aaa"}xxx
@@ -50,6 +55,7 @@ HttpHelper.SafeSignRequest
         public void OnActionExecuting(ActionExecutingContext filterContext)
         {
             IBase_AppSecretBusiness appSecretBus = AutofacHelper.GetService<IBase_AppSecretBusiness>();
+            ILogger logger= AutofacHelper.GetService<ILogger>();
 
             //若为本地测试，则不需要校验
             if (GlobalSwitch.RunModel == RunModel.LocalTest)
@@ -115,6 +121,13 @@ HttpHelper.SafeSignRequest
             string newSign = HttpHelper.BuildApiSign(appId, appSecret, guid, time.ToDateTime(), body);
             if (sign != newSign)
             {
+                string log =
+$@"header:sign签名错误!
+headers:{request.Headers.ToJson()}
+body:{body}
+正确sign:{newSign}
+";
+                logger.Error(LogType.系统异常, log);
                 ReturnError("header:sign签名错误");
                 return;
             }
