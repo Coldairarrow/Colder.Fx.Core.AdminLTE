@@ -82,7 +82,7 @@ namespace Coldairarrow.Business
         /// <typeparam name="T">实体泛型</typeparam>
         /// <param name="where">条件</param>
         /// <returns>影响条数</returns>
-        int Delete_Sql(Expression<Func<T, bool>> where) where T : class, new();
+        int Delete_Sql(Expression<Func<T, bool>> where);
 
         #endregion
 
