@@ -74,6 +74,16 @@ namespace Coldairarrow.Business
         /// <param name="condition">筛选条件</param>
         void Delete(Expression<Func<T, bool>> condition);
 
+        /// <summary>
+        /// 使用SQL语句按照条件删除数据
+        /// 用法:Delete_Sql"Base_User"(x=>x.Id == "Admin")
+        /// 注：生成的SQL类似于DELETE FROM [Base_User] WHERE [Name] = 'xxx' WHERE [Id] = 'Admin'
+        /// </summary>
+        /// <typeparam name="T">实体泛型</typeparam>
+        /// <param name="where">条件</param>
+        /// <returns>影响条数</returns>
+        int Delete_Sql(Expression<Func<T, bool>> where) where T : class, new();
+
         #endregion
 
         #region 更新数据

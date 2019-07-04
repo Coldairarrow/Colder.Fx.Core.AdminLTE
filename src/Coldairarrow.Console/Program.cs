@@ -20,8 +20,6 @@ namespace Coldairarrow.Console1
             var db = DbFactory.GetRepository();
             db.HandleSqlLog = Console.WriteLine;
 
-            string userId = "1133345545746780160";
-            int count = db.UpdateWhere_Sql(x => x.Id == userId && x.Sex >= 0, () => new Base_User { Birthday = DateTime.Now, Sex = 1 });
             Console.WriteLine("完成");
             Console.ReadLine();
         }

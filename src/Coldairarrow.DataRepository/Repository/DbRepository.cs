@@ -123,6 +123,17 @@ namespace Coldairarrow.DataRepository
         {
             return $"@{name}";
         }
+        private (string sql, IReadOnlyDictionary<string, object> paramters) GetWhereSql<T>(IQueryable<T> query) where T : class, new()
+        {
+            var querySql = query.ToSql();
+            string theQSql = querySql.sql.Replace("\r\n", "\n").Replace("\n", " ");
+            string pattern = "^SELECT.*?FROM.*? AS (.*?) WHERE .*?$";
+            var match = Regex.Match(theQSql, pattern);
+            string asTmp = match.Groups[1]?.ToString();
+            string whereSql = querySql.sql.Split(new string[] { "WHERE" }, StringSplitOptions.None)[1].Replace($"{asTmp}.", "");
+
+            return (whereSql, querySql.parameters);
+        }
 
         #endregion
 
@@ -427,6 +438,35 @@ namespace Coldairarrow.DataRepository
             Delete(deleteList);
         }
 
+        /// <summary>
+        /// 使用SQL语句按照条件删除数据
+        /// 用法:Delete_Sql"Base_User"(x=&gt;x.Id == "Admin")
+        /// 注：生成的SQL类似于DELETE FROM [Base_User] WHERE [Name] = 'xxx' WHERE [Id] = 'Admin'
+        /// </summary>
+        /// <typeparam name="T">实体泛型</typeparam>
+        /// <param name="where">条件</param>
+        /// <returns>
+        /// 影响条数
+        /// </returns>
+        public int Delete_Sql<T>(Expression<Func<T, bool>> where) where T : class, new()
+        {
+            string tableName = typeof(T).Name;
+            DbProviderFactory dbProviderFactory = DbProviderFactoryHelper.GetDbProviderFactory(DbType);
+            var whereSql = GetWhereSql(GetIQueryable<T>().Where(where));
+            var paramters = whereSql.paramters.Select(x =>
+            {
+                var newParamter = dbProviderFactory.CreateParameter();
+                newParamter.ParameterName = x.Key;
+                newParamter.Value = x.Value;
+
+                return newParamter;
+            }).ToList();
+
+            string sql = $"DELETE FROM {FormatFieldName(tableName)} WHERE {whereSql.sql}";
+
+            return ExecuteSql(sql, paramters);
+        }
+
         #endregion
 
         #region 更新数据
@@ -532,13 +572,9 @@ namespace Coldairarrow.DataRepository
             DbProviderFactory dbProviderFactory = DbProviderFactoryHelper.GetDbProviderFactory(DbType);
 
             List<KeyValuePair<string, object>> parameterList = new List<KeyValuePair<string, object>>();
-            var querySql = GetIQueryable<T>().Where(where).ToSql();
-            string theQSql = querySql.sql.Replace("\r\n", "\n").Replace("\n", " ");
-            string pattern = "^SELECT.*?FROM.*? AS (.*?) WHERE .*?$";
-            var match = Regex.Match(theQSql, pattern);
-            string asTmp = match.Groups[1]?.ToString();
-            string whereSql = querySql.sql.Split(new string[] { "WHERE" }, StringSplitOptions.None)[1].Replace($"{asTmp}.", "");
-            parameterList.AddRange(querySql.parameters.ToArray());
+            var whereSql = GetWhereSql(GetIQueryable<T>().Where(where));
+
+            parameterList.AddRange(whereSql.paramters.ToArray());
 
             List<(string propertyName, object value)> propertySet = new List<(string propertyName, object value)>();
             List<string> propertySetStr = new List<string>();
@@ -567,7 +603,7 @@ namespace Coldairarrow.DataRepository
                 return newParamter;
             }).ToList();
 
-            string sql = $"UPDATE {FormatFieldName(tableName)} SET {string.Join(",", propertySetStr)} WHERE {whereSql}";
+            string sql = $"UPDATE {FormatFieldName(tableName)} SET {string.Join(",", propertySetStr)} WHERE {whereSql.sql}";
 
             return ExecuteSql(sql, paramters);
         }

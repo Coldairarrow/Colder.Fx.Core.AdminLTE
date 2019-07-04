@@ -214,6 +214,20 @@ namespace Coldairarrow.Business
             Service.Delete(condition);
         }
 
+        /// <summary>
+        /// 使用SQL语句按照条件删除数据
+        /// 用法:Delete_Sql"Base_User"(x=&gt;x.Id == "Admin")
+        /// 注：生成的SQL类似于DELETE FROM [Base_User] WHERE [Name] = 'xxx' WHERE [Id] = 'Admin'
+        /// </summary>
+        /// <param name="where">条件</param>
+        /// <returns>
+        /// 影响条数
+        /// </returns>
+        public int Delete_Sql(Expression<Func<T, bool>> where)
+        {
+            return Service.Delete_Sql(where);
+        }
+
         #endregion
 
         #region 更新数据
