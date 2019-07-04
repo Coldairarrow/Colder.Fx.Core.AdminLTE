@@ -519,6 +519,13 @@ namespace Coldairarrow.DataRepository
             Update(list);
         }
 
+        /// <summary>使用SQL语句按照条件更新
+        /// 用法:UpdateWhere_Sql"Base_User"(x=&gt;x.Id == "Admin",()=&gt;new Base_User { Name='xxx' })
+        /// 注：生成的SQL类似于UPDATE [TABLE] SET [Name] = 'xxx' WHERE [Id] = 'Admin'</summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="where">筛选条件</param>
+        /// <param name="set">需要更新的字段设置</param>
+        /// <returns>影响条数</returns>
         public int UpdateWhere_Sql<T>(Expression<Func<T, bool>> where, Expression<Func<T>> set) where T : class, new()
         {
             string tableName = typeof(T).Name;
