@@ -616,7 +616,8 @@ namespace Coldairarrow.DataRepository
         public T GetEntity<T>(params object[] keyValue) where T : class, new()
         {
             var obj = Db.Set<T>().Find(keyValue);
-            Db.Entry(obj).State = EntityState.Detached;
+            if (!obj.IsNullOrEmpty())
+                Db.Entry(obj).State = EntityState.Detached;
 
             return obj;
         }
