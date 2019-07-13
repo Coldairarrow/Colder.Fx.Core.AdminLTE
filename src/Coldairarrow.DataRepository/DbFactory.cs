@@ -27,7 +27,14 @@ namespace Coldairarrow.DataRepository
             var repository= Activator.CreateInstance(dbRepositoryType, new object[] { conString }) as IRepository;
 
             //请求结束自动释放
-            AutofacHelper.GetScopeService<IDisposableContainer>().AddDisposableObj(repository);
+            try
+            {
+                AutofacHelper.GetScopeService<IDisposableContainer>().AddDisposableObj(repository);
+            }
+            catch
+            {
+
+            }
 
             return repository;
         }

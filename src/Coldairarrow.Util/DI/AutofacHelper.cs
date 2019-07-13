@@ -1,15 +1,15 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
+﻿using Autofac;
+using Microsoft.AspNetCore.Http;
 
 namespace Coldairarrow.Util
 {
     public class AutofacHelper
     {
-        public static IServiceProvider ServiceProvider { get; set; }
+        public static IContainer Container { get; set; }
 
         public static T GetService<T>()
         {
-            return (T)ServiceProvider.GetService(typeof(T));
+            return (T)Container.Resolve(typeof(T));
         }
 
         public static T GetScopeService<T>()

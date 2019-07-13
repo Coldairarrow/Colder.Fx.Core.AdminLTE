@@ -63,7 +63,14 @@ namespace Coldairarrow.Util
             var con = GetDbProviderFactory(dbType).CreateConnection();
 
             //请求结束自动释放
-            AutofacHelper.GetScopeService<IDisposableContainer>().AddDisposableObj(con);
+            try
+            {
+                AutofacHelper.GetScopeService<IDisposableContainer>().AddDisposableObj(con);
+            }
+            catch
+            {
+
+            }
 
             return con;
         }

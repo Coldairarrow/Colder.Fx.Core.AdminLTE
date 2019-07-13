@@ -19,29 +19,32 @@ namespace Coldairarrow.Business
             DateTime? startTime,
             DateTime? endTime)
         {
-            var db = DbFactory.GetRepository();
+            using (var db = DbFactory.GetRepository())
+            {
+                var whereExp = LinqHelper.True<Base_SysLog>();
+                if (!logContent.IsNullOrEmpty())
+                    whereExp = whereExp.And(x => x.LogContent.Contains(logContent));
+                if (!logType.IsNullOrEmpty())
+                    whereExp = whereExp.And(x => x.LogType == logType);
+                if (!level.IsNullOrEmpty())
+                    whereExp = whereExp.And(x => x.Level == level);
+                if (!opUserName.IsNullOrEmpty())
+                    whereExp = whereExp.And(x => x.OpUserName.Contains(opUserName));
+                if (!startTime.IsNullOrEmpty())
+                    whereExp = whereExp.And(x => x.OpTime >= startTime);
+                if (!endTime.IsNullOrEmpty())
+                    whereExp = whereExp.And(x => x.OpTime <= endTime);
 
-            var whereExp = LinqHelper.True<Base_SysLog>();
-            if (!logContent.IsNullOrEmpty())
-                whereExp = whereExp.And(x => x.LogContent.Contains(logContent));
-            if (!logType.IsNullOrEmpty())
-                whereExp = whereExp.And(x => x.LogType == logType);
-            if (!level.IsNullOrEmpty())
-                whereExp = whereExp.And(x => x.Level == level);
-            if (!opUserName.IsNullOrEmpty())
-                whereExp = whereExp.And(x => x.OpUserName.Contains(opUserName));
-            if (!startTime.IsNullOrEmpty())
-                whereExp = whereExp.And(x => x.OpTime >= startTime);
-            if (!endTime.IsNullOrEmpty())
-                whereExp = whereExp.And(x => x.OpTime <= endTime);
-
-            return db.GetIQueryable<Base_SysLog>().Where(whereExp).GetPagination(pagination).ToList();
+                return db.GetIQueryable<Base_SysLog>().Where(whereExp).GetPagination(pagination).ToList();
+            }
         }
 
         protected override void Write(LogEventInfo logEvent)
         {
-            var db = DbFactory.GetRepository();
-            db.Insert(GetBase_SysLogInfo(logEvent));
+            using (var db = DbFactory.GetRepository())
+            {
+                db.Insert(GetBase_SysLogInfo(logEvent));
+            }
         }
     }
 }

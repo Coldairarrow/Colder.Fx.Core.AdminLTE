@@ -44,6 +44,14 @@ namespace Coldairarrow.Business
             }
 
             //ElasticSearch
+            if (GlobalSwitch.LoggerType.HasFlag(LoggerType.ElasticSearch))
+            {
+                AddTarget(new ElasticSearchTarget
+                {
+                    Layout = layout
+                });
+            }
+
             NLog.LogManager.Configuration = config;
             void AddTarget(NLog.Targets.Target target)
             {

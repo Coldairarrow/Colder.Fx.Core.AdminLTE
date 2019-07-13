@@ -46,11 +46,9 @@ namespace Coldairarrow.Web
             builder.Populate(services);
             var container = builder.Build();
 
-            var serviceProvider= new AutofacServiceProvider(container);
+            AutofacHelper.Container = container;
 
-            AutofacHelper.ServiceProvider = serviceProvider;
-
-            return serviceProvider;
+            return new AutofacServiceProvider(container);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
