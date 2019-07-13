@@ -559,14 +559,18 @@ namespace Coldairarrow.DataRepository
             Update(list);
         }
 
-        /// <summary>使用SQL语句按照条件更新
-        /// 用法:UpdateWhere_Sql"Base_User"(x=&gt;x.Id == "Admin",()=&gt;new Base_User { Name='xxx' })
-        /// 注：生成的SQL类似于UPDATE [TABLE] SET [Name] = 'xxx' WHERE [Id] = 'Admin'</summary>
+        /// <summary>
+        /// 使用SQL语句按照条件更新
+        /// 用法:UpdateWhere_Sql"Base_User"(x=&gt;x.Id == "Admin",("Name","小明"))
+        /// 注：生成的SQL类似于UPDATE [TABLE] SET [Name] = 'xxx' WHERE [Id] = 'Admin'
+        /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
         /// <param name="where">筛选条件</param>
-        /// <param name="set">需要更新的字段设置</param>
-        /// <returns>影响条数</returns>
-        public int UpdateWhere_Sql<T>(Expression<Func<T, bool>> where, Expression<Func<T>> set) where T : class, new()
+        /// <param name="values">字段值设置</param>
+        /// <returns>
+        /// 影响条数
+        /// </returns>
+        public int UpdateWhere_Sql<T>(Expression<Func<T, bool>> where, params (string field, object value)[] values) where T : class, new()
         {
             string tableName = typeof(T).Name;
             DbProviderFactory dbProviderFactory = DbProviderFactoryHelper.GetDbProviderFactory(DbType);
@@ -576,22 +580,13 @@ namespace Coldairarrow.DataRepository
 
             parameterList.AddRange(whereSql.paramters.ToArray());
 
-            List<(string propertyName, object value)> propertySet = new List<(string propertyName, object value)>();
             List<string> propertySetStr = new List<string>();
-            ((MemberInitExpression)set.Body).Bindings.ForEach(aBinding =>
-            {
-                var propertyName = aBinding.Member.Name;
-                var theExpre = (aBinding as MemberAssignment).Expression;
-                var propertyValue = theExpre.GetMemberValue()?? theExpre.GetConstantValue();
-                propertySet.Add((propertyName, propertyValue));
-            });
 
-            propertySet.ForEach(aProperty =>
+            values.ToList().ForEach(aProperty =>
             {
-                string paramterName = FormatParamterName($"p_{aProperty.propertyName}");
+                var paramterName = FormatParamterName($"_p_{aProperty.field}");
                 parameterList.Add(new KeyValuePair<string, object>(paramterName, aProperty.value));
-
-                propertySetStr.Add($" {FormatFieldName(aProperty.propertyName)} = {paramterName} ");
+                propertySetStr.Add($" {FormatFieldName(aProperty.field)} = {paramterName} ");
             });
 
             var paramters = parameterList.Select(x =>
@@ -621,7 +616,8 @@ namespace Coldairarrow.DataRepository
         public T GetEntity<T>(params object[] keyValue) where T : class, new()
         {
             var obj = Db.Set<T>().Find(keyValue);
-            Db.Entry(obj).State = EntityState.Detached;
+            if (!obj.IsNullOrEmpty())
+                Db.Entry(obj).State = EntityState.Detached;
 
             return obj;
         }

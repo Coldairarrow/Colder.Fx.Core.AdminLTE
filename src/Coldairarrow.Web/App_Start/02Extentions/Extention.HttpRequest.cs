@@ -1,4 +1,7 @@
-﻿namespace Microsoft.AspNetCore.Http
+﻿using Coldairarrow.Util;
+using Microsoft.AspNetCore.Http.Extensions;
+
+namespace Microsoft.AspNetCore.Http
 {
     /// <summary>
     /// 拓展类
@@ -21,6 +24,19 @@
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// 获取去掉查询参数的Url
+        /// </summary>
+        /// <param name="req">请求</param>
+        /// <returns></returns>
+        public static string GetDisplayUrlNoQuery(this HttpRequest req)
+        {
+            var queryStr = req.QueryString.ToString();
+            var displayUrl = req.GetDisplayUrl();
+
+            return queryStr.IsNullOrEmpty() ? displayUrl : displayUrl.Replace(queryStr, "");
         }
     }
 }

@@ -156,15 +156,15 @@ namespace Coldairarrow.Util
                 request.Headers.Add(aHeader.Key, aHeader.Value);
             });
 
-            byte[] data = Encoding.UTF8.GetBytes(body);
-            request.ContentLength = data.Length;
-
             //HTTPS证书
             if (cerFile != null)
                 request.ClientCertificates.Add(cerFile);
 
             if (method.ToUpper() != "GET")
             {
+                byte[] data = Encoding.UTF8.GetBytes(body);
+                request.ContentLength = data.Length;
+
                 using (Stream requestStream = request.GetRequestStream())
                 {
                     requestStream.Write(data, 0, data.Length);

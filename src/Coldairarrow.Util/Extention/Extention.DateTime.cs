@@ -74,5 +74,16 @@ namespace Coldairarrow.Util
         {
             return TimeZoneInfo.ConvertTime(time, TimeZoneInfo.Local);
         }
+
+        /// <summary>
+        /// 转为转换为Unix时间戳格式(精确到秒)
+        /// </summary>
+        /// <param name="time">时间</param>
+        /// <returns></returns>
+        public static int ToUnixTimeStamp(this DateTime time)
+        {
+            DateTime startTime = new DateTime(1970, 1, 1).ToLocalTime();
+            return (int)(time - startTime).TotalSeconds;
+        }
     }
 }

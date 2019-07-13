@@ -123,14 +123,13 @@ namespace Coldairarrow.Business
 
         /// <summary>
         /// 使用SQL语句按照条件更新
-        /// 用法:UpdateWhere_Sql"Base_User"(x=>x.Id == "Admin",()=>new Base_User { Name='xxx' })
+        /// 用法:UpdateWhere_Sql"Base_User"(x=>x.Id == "Admin",("Name","小明"))
         /// 注：生成的SQL类似于UPDATE [TABLE] SET [Name] = 'xxx' WHERE [Id] = 'Admin'
         /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
         /// <param name="where">筛选条件</param>
-        /// <param name="set">需要更新的字段设置</param>
+        /// <param name="values">字段值设置</param>
         /// <returns>影响条数</returns>
-        int UpdateWhere_Sql(Expression<Func<T, bool>> where, Expression<Func<T>> set);
+        int UpdateWhere_Sql(Expression<Func<T, bool>> where, params (string field, object value)[] values);
 
         #endregion
 
