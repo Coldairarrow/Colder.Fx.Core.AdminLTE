@@ -20,7 +20,6 @@ namespace Coldairarrow.Util
             {
                 try
                 {
-                    AutofacHelper.GetService<ILogger>().Warn(LogType.系统测试, "释放");
                     x.Dispose();
                 }
                 catch
