@@ -1,7 +1,6 @@
-﻿using Coldairarrow.Util;
-using System;
+﻿using System;
 
-namespace Coldairarrow.Business
+namespace Coldairarrow.Util
 {
     public interface ILogger
     {

@@ -60,7 +60,12 @@ namespace Coldairarrow.Util
         /// <returns></returns>
         public static DbConnection GetDbConnection(DatabaseType dbType)
         {
-            return GetDbProviderFactory(dbType).CreateConnection();
+            var con = GetDbProviderFactory(dbType).CreateConnection();
+
+            //请求结束自动释放
+            AutofacHelper.GetScopeService<IDisposableContainer>().AddDisposableObj(con);
+
+            return con;
         }
 
         /// <summary>

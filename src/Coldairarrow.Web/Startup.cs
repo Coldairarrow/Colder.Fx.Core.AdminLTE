@@ -3,7 +3,6 @@ using Autofac.Extensions.DependencyInjection;
 using Autofac.Extras.DynamicProxy;
 using AutoMapper;
 using Coldairarrow.Business.Base_SysManage;
-using Coldairarrow.DataRepository;
 using Coldairarrow.Entity.Base_SysManage;
 using Coldairarrow.Util;
 using Microsoft.AspNetCore.Builder;
@@ -17,7 +16,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace Coldairarrow.Web
 {
@@ -47,8 +45,12 @@ namespace Coldairarrow.Web
             var builder = InitAutofac();
             builder.Populate(services);
             var container = builder.Build();
-            AutofacHelper.Container = container;
-            return new AutofacServiceProvider(container);
+
+            var serviceProvider= new AutofacServiceProvider(container);
+
+            AutofacHelper.ServiceProvider = serviceProvider;
+
+            return serviceProvider;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -79,24 +81,7 @@ namespace Coldairarrow.Web
                 );
             });
 
-            InitEF();
             InitAutoMapper();
-            InitLogger();
-        }
-
-        private void InitEF()
-        {
-            Task.Run(() =>
-            {
-                try
-                {
-                    DbFactory.GetRepository(null, null).GetIQueryable<Base_User>().ToList();
-                }
-                catch
-                {
-
-                }
-            });
         }
 
         private ContainerBuilder InitAutofac()
@@ -136,6 +121,11 @@ namespace Coldairarrow.Web
             //AOP
             builder.RegisterType<Interceptor>();
 
+            //请求结束自动释放
+            builder.RegisterType<DisposableContainer>()
+                .As<IDisposableContainer>()
+                .InstancePerLifetimeScope();
+
             return builder;
         }
 
@@ -149,14 +139,6 @@ namespace Coldairarrow.Web
                 cfg.CreateMap<Base_User, Base_UserDTO>();
                 cfg.CreateMap<Base_SysRole, Base_SysRoleDTO>();
             });
-        }
-
-        /// <summary>
-        /// 初始化Logger
-        /// </summary>
-        private void InitLogger()
-        {
-            return;
         }
     }
 }

@@ -24,7 +24,12 @@ namespace Coldairarrow.DataRepository
             dbType = dbType.IsNullOrEmpty() ? GlobalSwitch.DatabaseType : dbType;
             Type dbRepositoryType = Type.GetType("Coldairarrow.DataRepository." + DbProviderFactoryHelper.DbTypeToDbTypeStr(dbType.Value) + "Repository");
 
-            return Activator.CreateInstance(dbRepositoryType, new object[] { conString }) as IRepository;
+            var repository= Activator.CreateInstance(dbRepositoryType, new object[] { conString }) as IRepository;
+
+            //请求结束自动释放
+            AutofacHelper.GetScopeService<IDisposableContainer>().AddDisposableObj(repository);
+
+            return repository;
         }
 
         /// <summary>

@@ -26,11 +26,11 @@ namespace Coldairarrow.Business
         #region 构造函数
 
         /// <summary>
-        /// 构造函数
+        /// 无参构造函数
         /// </summary>
         public BaseBusiness()
         {
-            SetService(null, null);
+
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Coldairarrow.Business
         /// <param name="conStr">连接名或连接字符串</param>
         public BaseBusiness(string conStr)
         {
-            SetService(conStr, null);
+            _conString = conStr;
         }
 
         /// <summary>
@@ -49,23 +49,18 @@ namespace Coldairarrow.Business
         /// <param name="dbType">数据库类型</param>
         public BaseBusiness(string conStr, DatabaseType dbType)
         {
-            SetService(conStr, dbType);
+            _conString = conStr;
+            _dbType = dbType;
         }
 
         #endregion
 
         #region 私有成员
 
-        /// <summary>
-        /// 设置仓储服务
-        /// </summary>
-        /// <param name="conString">参数</param>
-        /// <param name="dbType">数据库类型</param>
-        /// <param name="entityNamespace">命名空间</param>
-        private void SetService(string conString, DatabaseType? dbType)
-        {
-            Service = DbFactory.GetRepository(conString, dbType);
-        }
+        private string _conString { get; }
+        private DatabaseType? _dbType { get; }
+        private IRepository _service { get; set; }
+        private object _serviceLock = new object();
 
         #endregion
 
@@ -77,7 +72,24 @@ namespace Coldairarrow.Business
         /// <value>
         /// The service.
         /// </value>
-        public IRepository Service { get; set; }
+        public IRepository Service
+        {
+            get
+            {
+                if (_service == null) //双if +lock
+                {
+                    lock (_serviceLock)
+                    {
+                        if (_service == null)
+                        {
+                            _service = DbFactory.GetRepository(_conString, _dbType);
+                        }
+                    }
+                }
+
+                return _service;
+            }
+        }
 
         #endregion
 
@@ -597,9 +609,9 @@ namespace Coldairarrow.Business
         /// 执行与释放或重置非托管资源关联的应用程序定义的任务。
         /// </summary>
         /// <exception cref="System.NotImplementedException"></exception>
-        public void Dispose()
+        public virtual void Dispose()
         {
-            Service.Dispose();
+            _service?.Dispose();
         }
 
         #endregion
