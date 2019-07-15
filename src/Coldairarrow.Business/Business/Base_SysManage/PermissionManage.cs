@@ -10,13 +10,13 @@ namespace Coldairarrow.Business.Base_SysManage
     /// <summary>
     /// 权限管理静态类
     /// </summary>
-    public class PermissionManage : IPermissionManage, ICircleDependency
+    public class PermissionManage : IPermissionManage, IDependency
     {
         #region DI
 
-        public IBase_UserBusiness _sysUserBus { get; set; }
-        public IOperator _operator { get; set; }
-        public IBase_SysRoleBusiness RoleBus { get; set; }
+        public IBase_UserBusiness _sysUserBus { get => AutofacHelper.GetService<IBase_UserBusiness>(); }
+        public IOperator _operator { get => AutofacHelper.GetService<IOperator>(); }
+        public IBase_SysRoleBusiness RoleBus { get => AutofacHelper.GetService<IBase_SysRoleBusiness>(); }
 
         #endregion
 
