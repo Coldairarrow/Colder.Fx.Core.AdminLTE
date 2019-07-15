@@ -337,7 +337,7 @@ namespace Coldairarrow.DataRepository
         public virtual void DeleteAll(Type type)
         {
             string tableName = GetDbTableName(type);
-            string sql = $"DELETE FROM {tableName}";
+            string sql = $"DELETE FROM {FormatFieldName(tableName)}";
             ExecuteSql(sql);
         }
 
