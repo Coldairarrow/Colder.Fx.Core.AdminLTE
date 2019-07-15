@@ -6,12 +6,12 @@ using static Coldairarrow.Entity.Base_SysManage.EnumType;
 
 namespace Coldairarrow.Business.Base_SysManage
 {
-    public class DataPermission : IDataPermission, ICircleDependency
+    public class DataPermission : IDataPermission, IDependency
     {
         #region DI
 
-        public IOperator Operator { get; set; }
-        public IBase_DepartmentBusiness DepartmentBus { get; set; }
+        public IOperator Operator { get => AutofacHelper.GetService<IOperator>(); }
+        public IBase_DepartmentBusiness DepartmentBus { get => AutofacHelper.GetService<IBase_DepartmentBusiness>(); }
 
         #endregion
 
