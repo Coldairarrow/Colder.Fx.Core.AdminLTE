@@ -8,7 +8,7 @@ namespace Coldairarrow.Util
     /// 参考:https://www.cnblogs.com/blqw/p/3475734.html
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class UsingLock<T>
+    public class UsingLock<T> : IDisposable
     {
         #region 内部类
 
@@ -161,6 +161,11 @@ namespace Coldairarrow.Util
                 _LockSlim.EnterWriteLock();
                 return new Lock(_LockSlim, true);
             }
+        }
+
+        public void Dispose()
+        {
+            _LockSlim.Dispose();
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace System.Collections.Generic
 {
-    public class SynchronizedCollection<T> : IEnumerable<T>
+    public class SynchronizedCollection<T> : IEnumerable<T>,IDisposable
     {
         #region 外部接口
 
@@ -109,6 +109,14 @@ namespace System.Collections.Generic
             {
                 return _list.GetEnumerator();
             }
+        }
+
+        public void Dispose()
+        {
+            _list.Clear();
+            _list = null;
+
+            _lock.Dispose();
         }
 
         #endregion

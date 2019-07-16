@@ -32,7 +32,18 @@ namespace Coldairarrow.DataRepository
             }
             optionsBuilder.EnableSensitiveDataLogging();
             optionsBuilder.UseModel(_model);
-            optionsBuilder.UseLoggerFactory(new LoggerFactory(new ILoggerProvider[] { new EFCoreSqlLogeerProvider(_loggerHandlerContainer) }));
+            //optionsBuilder.UseLoggerFactory(new LoggerFactory(new ILoggerProvider[] { new EFCoreSqlLogeerProvider(_loggerHandlerContainer) }));
         }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+
+            //_loggerFactory?.Dispose();
+            _dbConnection?.Dispose();
+            //_loggerFactory = null;
+            //_loggerHandlerContainer = null;
+        }
+
     }
 }
