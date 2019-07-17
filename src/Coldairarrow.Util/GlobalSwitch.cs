@@ -43,7 +43,7 @@ namespace Coldairarrow.Util
         /// <summary>
         /// 网站文件根路径
         /// </summary>
-        public static string WebRootPath { get => AutofacHelper.GetService<IHostingEnvironment>().WebRootPath; }
+        public static string WebRootPath { get => AutofacHelper.GetScopeService<IHostingEnvironment>().WebRootPath; }
 
         #endregion
 

@@ -15,6 +15,6 @@ namespace Coldairarrow.Business
         protected string _dataName { get; }
         protected string _nameField { get; }
         protected Type _entityType { get; }
-        protected ILogger Logger { get; } = AutofacHelper.GetService<ILogger>();
+        protected ILogger Logger { get; } = AutofacHelper.GetScopeService<ILogger>();
     }
 }

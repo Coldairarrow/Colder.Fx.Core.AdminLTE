@@ -14,7 +14,7 @@ namespace Microsoft.AspNetCore.Http
     {
         public static string MapPath(this HttpContext httpContext, string virtualPath)
         {
-            UrlHelper urlHelper = new UrlHelper(AutofacHelper.GetService<IActionContextAccessor>().ActionContext);
+            UrlHelper urlHelper = new UrlHelper(AutofacHelper.GetScopeService<IActionContextAccessor>().ActionContext);
             virtualPath = urlHelper.Content(virtualPath);
 
             return $"{Path.Combine(new List<string> { GlobalSwitch.WebRootPath }.Concat(virtualPath.Split('/')).ToArray())}";

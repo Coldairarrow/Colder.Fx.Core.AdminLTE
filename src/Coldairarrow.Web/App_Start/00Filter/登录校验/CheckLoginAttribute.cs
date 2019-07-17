@@ -19,8 +19,8 @@ namespace Coldairarrow.Web
         /// <param name="filterContext">过滤器上下文</param>
         public void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            IOperator Operator = AutofacHelper.GetService<IOperator>();
-            ILogger logger = AutofacHelper.GetService<ILogger>();
+            IOperator Operator = AutofacHelper.GetScopeService<IOperator>();
+            ILogger logger = AutofacHelper.GetScopeService<ILogger>();
 
             var request = filterContext.HttpContext.Request;
 

@@ -60,7 +60,7 @@ namespace Coldairarrow.Business
             }
         }
         private NLog.Logger _nLogger { get; } = NLog.LogManager.GetLogger("sysLogger");
-        private IOperator _operator { get; } = AutofacHelper.GetService<IOperator>();
+        private IOperator _operator { get; } = AutofacHelper.GetScopeService<IOperator>();
 
         public void Log(LogLevel logLevel, LogType logType, string msg, string data)
         {

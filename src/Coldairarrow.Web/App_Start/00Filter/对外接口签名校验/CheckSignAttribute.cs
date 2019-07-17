@@ -54,8 +54,8 @@ HttpHelper.SafeSignRequest
         /// <param name="filterContext"></param>
         public void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            IBase_AppSecretBusiness appSecretBus = AutofacHelper.GetService<IBase_AppSecretBusiness>();
-            ILogger logger= AutofacHelper.GetService<ILogger>();
+            IBase_AppSecretBusiness appSecretBus = AutofacHelper.GetScopeService<IBase_AppSecretBusiness>();
+            ILogger logger= AutofacHelper.GetScopeService<ILogger>();
 
             //若为本地测试，则不需要校验
             if (GlobalSwitch.RunModel == RunModel.LocalTest)

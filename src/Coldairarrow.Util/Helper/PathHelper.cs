@@ -16,7 +16,7 @@ namespace Coldairarrow.Util
         {
             if (!virtualUrl.IsNullOrEmpty())
             {
-                UrlHelper urlHelper = new UrlHelper(AutofacHelper.GetService<IActionContextAccessor>().ActionContext);
+                UrlHelper urlHelper = new UrlHelper(AutofacHelper.GetScopeService<IActionContextAccessor>().ActionContext);
 
                 return urlHelper.Content(virtualUrl);
             }
@@ -34,7 +34,7 @@ namespace Coldairarrow.Util
             string path = virtualPath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
             if (path[0] == '~')
                 path = path.Remove(0, 2);
-            string rootPath = AutofacHelper.GetService<IHostingEnvironment>().WebRootPath;
+            string rootPath = AutofacHelper.GetScopeService<IHostingEnvironment>().WebRootPath;
 
             return Path.Combine(rootPath, path);
         }

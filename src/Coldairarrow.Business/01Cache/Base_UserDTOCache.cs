@@ -6,7 +6,7 @@ namespace Coldairarrow.Business.Cache
 {
     public class Base_UserDTOCache : BaseCache<Base_UserDTO>, IBase_UserDTOCache, IDependency
     {
-        public IBase_UserBusiness SysUserBus { get => AutofacHelper.GetService<IBase_UserBusiness>(); }
+        public IBase_UserBusiness SysUserBus { get => AutofacHelper.GetScopeService<IBase_UserBusiness>(); }
         protected override string _moduleKey => "Base_UserDTO";
         protected override Base_UserDTO GetDbData(string key)
         {

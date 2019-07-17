@@ -14,9 +14,9 @@ namespace Coldairarrow.Business.Base_SysManage
     {
         #region DI
 
-        public IBase_UserBusiness _sysUserBus { get => AutofacHelper.GetService<IBase_UserBusiness>(); }
-        public IOperator _operator { get => AutofacHelper.GetService<IOperator>(); }
-        public IBase_SysRoleBusiness RoleBus { get => AutofacHelper.GetService<IBase_SysRoleBusiness>(); }
+        public IBase_UserBusiness _sysUserBus { get => AutofacHelper.GetScopeService<IBase_UserBusiness>(); }
+        public IOperator _operator { get => AutofacHelper.GetScopeService<IOperator>(); }
+        public IBase_SysRoleBusiness RoleBus { get => AutofacHelper.GetScopeService<IBase_SysRoleBusiness>(); }
 
         #endregion
 

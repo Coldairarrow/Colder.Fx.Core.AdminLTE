@@ -7,9 +7,9 @@ namespace Microsoft.AspNetCore.Mvc
 {
     public abstract class DependencyViewPage : RazorPage<dynamic>
     {
-        public IPermissionManage PermissionManage { get => AutofacHelper.GetService<IPermissionManage>(); }
-        public ISystemMenuManage SystemMenuManage { get => AutofacHelper.GetService<ISystemMenuManage>(); }
-        public IBase_UserBusiness SysUserBus { get => AutofacHelper.GetService<IBase_UserBusiness>(); }
-        public IOperator Operator { get => AutofacHelper.GetService<IOperator>(); }
+        public IPermissionManage PermissionManage { get => AutofacHelper.GetScopeService<IPermissionManage>(); }
+        public ISystemMenuManage SystemMenuManage { get => AutofacHelper.GetScopeService<ISystemMenuManage>(); }
+        public IBase_UserBusiness SysUserBus { get => AutofacHelper.GetScopeService<IBase_UserBusiness>(); }
+        public IOperator Operator { get => AutofacHelper.GetScopeService<IOperator>(); }
     }
 }

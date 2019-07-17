@@ -9,7 +9,7 @@ namespace Coldairarrow.Web
     {
         public void OnException(ExceptionContext context)
         {
-            ILogger logger = AutofacHelper.GetService<ILogger>();
+            ILogger logger = AutofacHelper.GetScopeService<ILogger>();
 
             var ex = context.Exception;
             logger.Error(ex);

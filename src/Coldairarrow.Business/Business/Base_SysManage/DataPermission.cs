@@ -10,8 +10,8 @@ namespace Coldairarrow.Business.Base_SysManage
     {
         #region DI
 
-        public IOperator Operator { get => AutofacHelper.GetService<IOperator>(); }
-        public IBase_DepartmentBusiness DepartmentBus { get => AutofacHelper.GetService<IBase_DepartmentBusiness>(); }
+        public IOperator Operator { get => AutofacHelper.GetScopeService<IOperator>(); }
+        public IBase_DepartmentBusiness DepartmentBus { get => AutofacHelper.GetScopeService<IBase_DepartmentBusiness>(); }
 
         #endregion
 
