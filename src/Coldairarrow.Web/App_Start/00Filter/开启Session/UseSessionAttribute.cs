@@ -18,7 +18,7 @@ namespace Coldairarrow.Web
             if (sessionCookie.IsNullOrEmpty())
             {
                 string sessionId = Guid.NewGuid().ToString();
-                context.HttpContext.Response.Cookies.Append(SessionHelper.SessionCookieName, sessionId, new CookieOptions { Expires = DateTime.MaxValue });
+                context.HttpContext.Response.Cookies.Append(SessionHelper.SessionCookieName, sessionId, new CookieOptions { Expires = DateTime.MaxValue, SameSite = SameSiteMode.None });
 
                 context.Result = new RedirectResult(context.HttpContext.Request.GetDisplayUrl());
             }
