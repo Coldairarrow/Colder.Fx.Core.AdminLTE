@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Data.Common;
-using static Coldairarrow.DataRepository.EFCoreSqlLogeerProvider;
 
 namespace Coldairarrow.DataRepository
 {
@@ -19,8 +18,8 @@ namespace Coldairarrow.DataRepository
         private DatabaseType _dbType { get; }
         private DbConnection _dbConnection { get; }
         private IModel _model { get; }
-        public Action<string> HandleSqlLog { set => _loggerHandlerContainer.HandleSqlLog = value; }
-        LoggerHandlerContainer _loggerHandlerContainer { get; } = new LoggerHandlerContainer();
+        private static ILoggerFactory _loggerFactory =
+            new LoggerFactory(new ILoggerProvider[] { new EFCoreSqlLogeerProvider() });
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             switch (_dbType)
@@ -32,18 +31,7 @@ namespace Coldairarrow.DataRepository
             }
             optionsBuilder.EnableSensitiveDataLogging();
             optionsBuilder.UseModel(_model);
-            //optionsBuilder.UseLoggerFactory(new LoggerFactory(new ILoggerProvider[] { new EFCoreSqlLogeerProvider(_loggerHandlerContainer) }));
+            optionsBuilder.UseLoggerFactory(_loggerFactory);
         }
-
-        public override void Dispose()
-        {
-            base.Dispose();
-
-            //_loggerFactory?.Dispose();
-            _dbConnection?.Dispose();
-            //_loggerFactory = null;
-            //_loggerHandlerContainer = null;
-        }
-
     }
 }

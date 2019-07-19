@@ -33,19 +33,6 @@ namespace Coldairarrow.DataRepository
 
         #region 外部接口
 
-        public Action<string> HandleSqlLog
-        {
-            set
-            {
-                _HandleSqlLog = value;
-                _db.HandleSqlLog = _HandleSqlLog;
-            }
-            get
-            {
-                return _HandleSqlLog;
-            }
-        }
-
         public void RefreshDb()
         {
             //重用DbConnection,使用底层相同的DbConnection,支持Model持热更新
@@ -58,7 +45,6 @@ namespace Coldairarrow.DataRepository
             var dBCompiledModel = DbModelFactory.GetDbCompiledModel(_conString, _dbType);
             _db = new BaseDbContext(_dbType,con, dBCompiledModel);
             _db.Database.UseTransaction(_transaction);
-            _db.HandleSqlLog= HandleSqlLog;
             disposedValue = false;
         }
 
