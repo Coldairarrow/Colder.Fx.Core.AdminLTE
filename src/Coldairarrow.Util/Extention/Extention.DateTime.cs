@@ -24,7 +24,7 @@ namespace Coldairarrow.Util
         /// <returns></returns>
         public static long ToJsTimestamp(this DateTime dateTime)
         {
-            var startTime = TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1, 0, 0, 0, 0));
+            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).ToLocalTime();
             long result = (dateTime.Ticks - startTime.Ticks) / 10000;   //除10000调整为13位
             return result;
         }
@@ -63,6 +63,27 @@ namespace Coldairarrow.Util
             Instant now = SystemClock.Instance.GetCurrentInstant();
             var shanghaiZone = DateTimeZoneProviders.Tzdb["Asia/Shanghai"];
             return now.InZone(shanghaiZone).ToDateTimeUnspecified();
+        }
+
+        /// <summary>
+        /// 转为本地时间
+        /// </summary>
+        /// <param name="time">时间</param>
+        /// <returns></returns>
+        public static DateTime ToLocalTime(this DateTime time)
+        {
+            return TimeZoneInfo.ConvertTime(time, TimeZoneInfo.Local);
+        }
+
+        /// <summary>
+        /// 转为转换为Unix时间戳格式(精确到秒)
+        /// </summary>
+        /// <param name="time">时间</param>
+        /// <returns></returns>
+        public static int ToUnixTimeStamp(this DateTime time)
+        {
+            DateTime startTime = new DateTime(1970, 1, 1).ToLocalTime();
+            return (int)(time - startTime).TotalSeconds;
         }
     }
 }

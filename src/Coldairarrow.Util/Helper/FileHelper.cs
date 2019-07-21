@@ -60,14 +60,14 @@ namespace Coldairarrow.Util
 
         /// <summary>
         /// 输出字符串到文件
-        /// 注：使用自定义模式,使用默认编码
+        /// 注：使用自定义模式,使用UTF-8编码
         /// </summary>
         /// <param name="content">内容</param>
         /// <param name="path">文件路径</param>
         /// <param name="fileModel">输出方法</param>
         public static void WriteTxt(string content, string path, FileMode fileModel)
         {
-            WriteTxt(content, path, null, fileModel);
+            WriteTxt(content, path, Encoding.UTF8, fileModel);
         }
 
         /// <summary>
@@ -117,7 +117,11 @@ namespace Coldairarrow.Util
         public static void CheckDirectory(string path)
         {
             if (path.Contains("\\"))
-                Directory.CreateDirectory(GetPathDirectory(path));
+            {
+                var dir = GetPathDirectory(path);
+                if (!Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
+            }
         }
 
         /// <summary>
@@ -142,8 +146,7 @@ namespace Coldairarrow.Util
             if (!path.Contains("\\"))
                 return GetCurrentDir();
 
-            string pathDirectory = string.Empty;
-            string pattern = @"^(.*\\).*?$";
+            string pattern = @"^(.*)\\.*?$";
             Match match = Regex.Match(path, pattern);
 
             return match.Groups[1].ToString();

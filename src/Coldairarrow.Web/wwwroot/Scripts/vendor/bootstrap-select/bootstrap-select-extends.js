@@ -57,7 +57,8 @@ $('#roleList').selectpicker({
                 valueField: 'value',
                 textField: 'text',
                 onSelect: null,
-                pleaseSelect: pleaseSelect
+                pleaseSelect: pleaseSelect,
+                onLoadSuccess: null
             };
             var _options = $.extend(defaults, options);
 
@@ -72,6 +73,9 @@ $('#roleList').selectpicker({
                 getData(function () {
                     renderHtml();
                     bindEvent();
+                    if (_options.onLoadSuccess) {
+                        _options.onLoadSuccess();
+                    }
                 });
             }
 
@@ -104,18 +108,20 @@ $('#roleList').selectpicker({
                 var data = _options.data;
                 var selected = _options.value || [];
                 $(_this).empty();
+                //添加请选择
+                if (_options.pleaseSelect) {
+                    $(_this).append('<option value="">请选择</option>');
+                }
+                var multiple = $(_this).prop('multiple');
                 for (var i = 0; i < data.length; i++) {
+
                     var text = data[i][_options.textField];
                     var value = data[i][_options.valueField];
 
-                    var selectedHtml = ''
-                    if (selected.indexOf(value) > -1) {
-                        selectedHtml = 'selected="selected"';
-                    }
+                    var selectedHtml = '';
 
-                    //添加请选择
-                    if (_options.pleaseSelect) {
-                        $(_this).append("<option>请选择</option>");
+                    if (selected.indexOf((value || '').toString()) > -1) {
+                        selectedHtml = 'selected="selected"';
                     }
 
                     $(_this).append("<option " + selectedHtml + " value=" + value + ">" + text + "</option>");
@@ -153,7 +159,11 @@ $('#roleList').selectpicker({
                         getOption().data = resJson || [];
                         next();
                     });
-                } else {//本地数据
+                }
+                else if (getOption().data && getOption().data.length > 0) {
+                    next();
+                }
+                else {//本地数据
                     getOption().data = [];
                     $(_this).find('option').each(function () {
                         getOption().data.push({

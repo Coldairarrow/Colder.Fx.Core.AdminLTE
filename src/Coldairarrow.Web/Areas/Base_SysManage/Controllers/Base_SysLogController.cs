@@ -1,16 +1,24 @@
 using Coldairarrow.Business.Base_SysManage;
-using Coldairarrow.Entity.Base_SysManage;
 using Coldairarrow.Util;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 
-namespace Coldairarrow.Web
+namespace Coldairarrow.Web.Areas.Base_SysManage.Controllers
 {
     [Area("Base_SysManage")]
     public class Base_SysLogController : BaseMvcController
     {
-        Base_SysLogBusiness _base_SysLogBusiness = new Base_SysLogBusiness();
+        #region DI
+
+        public Base_SysLogController(IBase_SysLogBusiness sysLogBus)
+        {
+            _sysLogBus = sysLogBus;
+        }
+
+        IBase_SysLogBusiness _sysLogBus { get; }
+
+        #endregion
 
         #region 视图功能
 
@@ -34,14 +42,15 @@ namespace Coldairarrow.Web
         /// <param name="pagination">分页参数</param>
         /// <returns></returns>
         public ActionResult GetLogList(
+            Pagination pagination,
             string logContent,
             string logType,
+            string level,
             string opUserName,
             DateTime? startTime,
-            DateTime? endTime,
-            Pagination pagination)
+            DateTime? endTime)
         {
-            var dataList = _base_SysLogBusiness.GetLogList(logContent, logType, opUserName, startTime, endTime, pagination);
+            var dataList = _sysLogBus.GetLogList(pagination, logContent, logType, level, opUserName, startTime, endTime);
 
             return Content(pagination.BuildTableResult_DataGrid(dataList).ToJson());
         }
@@ -49,7 +58,8 @@ namespace Coldairarrow.Web
         public ActionResult GetLogTypeList()
         {
             List<object> logTypeList = new List<object>();
-            Enum.GetNames(typeof(EnumType.LogType)).ForEach(aName =>
+
+            Enum.GetNames(typeof(LogType)).ForEach(aName =>
             {
                 logTypeList.Add(new { Name = aName, Value = aName });
             });

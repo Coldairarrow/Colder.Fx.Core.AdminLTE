@@ -5,69 +5,25 @@ using Coldairarrow.Util;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Coldairarrow.UnitTests
 {
     [TestClass]
-    public class Base_BusinessTests
+    public class Base_BusinessTests:BaseTest
     {
-        #region 构造函数
-
-        static Base_BusinessTests()
-        {
-            for (int i = 1; i <= 100; i++)
-            {
-                Base_UnitTest newData = new Base_UnitTest
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Age = i,
-                    UserId = "Admin" + i,
-                    UserName = "超级管理员" + i
-                };
-                _dataList.Add(newData);
-            }
-        }
-
-        public Base_BusinessTests()
+        protected override void Clear()
         {
             _baseBus.DeleteAll();
         }
 
-        #endregion
-
         #region 私有成员
 
         private BaseBusiness<Base_UnitTest> _baseBus { get; } = new BaseBusiness<Base_UnitTest>();
-        private static Base_UnitTest _newData { get; } = new Base_UnitTest
-        {
-            Id = Guid.NewGuid().ToString(),
-            UserId = "Admin",
-            UserName = "超级管理员",
-            Age = 22
-        };
-
-        private static List<Base_UnitTest> _insertList { get; } = new List<Base_UnitTest>
-        {
-            new Base_UnitTest
-            {
-                Id = Guid.NewGuid().ToString(),
-                UserId = "Admin1",
-                UserName = "超级管理员1",
-                Age = 22
-            },
-            new Base_UnitTest
-            {
-                Id = Guid.NewGuid().ToString(),
-                UserId = "Admin2",
-                UserName = "超级管理员2",
-                Age = 22
-            }
-        };
-
-        private static List<Base_UnitTest> _dataList { get; } = new List<Base_UnitTest>();
 
         #endregion
 
@@ -197,6 +153,16 @@ namespace Coldairarrow.UnitTests
             _baseBus.UpdateAny(newList1, new List<string> { "UserName", "Age" });
             var dbData = _baseBus.GetList();
             Assert.AreEqual(newList2.OrderBy(x => x.Id).ToJson(), dbData.OrderBy(x => x.Id).ToJson());
+
+            //更新指定条件数据
+            _baseBus.DeleteAll();
+            _baseBus.Insert(_newData);
+            _baseBus.UpdateWhere(x => x.UserId == "Admin", x =>
+            {
+                x.UserId = "Admin2";
+            });
+
+            Assert.IsTrue(_baseBus.GetIQueryable().Any(x => x.UserId == "Admin2"));
         }
 
         /// <summary>
@@ -305,30 +271,67 @@ namespace Coldairarrow.UnitTests
         [TestMethod]
         public void TransactionTest()
         {
-            //失败事务
-            _baseBus.DeleteAll();
-            _baseBus.BeginTransaction();
-            _baseBus.Insert(_newData);
+            //失败事务,默认级别
+            new Action(() =>
+            {
+                using (var transaction = _baseBus.BeginTransaction())
+                {
+                    _baseBus.Insert(_newData);
+                    var newData2 = _newData.DeepClone();
+                    newData2.Id = IdHelper.GetId();
+                    _baseBus.Insert(newData2);
+                    bool succcess = _baseBus.EndTransaction().Success;
+                    Assert.AreEqual(succcess, false);
+                }
+            })();
 
-            var newData2 = _newData.DeepClone();
-            newData2.Id = Guid.NewGuid().ToSequentialGuid();
-            _baseBus.Insert(newData2);
-            bool succcess = _baseBus.EndTransaction();
-            Assert.AreEqual(succcess, false);
+            //成功事务,默认级别
+            new Action(() =>
+            {
+                Clear();
+                using (var transaction = _baseBus.BeginTransaction())
+                {
+                    var newData = _newData.DeepClone();
+                    newData.Id = Guid.NewGuid().ToString();
+                    newData.UserId = IdHelper.GetId();
+                    newData.UserName = IdHelper.GetId();
+                    _baseBus.Insert(_newData);
+                    _baseBus.Insert(newData);
+                    bool succcess = _baseBus.EndTransaction().Success;
+                    int count = _baseBus.GetIQueryable().Count();
+                    Assert.AreEqual(succcess, true);
+                    Assert.AreEqual(count, 2);
+                }
+            })();
 
-            //成功事务
-            _baseBus.DeleteAll();
-            _baseBus.BeginTransaction();
-            var newData = _newData.DeepClone();
-            newData.Id = Guid.NewGuid().ToString();
-            newData.UserId = Guid.NewGuid().ToSequentialGuid();
-            newData.UserName = Guid.NewGuid().ToSequentialGuid();
-            _baseBus.Insert(_newData);
-            _baseBus.Insert(newData);
-            succcess = _baseBus.EndTransaction();
-            int count = _baseBus.GetIQueryable().Count();
-            Assert.AreEqual(succcess, true);
-            Assert.AreEqual(count, 2);
+            //隔离级别:RepeatableRead
+            new Action(() =>
+            {
+                Clear();
+                var db1 = DbFactory.GetRepository();
+                var db2 = DbFactory.GetRepository();
+                db1.Insert(_newData);
+                using (db1.BeginTransaction(IsolationLevel.RepeatableRead))
+                {
+                    //db1读=>db2写(阻塞)=>db1读=>db1提交
+                    var db1Data_1 = db1.GetIQueryable<Base_UnitTest>().Where(x => x.Id == _newData.Id).FirstOrDefault();
+
+                    var updateData = _newData.DeepClone();
+                    updateData.UserName = IdHelper.GetId();
+                    var task = Task.Run(() =>
+                    {
+                        db2.Update(updateData);
+                    });
+
+                    var db1Data_2 = db1.GetIQueryable<Base_UnitTest>().Where(x => x.Id == _newData.Id).FirstOrDefault();
+                    Assert.AreEqual(db1Data_1.ToJson(), db1Data_2.ToJson());
+
+                    db1.EndTransaction();
+                    task.Wait();
+                    var db1Data_3 = db1.GetIQueryable<Base_UnitTest>().Where(x => x.Id == _newData.Id).FirstOrDefault();
+                    Assert.AreEqual(updateData.ToJson(), db1Data_3.ToJson());
+                }
+            })();
         }
 
         /// <summary>
@@ -360,36 +363,36 @@ namespace Coldairarrow.UnitTests
                 UserId = "2",
                 UserName = Guid.NewGuid().ToString()
             };
-            DistributedTransaction distributedTransaction = new DistributedTransaction(_bus1.Service, _bus2.Service);
-            distributedTransaction.BeginTransaction();
-            _bus1.ExecuteSql("insert into Base_UnitTest(Id) values('10') ");
-            _bus1.Insert(data1);
-            _bus1.Insert(data3);
-            _bus2.Insert(data1);
-            _bus2.Insert(data2);
-            bool succcess = distributedTransaction.EndTransaction();
-            int count1 = _bus1.GetIQueryable().Count();
-            int count2 = _bus2.GetIQueryable().Count();
-            Assert.AreEqual(succcess, false);
-            Assert.AreEqual(count1, 0);
-            Assert.AreEqual(count2, 0);
+            using (var distributedTransaction = new DistributedTransaction(_bus1.Service, _bus2.Service))
+            {
+                distributedTransaction.BeginTransaction();
+                _bus1.ExecuteSql("insert into Base_UnitTest(Id) values('10') ");
+                _bus1.Insert(data1);
+                _bus1.Insert(data2);
+                _bus2.Insert(data1);
+                _bus2.Insert(data3);
+                var succcess = distributedTransaction.EndTransaction();
+                Assert.AreEqual(succcess.Success, false);
+                Assert.AreEqual(_bus1.GetIQueryable().Count(), 0);
+                Assert.AreEqual(_bus2.GetIQueryable().Count(), 0);
+            }
 
             //成功事务
-            _bus1.DeleteAll();
-            _bus2.DeleteAll();
-            distributedTransaction = new DistributedTransaction(_bus1.Service, _bus2.Service);
-            distributedTransaction.BeginTransaction();
-            _bus1.ExecuteSql("insert into Base_UnitTest(Id) values('10') ");
-            _bus1.Insert(data1);
-            _bus1.Insert(data3);
-            _bus2.Insert(data1);
-            _bus2.Insert(data3);
-            succcess = distributedTransaction.EndTransaction();
-            count1 = _bus1.GetIQueryable().Count();
-            count2 = _bus2.GetIQueryable().Count();
-            Assert.AreEqual(succcess, true);
-            Assert.AreEqual(count1, 3);
-            Assert.AreEqual(count2, 2);
+            using (var distributedTransaction = new DistributedTransaction(_bus1.Service, _bus2.Service))
+            {
+                distributedTransaction.BeginTransaction();
+                _bus1.ExecuteSql("insert into Base_UnitTest(Id) values('10') ");
+                _bus1.Insert(data1);
+                _bus1.Insert(data3);
+                _bus2.Insert(data1);
+                _bus2.Insert(data3);
+                var succcess = distributedTransaction.EndTransaction();
+                int count1 = _bus1.GetIQueryable().Count();
+                int count2 = _bus2.GetIQueryable().Count();
+                Assert.AreEqual(succcess.Success, true);
+                Assert.AreEqual(count1, 3);
+                Assert.AreEqual(count2, 2);
+            }
         }
 
         #endregion

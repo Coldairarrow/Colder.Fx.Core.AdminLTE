@@ -2,16 +2,26 @@ using Coldairarrow.Business.Base_SysManage;
 using Coldairarrow.Entity.Base_SysManage;
 using Coldairarrow.Util;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
-namespace Coldairarrow.Web
+namespace Coldairarrow.Web.Areas.Base_SysManage.Controllers
 {
     [Area("Base_SysManage")]
     public class Base_AppSecretController : BaseMvcController
     {
-        Base_AppSecretBusiness _base_AppSecretBusiness = new Base_AppSecretBusiness();
+        #region DI
 
-        #region 视图功能
+        public Base_AppSecretController(IBase_AppSecretBusiness appSecretBus, IPermissionManage permissionManage)
+        {
+            _appSecretBus = appSecretBus;
+            _permissionManage = permissionManage;
+        }
+
+        IBase_AppSecretBusiness _appSecretBus { get; }
+        IPermissionManage _permissionManage { get; set; }
+
+        #endregion
+
+        #region 视图
 
         public ActionResult Index()
         {
@@ -20,7 +30,7 @@ namespace Coldairarrow.Web
 
         public ActionResult Form(string id)
         {
-            var theData = id.IsNullOrEmpty() ? new Base_AppSecret() : _base_AppSecretBusiness.GetTheData(id);
+            var theData = id.IsNullOrEmpty() ? new Base_AppSecret() : _appSecretBus.GetTheData(id);
 
             return View(theData);
         }
@@ -34,24 +44,18 @@ namespace Coldairarrow.Web
 
         #endregion
 
-        #region 获取数据
+        #region 获取
 
-        /// <summary>
-        /// 获取数据列表
-        /// </summary>
-        /// <param name="condition">查询类型</param>
-        /// <param name="keyword">关键字</param>
-        /// <returns></returns>
-        public ActionResult GetDataList(string condition, string keyword, Pagination pagination)
+        public ActionResult GetDataList(Pagination pagination, string keyword)
         {
-            var dataList = _base_AppSecretBusiness.GetDataList(condition, keyword, pagination);
+            var dataList = _appSecretBus.GetDataList(pagination, keyword);
 
             return Content(pagination.BuildTableResult_DataGrid(dataList).ToJson());
         }
 
         #endregion
 
-        #region 提交数据
+        #region 提交
 
         /// <summary>
         /// 保存
@@ -59,18 +63,19 @@ namespace Coldairarrow.Web
         /// <param name="theData">保存的数据</param>
         public ActionResult SaveData(Base_AppSecret theData)
         {
-            if(theData.Id.IsNullOrEmpty())
+            AjaxResult res;
+            if (theData.Id.IsNullOrEmpty())
             {
-                theData.Id = Guid.NewGuid().ToSequentialGuid();
+                theData.Id = IdHelper.GetId();
 
-                _base_AppSecretBusiness.AddData(theData);
+                res = _appSecretBus.AddData(theData);
             }
             else
             {
-                _base_AppSecretBusiness.UpdateData(theData);
+                res = _appSecretBus.UpdateData(theData);
             }
 
-            return Success();
+            return JsonContent(res.ToJson());
         }
 
         /// <summary>
@@ -79,14 +84,14 @@ namespace Coldairarrow.Web
         /// <param name="theData">删除的数据</param>
         public ActionResult DeleteData(string ids)
         {
-            _base_AppSecretBusiness.DeleteData(ids.ToList<string>());
+            var res = _appSecretBus.DeleteData(ids.ToList<string>());
 
-            return Success("删除成功！");
+            return JsonContent(res.ToJson());
         }
 
         public ActionResult SavePermission(string appId, string permissions)
         {
-            PermissionManage.SetAppIdPermission(appId, permissions.ToList<string>());
+            _permissionManage.SetAppIdPermission(appId, permissions.ToList<string>());
 
             return Success();
         }

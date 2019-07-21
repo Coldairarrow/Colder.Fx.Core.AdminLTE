@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Reflection;
 using System.Text;
@@ -59,7 +58,7 @@ namespace Coldairarrow.Util
                         if (dbValue != null)
                         {
                             Type memberType = theField.FieldType;
-                            dbValue = dbValue.ChangeType(memberType);
+                            dbValue = dbValue.ChangeType_ByConvert(memberType);
                         }
                         theField.SetValue(_t, dbValue);
                     }
@@ -73,61 +72,9 @@ namespace Coldairarrow.Util
                         if (dbValue != null)
                         {
                             Type memberType = theProperty.PropertyType;
-                            if (memberType.IsGenericType && memberType.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
-                            {
-                                NullableConverter newNullableConverter = new NullableConverter(memberType);
-                                dbValue = newNullableConverter.ConvertFrom(dbValue);
-                            }
-                            else
-                            {
-                                dbValue = Convert.ChangeType(dbValue, memberType);
-                            }
+                            dbValue = dbValue.ChangeType_ByConvert(memberType);
                         }
                         theProperty.SetValue(_t, dbValue);
-                    }
-                }
-                list.Add(_t);
-            }
-            return list;
-        }
-
-        /// <summary>
-        /// DataTable转List
-        /// </summary>
-        /// <typeparam name="T">转换类型</typeparam>
-        /// <param name="dt">数据源</param>
-        /// <returns></returns>
-        public static List<T> EmitToList<T>(this DataTable dt)
-        {
-            //确认参数有效
-            if (dt == null)
-                return null;
-
-            List<T> list = new List<T>();
-            var objBuilder = EmitHelper.CreateBuilder(typeof(T));
-            for (int i = 0; i < dt.Rows.Count; i++)
-            {
-                //创建泛型对象
-                T _t = (T)objBuilder();
-                //获取对象所有属性
-                PropertyInfo[] propertyInfo = _t.GetType().GetProperties();
-                for (int j = 0; j < dt.Columns.Count; j++)
-                {
-                    foreach (PropertyInfo info in propertyInfo)
-                    {
-                        //属性名称和列名相同时赋值
-                        if (dt.Columns[j].ColumnName.ToUpper().Equals(info.Name.ToUpper()))
-                        {
-                            if (dt.Rows[i][j] != DBNull.Value)
-                            {
-                                info.SetValue(_t, dt.Rows[i][j], null);
-                            }
-                            else
-                            {
-                                info.SetValue(_t, null, null);
-                            }
-                            break;
-                        }
                     }
                 }
                 list.Add(_t);

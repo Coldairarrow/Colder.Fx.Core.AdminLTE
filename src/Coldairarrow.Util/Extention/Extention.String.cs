@@ -48,6 +48,16 @@ namespace Coldairarrow.Util
         }
 
         /// <summary>
+        /// 转换为MD5加密后的字符串（16位）
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static string ToMD5String16(this string str)
+        {
+            return str.ToMD5String().Substring(8, 16);
+        }
+
+        /// <summary>
         /// Base64加密
         /// 注:默认采用UTF8编码
         /// </summary>
@@ -172,6 +182,20 @@ namespace Coldairarrow.Util
             if (string.IsNullOrEmpty(str))
                 return 0;
             return Convert.ToInt32(str);
+        }
+
+        /// <summary>
+        /// string转long
+        /// </summary>
+        /// <param name="str">字符串</param>
+        /// <returns></returns>
+        public static long ToLong(this string str)
+        {
+            str = str.Replace("\0", "");
+            if (string.IsNullOrEmpty(str))
+                return 0;
+
+            return Convert.ToInt64(str);
         }
 
         /// <summary>
@@ -454,6 +478,16 @@ namespace Coldairarrow.Util
         {
             var values = typeof(T).GetEnumValues().CastToList<T>();
             return values.Where(x => x.ToString() == enumText).FirstOrDefault();
+        }
+
+        /// <summary>
+        /// 转为MurmurHash
+        /// </summary>
+        /// <param name="str">字符串</param>
+        /// <returns></returns>
+        public static uint ToMurmurHash(this string str)
+        {
+            return MurmurHash2.Hash(Encoding.UTF8.GetBytes(str));
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿@{
+@{
     Layout = "~/Views/Shared/_Layout_Form.cshtml";
 }
 <link rel="stylesheet" type="text/css" href="@Url.Scrpit("~/Scripts/vendor/font-awesome/css/font-awesome.min.css")">
@@ -41,7 +41,7 @@
 </div>
 <script>
     var linkId = request('linkId');
-    var tables = request('tables');
+    var tables = {};
 
     $(function () {
         initEvent();
@@ -86,5 +86,9 @@
     //提交表单
     function submitForm() {
         $('#submit').trigger('click');
+    }
+
+    function setTables(_tables) {
+        tables = _tables;
     }
 </script>

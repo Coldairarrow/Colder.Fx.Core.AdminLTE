@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "10.Coldairarrow.UnitTests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "05.Coldairarrow.Web", "Coldairarrow.Web\05.Coldairarrow.Web.csproj", "{EF442407-64C1-44C5-8C00-79CFFF082FD2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "06.Coldairarrow.ConsoleApp", "Coldairarrow.Console\06.Coldairarrow.ConsoleApp.csproj", "{D14CDA56-F422-4A96-9B68-7E992A98F513}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "06.Coldairarrow.Console", "Coldairarrow.Console\06.Coldairarrow.Console.csproj", "{D14CDA56-F422-4A96-9B68-7E992A98F513}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -39,7 +39,7 @@
                     <div class="help-block with-errors"></div>
                 </div>
                 <div class="form-group has-feedback">
-                    <input id="password" name="password" type="password" required class="form-control" placeholder="请输入密码">
+                    <input id="password" name="password" type="text" required class="form-control" placeholder="请输入密码">
                     <span class="glyphicon glyphicon-lock form-control-feedback"></span>
                     <div class="help-block with-errors"></div>
                 </div>
@@ -66,19 +66,19 @@
     <!--jQuery-cookie-->
     <script src="@Url.Scrpit("~/Scripts/vendor/jQuery-cookie/jquery.cookie.min.js")"></script>
 
-    <!-- Bootstrap 3.3.6 -->
-    <script src="@Url.Scrpit("~/Scripts/vendor/bootstrap/js/bootstrap.min.js")"></script>
     <!-- iCheck -->
     <script src="@Url.Scrpit("~/Scripts/vendor/iCheck/icheck.min.js")"></script>
-    <!--bootstrap-validator-->
     <!--bootstrap-->
-    <link href="@Url.Scrpit("~/Scripts/vendor/bootstrap/css/bootstrap.min.css")" rel="stylesheet">
     <script src="@Url.Scrpit("~/Scripts/vendor/bootstrap/js/bootstrap.min.js")"></script>
     <script src="@Url.Scrpit("~/Scripts/vendor/bootstrap/js/bootstrap-BtnBuilder.js")"></script>
     <script src="@Url.Scrpit("~/Scripts/vendor/bootstrap-validator/validator.min.js")"></script>
     <!--layer-->
     <script src="@Url.Scrpit("~/Scripts/vendor/layer/layer.js")"></script>
     <script src="@Url.Scrpit("~/Scripts/vendor/layer/layer-extends.js")"></script>
+
+    <!--bootstrapPwdBox-->
+    <script src="@Url.Scrpit("~/Scripts/vendor/bootstrap-pwdbox/bootstrapPwdBox.js")"></script>
+
     <!--fx-->
     <script src="@Url.Scrpit("~/Scripts/util/util.js")"></script>
 
@@ -125,11 +125,14 @@
             var password = $.cookie('password');
             if (userName && password) {
                 $('#userName').val(userName);
-                $('#password').val(password);
                 $('#savePwd').prop('checked', 'checked');
             } else {
                 $('#savePwd').removeAttr('checked');
             }
+
+            $('#password').bootstrapPwdBox({
+                value: password
+            });
         }
 
         //保存账号密码

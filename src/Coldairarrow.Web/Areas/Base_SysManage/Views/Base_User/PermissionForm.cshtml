@@ -1,7 +1,7 @@
-﻿@using Coldairarrow.Business.Base_SysManage;
+@inherits  DependencyViewPage
 
 @{
-    var permissions = PermissionManage.GetUserPermissionModules((string)ViewData["userId"]);
+    var permissions = this.PermissionManage.GetUserPermissionModules((string)ViewData["userId"]);
 }
 
 <!DOCTYPE html>

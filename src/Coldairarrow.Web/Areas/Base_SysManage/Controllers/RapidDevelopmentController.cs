@@ -2,16 +2,20 @@
 using Coldairarrow.Util;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Coldairarrow.Web
+namespace Coldairarrow.Web.Areas.Base_SysManage.Controllers
 {
     [Area("Base_SysManage")]
     public class RapidDevelopmentController : BaseMvcController
     {
-        RapidDevelopmentBusiness _rapidDevelopmentBus = new RapidDevelopmentBusiness();
+        public RapidDevelopmentController(IRapidDevelopmentBusiness rapidDevBus)
+        {
+            _rapidDevBus = rapidDevBus;
+        }
+        IRapidDevelopmentBusiness _rapidDevBus { get; }
 
         #region 视图功能
 
-        public IActionResult Index()
+        public ActionResult Index()
         {
             return View();
         }
@@ -31,7 +35,7 @@ namespace Coldairarrow.Web
         /// <returns></returns>
         public ActionResult GetAllDbLink()
         {
-            var dataList = _rapidDevelopmentBus.GetAllDbLink();
+            var dataList = _rapidDevBus.GetAllDbLink();
 
             return Content(dataList.ToJson());
         }
@@ -46,11 +50,11 @@ namespace Coldairarrow.Web
             Pagination pagination = new Pagination
             {
                 PageIndex = 1,
-                PageRows = int.MaxValue
+                PageRows = int.MaxValue,
+                RecordCount = int.MaxValue
             };
-            var resList = _rapidDevelopmentBus.GetDbTableList(linkId);
 
-            return Content(pagination.BuildTableResult_BootstrapTable(resList).ToJson());
+            return Content(pagination.BuildTableResult_DataGrid(_rapidDevBus.GetDbTableList(linkId)).ToJson());
         }
 
         #endregion
@@ -66,7 +70,7 @@ namespace Coldairarrow.Web
         /// <param name="buildType">需要生成类型</param>
         public ActionResult BuildCode(string linkId, string areaName, string tables, string buildType)
         {
-            _rapidDevelopmentBus.BuildCode(linkId, areaName, tables, buildType);
+            _rapidDevBus.BuildCode(linkId, areaName, tables, buildType);
 
             return Success("生成成功！");
         }

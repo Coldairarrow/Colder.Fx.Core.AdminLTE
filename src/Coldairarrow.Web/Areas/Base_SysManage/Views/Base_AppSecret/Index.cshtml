@@ -1,18 +1,26 @@
-﻿@{
+@inherits DependencyViewPage
+
+@{
     Layout = "~/Views/Shared/_Layout_List.cshtml";
+
+    var canManage = PermissionManage.OperatorHasPermissionValue("sysrole.manage");
+    var manageSysPermission = this.PermissionManage.OperatorHasPermissionValue("sysrole.manageSysPermission");
 }
 
 <div class="fx-content">
     <div id="toobar">
         <div class="btn-group btn-group-sm">
-            <button onclick="openForm('', '添加数据');" type="button" class="btn btn-default" aria-label="Left Align">
-                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                添加
-            </button>
-            <button onclick="deleteData();" type="button" class="btn btn-default" aria-label="Right Align">
-                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                删除
-            </button>
+            @if (canManage)
+            {
+                <button onclick="openForm('', '添加数据');" type="button" class="btn btn-default" aria-label="Left Align">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                    添加
+                </button>
+                <button onclick="deleteData();" type="button" class="btn btn-default" aria-label="Right Align">
+                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                    删除
+                </button>
+            }
             <button type="button" class="btn btn-default" aria-label="Right Align" onclick="javascript: location.reload();">
                 <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
                 刷新
@@ -22,11 +30,7 @@
     <div class="fx-wrapper">
         <form class="form-inline" id="searchForm">
             <div class="form-group">
-                <label>查询类别</label>
-                <select class="selectpicker" name="condition" data-style="btn-default btn-sm" data-width="100px">
-                    <option value="">请选择</option>
-                    <option value="AppId">AppId</option>
-                </select>
+                <label>关键字</label>
                 <input type="text" class="form-control input-sm" name="keyword" placeholder="请输入关键字">
             </div>
             <div class="form-group">
@@ -44,6 +48,8 @@
 
 <script>
     var $table = $('#dataTable');
+    var canManage =@canManage.ToString().ToLower();
+    var manageSysPermission =@manageSysPermission.ToString().ToLower();
 
     $(function () {
         initTable();
@@ -59,6 +65,8 @@
             method: 'post',
             clickToSelect: false,
             sidePagination: "server",
+            contentType: 'application/x-www-form-urlencoded',
+            queryParamsType: '',
             pageNumber: 1,
             pageSize: 30,
             pageList: [10, 30, 60, 100],
@@ -69,9 +77,13 @@
                 {
                     title: '操作', field: '_', width: '', formatter: function (value, row) {
                         var builder = new BtnBuilder();
-                        builder.AddBtn({ icon: 'glyphicon-edit', function: 'openForm', param: [row['Id']] });
-                        builder.AddBtn({ icon: 'glyphicon-trash', function: 'deleteData', param: [row['Id']] });
-                        builder.AddBtn({ name: '权限分配', icon: 'glyphicon-edit', function: 'setPermission', param: [row['appId']] });
+                        if (canManage) {
+                            builder.AddBtn({ icon: 'glyphicon-edit', function: 'openForm', param: [row['Id']] });
+                            builder.AddBtn({ icon: 'glyphicon-trash', function: 'deleteData', param: [row['Id']] });
+                        }
+                        if (manageSysPermission) {
+                            builder.AddBtn({ name: '权限分配', icon: 'glyphicon-edit', function: 'setPermission', param: [row['appId']] });
+                        }
 
                         return builder.build();
                     }

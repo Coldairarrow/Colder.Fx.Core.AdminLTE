@@ -1,21 +1,26 @@
-﻿@using Coldairarrow.Business.Base_SysManage;
+@inherits DependencyViewPage
 
 @{
     Layout = "~/Views/Shared/_Layout_List.cshtml";
-    var manageSysPermission = PermissionManage.OperatorHasPermissionValue("sysuser.manageSysPermission");
+
+    var manageSysPermission = this.PermissionManage.OperatorHasPermissionValue("sysuser.manageSysPermission");
+    var canManage = PermissionManage.OperatorHasPermissionValue("sysuser.manage");
 }
 
 <div class="fx-content">
     <div id="toobar">
         <div class="btn-group btn-group-sm">
-            <button onclick="openForm('', '添加数据');" type="button" class="btn btn-default" aria-label="Left Align">
-                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                添加
-            </button>
-            <button onclick="deleteData();" type="button" class="btn btn-default" aria-label="Right Align">
-                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                删除
-            </button>
+            @if (canManage)
+            {
+                <button onclick="openForm('', '添加数据');" type="button" class="btn btn-default" aria-label="Left Align">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                    添加
+                </button>
+                <button onclick="deleteData();" type="button" class="btn btn-default" aria-label="Right Align">
+                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                    删除
+                </button>
+            }
             <button type="button" class="btn btn-default" aria-label="Right Align" onclick="javascript: location.reload();">
                 <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
                 刷新
@@ -25,12 +30,7 @@
     <div class="fx-wrapper">
         <form class="form-inline" id="searchForm">
             <div class="form-group">
-                <label>查询类别</label>
-                <select class="selectpicker" name="condition" data-style="btn-default btn-sm" data-width="100px">
-                    <option value="">请选择</option>
-                    <option value="UserName">用户名</option>
-                    <option value="RealName">真实姓名</option>
-                </select>
+                <label>关键字</label>
                 <input type="text" class="form-control input-sm" name="keyword" placeholder="请输入关键字">
             </div>
             <div class="form-group">
@@ -49,6 +49,7 @@
 <script>
     var $table = $('#dataTable');
     var manageSysPermission=@manageSysPermission.ToString().ToLower();
+    var canManage =@canManage.ToString().ToLower();
 
     $(function () {
         initTable();
@@ -64,6 +65,8 @@
             method: 'post',
             clickToSelect: false,
             sidePagination: "server",
+            contentType: 'application/x-www-form-urlencoded',
+            queryParamsType: '',
             pageNumber: 1,
             pageSize: 30,
             pageList: [10, 30, 60, 100],
@@ -71,6 +74,7 @@
                 { title: 'ck', field: 'ck', checkbox: true },
                 { title: '用户名', field: 'UserName', width: 200 },
                 { title: '真实姓名', field: 'RealName', width: 200 },
+                { title: '所属部门', field: 'DepartmentName', width: 200 },
                 {
                     title: '性别', field: 'Sex', width: 200, formatter: function (value, row) {
                         var mapping = {
@@ -90,10 +94,12 @@
                 {
                     title: '操作', field: '_', width: '20%', formatter: function (value, row) {
                         var builder = new BtnBuilder();
-                        builder.AddBtn({ icon: 'glyphicon-edit', function: 'openForm', param: [row['Id']] });
-                        builder.AddBtn({ icon: 'glyphicon-trash', function: 'deleteData', param: [row['Id']] });
+                        if (canManage) {
+                            builder.AddBtn({ icon: 'glyphicon-edit', function: 'openForm', param: [row['Id']] });
+                            builder.AddBtn({ icon: 'glyphicon-trash', function: 'deleteData', param: [row['Id']] });
+                        }
                         if (manageSysPermission) {
-                            builder.AddBtn({ name: '权限分配', icon: 'glyphicon-edit', function: 'setPermission', param: [row['UserId'], row['RealName']] });
+                            builder.AddBtn({ name: '权限分配', icon: 'glyphicon-edit', function: 'setPermission', param: [row['Id'], row['RealName']] });
                         }
 
                         return builder.build();

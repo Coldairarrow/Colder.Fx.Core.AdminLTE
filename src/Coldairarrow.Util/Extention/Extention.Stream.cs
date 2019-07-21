@@ -22,18 +22,13 @@ namespace Coldairarrow.Util
 
         /// <summary>
         /// 将流读为字符串
-        /// 注：使用默认编码
+        /// 注：默认使用UTF-8编码
         /// </summary>
         /// <param name="stream">流</param>
         /// <returns></returns>
         public static string ReadToString(this Stream stream)
         {
-            string resStr = string.Empty;
-            stream.Seek(0, SeekOrigin.Begin);
-            resStr = new StreamReader(stream).ReadToEnd();
-            stream.Seek(0, SeekOrigin.Begin);
-
-            return resStr;
+            return ReadToString(stream, Encoding.UTF8);
         }
 
         /// <summary>

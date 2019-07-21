@@ -1,24 +1,40 @@
-﻿using Coldairarrow.Util;
+﻿using Coldairarrow.Business.Base_SysManage;
+using Coldairarrow.DataRepository;
+using Coldairarrow.Entity.Base_SysManage;
+using Coldairarrow.Util;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace Coldairarrow.Web
 {
-    //[CheckUrlPermission]
     public class TestController : BaseController
     {
+        public TestController(IBase_UserBusiness userBus)
+        {
+            _userBus = userBus;
+        }
+        private IBase_UserBusiness _userBus { get; }
         public ActionResult Index()
         {
             return View();
         }
 
-        public ActionResult RequestDemo()
+        public IActionResult Test()
         {
-            return View();
-        }
+            var db = DbFactory.GetRepository();
+            Base_UnitTest base_UnitTest = new Base_UnitTest
+            {
+                Id = IdHelper.GetId(),
+                Age = int.MaxValue,
+                UserId = IdHelper.GetId(),
+                UserName = IdHelper.GetId()
+            };
+            db.Insert(base_UnitTest);
+            db.GetIQueryable<Base_UnitTest>().GetPagination(new Pagination()).ToList();
+            db.Update(base_UnitTest);
+            db.Delete(base_UnitTest);
 
-        public IActionResult Test(string name,int age)
-        {
-            return Content(new { name, age }.ToJson());
+            return Success();
         }
     }
 }

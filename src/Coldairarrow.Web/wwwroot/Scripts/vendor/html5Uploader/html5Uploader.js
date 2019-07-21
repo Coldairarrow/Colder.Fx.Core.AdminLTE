@@ -6,18 +6,21 @@
     function Html5Uploader(container, options) {
         var defaults = {
             imgs: [],
-            enableScale: true,
+            enableScale: false,
             asyncUpload: false,
             uploadUrl: null,
             maxHeight: 800,
             maxWidth: 800,
             uploadLimit: 5,  //上传数量限制，0为不限
             sizeLimit: 5,    //大小限制，M
-            postData: null
+            postData: null,
+            type:'image' //默认图片,file则为文件
         };
         var imgItemHtml = [
             '<li class="up-pic">',
             '<div class="up-clip">',
+            '<span data-src="" style="display:none"></span>',
+            '<a href="" style="display:none"></a>',
             '<img src="" style="display:block;" />',
             '</div>',
             '<div class="up-mask"></div>',
@@ -41,7 +44,8 @@
             if (!$imgWrap.length) {
                 $imgWrap = $('<ul class="up-pics"></ul>').appendTo($container);
             }
-            $file = $('<input type="file" class="up-file" accept="image/*" />').appendTo($container);
+            var accept = options.type == 'image' ? 'image/*' : '*/*';
+            $file = $('<input type="file" class="up-file" accept="' + accept + '" />').appendTo($container);
             if (options.uploadLimit > 1) {
                 $file.attr("multiple", "multiple");
             }
@@ -95,7 +99,7 @@
 
         //上传，可实现批量上传
         function uploadFile(file, onUploadComplete) {
-            if (!file.type.match(/image.*/)) {
+            if (!file.type.match(/image.*/) && options.type == 'image') {
                 alert("只能选择图片文件.");
                 fileCount--;
                 if (onUploadComplete) {
@@ -129,8 +133,13 @@
                 });
             }
 
-            var fileName = file.name,
-                $imgItem = $(imgItemHtml).appendTo($imgWrap);
+            var fileName = file.name;
+            var fileType = file.type.indexOf("image/") == -1 ? 'file' : 'image';
+            var $imgItem = $(imgItemHtml).appendTo($imgWrap);
+            if (fileType == 'file') {
+                $imgItem.find('img').css('display', 'none');
+                $imgItem.find('div a').css('display', 'block');
+            }
 
             function readFile() {
                 var reader = new FileReader();
@@ -147,10 +156,12 @@
 
                     //第一段进度条
                     //$imgItem.find(".pos").animate({ width: "30%" }, 100, "linear");
-                    $imgItem.find("img").attr({
-                        "src": fileData,
-                        "onload": loadimg
-                    });
+                    if (fileType == 'image') {
+                        $imgItem.find("img").attr({
+                            "src": fileData,
+                            "onload": loadimg
+                        });
+                    }
 
                     if (options.enableScale) {
                         scaleAndUpload(fileData);
@@ -169,7 +180,7 @@
                     var scaleWidth = this.naturalWidth,
                         scaleHeight = this.naturalHeight;
 
-                    // 如果高度超标
+                    //// 如果高度超标
                     //if (scaleHeight > options.maxHeight) {
                     //    // 宽度等比例缩放 *=
                     //    scaleWidth *= options.maxHeight / scaleHeight;
@@ -180,8 +191,8 @@
                     //    scaleHeight *= options.maxWidth / scaleWidth;
                     //    scaleWidth = options.maxWidth;
                     //}
-                    this.width = scaleWidth,
-                    this.height = scaleHeight;
+                    //this.width = scaleWidth,
+                    //this.height = scaleHeight;
 
                     var canvas = document.createElement("canvas");
                     var ctx = canvas.getContext("2d");
@@ -238,8 +249,10 @@
 
             //提交至服务器
             function upload(fileData) {
+
+                //使用URL异步上传
                 if (options.asyncUpload && options.uploadUrl) {
-                    var postData = $.extend(options.postData, { fileName: fileName, data: fileData, count: fileCount, uploadVerNo: uploadVerNo });
+                    var postData = $.extend(options.postData, { fileName: fileName, fileType: fileType, data: fileData, count: fileCount, uploadVerNo: uploadVerNo });
                     $.post(options.uploadUrl, postData, function (res) {
                         if (!res.success) {
                             alert(res.message);
@@ -250,7 +263,13 @@
                             return;
                         }
 
-                        $imgItem.find("img").attr({ "src": res.src, "onload": loadimg });
+                        $imgItem.find('span').attr('data-src', res.src);
+                        if (fileType == 'image') {
+                            $imgItem.find("img").attr({ "src": res.src, "onload": loadimg });
+                        } else {
+                            $imgItem.find('div a').attr('href', res.src);
+                            $imgItem.find('div a').text(fileName);
+                        }
 
                         // 播放剩下的进度条动画
                         $imgItem.find(".pos").animate({ width: "100%" }, 0, "linear", function () {
@@ -356,17 +375,26 @@
         //获得已上传图片路径
         function getUploadFiles() {
             var files = [];
-            $imgWrap.find(".up-over img").each(function () {
-                files.push($(this).attr("src"));
+            $imgWrap.find("span").each(function () {
+                files.push($(this).attr("data-src"));
             });
             return files;
         }
 
         function insertItem(src) {
+            var fileName = getFileName(src);
+            var fileType = getFileType(fileName);
             var $imgItem = $(imgItemHtml).appendTo($imgWrap);
             $imgItem.addClass("up-over");
-            $imgItem.find("img")
-                .attr({ "src": src, "onload": loadimg });
+            if (fileType == 'image') {
+                $imgItem.find("img").attr({ "src": src, "onload": loadimg });
+            } else {
+                $imgItem.find("img").css('display', 'none');
+                $imgItem.find('div a').css('display', 'block');
+                $imgItem.find('div a').attr('href', src);
+                $imgItem.find('div a').text(fileName);
+            }
+            $imgItem.find('span').attr('data-src', src);
 
             uploadCountCheck();
         }
@@ -380,5 +408,23 @@
             "insertItem": insertItem,
             "clear": clear
         };
+
+        function getFileType(fileName) {
+            var suffixIndex = fileName.lastIndexOf(".");
+            var suffix = fileName.substring(suffixIndex + 1).toUpperCase();
+            if (suffix != "BMP" && suffix != "JPG" && suffix != "JPEG" && suffix != "PNG" && suffix != "GIF") {
+                return 'file';
+            } else {
+                return 'image';
+            }
+        }
+
+        function getFileName(src) {
+            var str = src;
+            var url = str.split('?')[0];
+            var pathArray = url.split('/');
+
+            return pathArray[pathArray.length - 1];
+        }
     }
 })(jQuery);

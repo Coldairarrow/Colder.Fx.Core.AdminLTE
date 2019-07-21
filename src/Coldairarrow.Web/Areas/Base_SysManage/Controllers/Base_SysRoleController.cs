@@ -2,14 +2,20 @@ using Coldairarrow.Business.Base_SysManage;
 using Coldairarrow.Entity.Base_SysManage;
 using Coldairarrow.Util;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
-namespace Coldairarrow.Web
+namespace Coldairarrow.Web.Areas.Base_SysManage.Controllers
 {
     [Area("Base_SysManage")]
     public class Base_SysRoleController : BaseMvcController
     {
-        Base_SysRoleBusiness _base_SysRoleBusiness = new Base_SysRoleBusiness();
+        public Base_SysRoleController(IBase_SysRoleBusiness sysRoleBus, IPermissionManage permissionManage)
+        {
+            _sysRoleBus = sysRoleBus;
+            _permissionManage = permissionManage;
+        }
+
+        IBase_SysRoleBusiness _sysRoleBus { get; }
+        IPermissionManage _permissionManage { get; set; }
 
         #region 视图功能
 
@@ -20,7 +26,7 @@ namespace Coldairarrow.Web
 
         public ActionResult Form(string id)
         {
-            var theData = id.IsNullOrEmpty() ? new Base_SysRole() : _base_SysRoleBusiness.GetTheData(id);
+            var theData = id.IsNullOrEmpty() ? new Base_SysRole() : _sysRoleBus.GetTheData(id);
 
             return View(theData);
         }
@@ -36,17 +42,11 @@ namespace Coldairarrow.Web
 
         #region 获取数据
 
-        /// <summary>
-        /// 获取数据列表
-        /// </summary>
-        /// <param name="condition">查询类型</param>
-        /// <param name="keyword">关键字</param>
-        /// <returns></returns>
-        public ActionResult GetDataList(string condition, string keyword, Pagination pagination)
+        public ActionResult GetDataList(Pagination pagination, string roleName)
         {
-            var dataList = _base_SysRoleBusiness.GetDataList(condition, keyword, pagination);
+            var dataList = _sysRoleBus.GetDataList(pagination, null, roleName);
 
-            return Content(pagination.BuildTableResult_DataGrid(dataList).ToJson());
+            return DataTable_Bootstrap(dataList, pagination);
         }
 
         /// <summary>
@@ -56,12 +56,7 @@ namespace Coldairarrow.Web
         /// <returns></returns>
         public ActionResult GetDataList_NoPagin()
         {
-            Pagination pagination = new Pagination
-            {
-                PageIndex = 1,
-                PageRows = int.MaxValue
-            };
-            var dataList = _base_SysRoleBusiness.GetDataList(null, null, pagination);
+            var dataList = _sysRoleBus.GetDataList(new Pagination());
 
             return Content(dataList.ToJson());
         }
@@ -76,19 +71,19 @@ namespace Coldairarrow.Web
         /// <param name="theData">保存的数据</param>
         public ActionResult SaveData(Base_SysRole theData)
         {
+            AjaxResult res;
             if (theData.Id.IsNullOrEmpty())
             {
-                theData.Id = Guid.NewGuid().ToSequentialGuid();
-                theData.RoleId = Guid.NewGuid().ToSequentialGuid();
+                theData.Id = IdHelper.GetId();
 
-                _base_SysRoleBusiness.AddData(theData);
+                res = _sysRoleBus.AddData(theData);
             }
             else
             {
-                _base_SysRoleBusiness.UpdateData(theData);
+                res = _sysRoleBus.UpdateData(theData);
             }
 
-            return Success();
+            return JsonContent(res.ToJson());
         }
 
         /// <summary>
@@ -97,11 +92,12 @@ namespace Coldairarrow.Web
         /// <param name="theData">删除的数据</param>
         public ActionResult DeleteData(string ids)
         {
-            _base_SysRoleBusiness.DeleteData(ids.ToList<string>());
+            var res = _sysRoleBus.DeleteData(ids.ToList<string>());
 
-            PermissionManage.ClearUserPermissionCache();
+            if (res.Success)
+                _permissionManage.ClearUserPermissionCache();
 
-            return Success("删除成功！");
+            return JsonContent(res.ToJson());
         }
 
         /// <summary>
@@ -110,11 +106,9 @@ namespace Coldairarrow.Web
         /// <param name="roleId">角色Id</param>
         /// <param name="permissions">权限值</param>
         /// <returns></returns>
-        public ActionResult SavePermission(string roleId,string permissions)
+        public ActionResult SavePermission(string roleId, string permissions)
         {
-            _base_SysRoleBusiness.SavePermission(roleId, permissions.ToList<string>());
-
-            PermissionManage.ClearUserPermissionCache();
+            _sysRoleBus.SavePermission(roleId, permissions.ToList<string>());
 
             return Success();
         }

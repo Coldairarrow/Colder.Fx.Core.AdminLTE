@@ -156,15 +156,15 @@ namespace Coldairarrow.Util
                 request.Headers.Add(aHeader.Key, aHeader.Value);
             });
 
-            byte[] data = Encoding.UTF8.GetBytes(body);
-            request.ContentLength = data.Length;
-
             //HTTPS证书
             if (cerFile != null)
                 request.ClientCertificates.Add(cerFile);
 
             if (method.ToUpper() != "GET")
             {
+                byte[] data = Encoding.UTF8.GetBytes(body);
+                request.ContentLength = data.Length;
+
                 using (Stream requestStream = request.GetRequestStream())
                 {
                     requestStream.Write(data, 0, data.Length);
@@ -350,6 +350,45 @@ namespace Coldairarrow.Util
             }
 
             return "";
+        }
+
+        /// <summary>
+        /// 发起安全签名请求
+        /// 注：使用本框架签名算法,ContentType为application/json
+        /// </summary>
+        /// <param name="url">地址</param>
+        /// <param name="body">请求body</param>
+        /// <param name="appId">应用Id</param>
+        /// <param name="appSecret">应用密钥</param>
+        /// <returns></returns>
+        public static string SafeSignRequest(string url, string body, string appId, string appSecret)
+        {
+            string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            string guid = Guid.NewGuid().ToString();
+            Dictionary<string, string> headers = new Dictionary<string, string>
+            {
+                {"appId",appId },
+                {"time",time },
+                {"guid",guid },
+                {"sign",BuildApiSign(appId,appSecret,guid,time.ToDateTime(),body) }
+            };
+
+            return RequestData("post", url, body, "application/json", headers);
+        }
+
+        /// <summary>
+        /// 生成接口签名sign
+        /// 注：md5(appId+time+guid+body+appSecret)
+        /// </summary>
+        /// <param name="appId">应用Id</param>
+        /// <param name="appSecret">应用密钥</param>
+        /// <param name="guid">唯一GUID</param>
+        /// <param name="time">时间</param>
+        /// <param name="body">请求体</param>
+        /// <returns></returns>
+        public static string BuildApiSign(string appId, string appSecret, string guid, DateTime time, string body)
+        {
+            return $"{appId}{time.ToString("yyyy-MM-dd HH:mm:ss")}{guid}{body}{appSecret}".ToMD5String();
         }
 
         #endregion

@@ -10,6 +10,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Coldairarrow.DataRepository
 {
@@ -17,6 +18,7 @@ namespace Coldairarrow.DataRepository
     /// 描述：数据库仓储基类类
     /// 作者：Coldairarrow
     /// </summary>
+    /// <seealso cref="IRepository" />
     public class DbRepository : IRepository
     {
         #region 构造函数
@@ -24,69 +26,26 @@ namespace Coldairarrow.DataRepository
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="param">构造参数，可以为数据库连接字符串或者DbContext</param>
+        /// <param name="conString">构造参数，可以为数据库连接字符串或者DbContext</param>
         /// <param name="dbType">数据库类型</param>
-        public DbRepository(Object param, DatabaseType dbType, string entityNamespace)
+        public DbRepository(string conString, DatabaseType dbType)
         {
-            BuildParam = param;
-            _dbType = dbType;
-            _entityNamespace = entityNamespace;
-            Handle_BuildDbContext = new Func<DbContext>(() =>
-            {
-                return DbFactory.GetDbContext(BuildParam, _dbType, _entityNamespace);
-            });
-            _db = Handle_BuildDbContext?.Invoke();
-            _connectionString = _db.Database.GetDbConnection().ConnectionString;
-            IsDisposed = false;
+            ConnectionString = conString;
+            DbType = dbType;
         }
 
         #endregion
 
-        #region 拥有成员
+        #region 私有成员
 
-        /// <summary>
-        /// 连接字符串
-        /// </summary>
-        protected string _connectionString { get; }
-
-        /// <summary>
-        /// 数据库类型
-        /// </summary>
-        private DatabaseType _dbType { get; set; }
-
-        /// <summary>
-        /// 连接上下文DbContext
-        /// </summary>
-        private DbContext _db { get; set; }
-
-        /// <summary>
-        /// 建造DbConText所需参数
-        /// </summary>
-        private Object BuildParam { get; set; }
-
-        /// <summary>
-        /// 实体命名空间
-        /// </summary>
-        private string _entityNamespace { get; set; }
-
-        /// <summary>
-        /// 标记DbContext是否已经释放
-        /// </summary>
-        protected bool IsDisposed { get; set; }
-
-        /// <summary>
-        /// 判断是否开始事物
-        /// </summary>
-        protected IDbContextTransaction Transaction { get; set; }
-
-        protected DbContext Db
+        protected IRepositoryDbContext Db
         {
             get
             {
-                if (IsDisposed)
+                if (_disposed || _db == null)
                 {
-                    _db = Handle_BuildDbContext?.Invoke();
-                    IsDisposed = false;
+                    _db = DbFactory.GetDbContext(ConnectionString, DbType);
+                    _disposed = false;
                 }
 
                 return _db;
@@ -96,118 +55,172 @@ namespace Coldairarrow.DataRepository
                 _db = value;
             }
         }
-
-        protected static PropertyInfo GetKeyProperty<T>()
+        private IRepositoryDbContext _db { get; set; }
+        protected bool _disposed { get; set; }
+        protected DbTransaction _transaction { get; set; }
+        protected static PropertyInfo GetKeyProperty(Type type)
         {
-            return GetKeyPropertys<T>().FirstOrDefault();
+            return GetKeyPropertys(type).FirstOrDefault();
         }
-
-        protected static List<PropertyInfo> GetKeyPropertys<T>()
+        protected static List<PropertyInfo> GetKeyPropertys(Type type)
         {
-            var properties = typeof(T)
+            var properties = type
                 .GetProperties()
                 .Where(x => x.GetCustomAttributes(true).Select(o => o.GetType().FullName).Contains(typeof(KeyAttribute).FullName))
                 .ToList();
 
             return properties;
         }
-
-        protected static string GetDbTableName<T>()
+        protected string GetDbTableName(Type type)
         {
             string tableName = string.Empty;
-            var tableAttribute = typeof(T).GetCustomAttribute<TableAttribute>();
+            var tableAttribute = type.GetCustomAttribute<TableAttribute>();
             if (tableAttribute != null)
                 tableName = tableAttribute.Name;
             else
-                tableName = typeof(T).Name;
+                tableName = type.Name;
 
             return tableName;
         }
+        private void PackWork(IEnumerable<Type> entityTypes, Action work)
+        {
+            entityTypes.ForEach(x => Db.CheckEntityType(x));
 
-        #endregion
+            if (_openedTransaction)
+                _transactionHandler += work;
+            else
+            {
+                work();
+                CommitDb();
+                Dispose();
+            }
+        }
+        private void PackWork(Type entityType, Action work)
+        {
+            PackWork(new List<Type> { entityType }, work);
+        }
+        protected bool _openedTransaction { get; set; } = false;
+        protected Action _transactionHandler { get; set; }
+        private ITransaction _BeginTransaction(IsolationLevel? isolationLevel = null)
+        {
+            _openedTransaction = true;
+            if (isolationLevel == null)
+                _transaction = Db.Database.BeginTransaction().GetDbTransaction();
+            else
+                _transaction = Db.Database.BeginTransaction(isolationLevel.Value).GetDbTransaction();
 
-        #region 事件处理
+            Db.UseTransaction(_transaction);
 
-        Func<DbContext> Handle_BuildDbContext { get; set; }
+            return this;
+        }
+        private Action<string> _HandleSqlLog { get; set; }
+        protected virtual string FormatFieldName(string name)
+        {
+            throw new NotImplementedException("请在子类实现!");
+        }
+        protected virtual string FormatParamterName(string name)
+        {
+            return $"@{name}";
+        }
+        private (string sql, IReadOnlyDictionary<string, object> paramters) GetWhereSql<T>(IQueryable<T> query) where T : class, new()
+        {
+            var querySql = query.ToSql();
+            string theQSql = querySql.sql.Replace("\r\n", "\n").Replace("\n", " ");
+            string pattern = "^SELECT.*?FROM.*? AS (.*?) WHERE .*?$";
+            var match = Regex.Match(theQSql, pattern);
+            string asTmp = match.Groups[1]?.ToString();
+            string whereSql = querySql.sql.Split(new string[] { "WHERE" }, StringSplitOptions.None)[1].Replace($"{asTmp}.", "");
+
+            return (whereSql, querySql.parameters);
+        }
 
         #endregion
 
         #region 事物相关
 
         /// <summary>
-        /// 是否开启事务,单库事务
+        /// 开始事物
         /// </summary>
-        protected bool _openedTransaction { get; set; } = false;
-
-        /// <summary>
-        /// 需要执行的Sql事务
-        /// </summary>
-        protected Action _sqlTransaction { get; set; }
-        public Action<string> HandleSqlLog { set => EFCoreSqlLogeerProvider.HandleSqlLog = value; }
-
-        /// <summary>
-        /// 提交到数据库
-        /// </summary>
-        protected void Commit()
+        public ITransaction BeginTransaction()
         {
-            //若未开启事物则直接提交到数据库
-            if (!_openedTransaction)
-            {
-                Db.SaveChanges();
-                Db.Dispose();
-                IsDisposed = true;
-            }
+            return _BeginTransaction();
         }
 
         /// <summary>
-        /// 释放数据,初始化状态
+        /// 开始事物
+        /// 注:自定义事物级别
         /// </summary>
-        protected void Dispose()
+        /// <param name="isolationLevel">事物级别</param>
+        public ITransaction BeginTransaction(IsolationLevel isolationLevel)
         {
-            Transaction?.Dispose();
-            Db?.Dispose();
-            IsDisposed = true;
-            _openedTransaction = false;
-            _sqlTransaction = null;
+            return _BeginTransaction(isolationLevel);
         }
 
         /// <summary>
-        /// 开始单库事物
-        /// 注意:若要使用跨库事务,请使用DistributedTransaction
+        /// 结束事物
         /// </summary>
-        public void BeginTransaction()
+        /// <returns></returns>
+        public (bool Success, Exception ex) EndTransaction()
         {
-            Transaction = Db.Database.BeginTransaction();
-            _openedTransaction = true;
-        }
-
-        /// <summary>
-        /// 结束事物提交
-        /// </summary>
-        public bool EndTransaction()
-        {
-            bool isOK = true;
+            bool success = true;
+            Exception resEx = null;
             try
             {
-                _sqlTransaction?.Invoke();
-                Db.SaveChanges();
-                Transaction.Commit();
+                CommitDb();
+                CommitTransaction();
             }
-            catch
+            catch (Exception ex)
             {
-                Transaction.Rollback();
-                isOK = false;
+                success = false;
+                resEx = ex;
+                RollbackTransaction();
             }
             finally
             {
                 Dispose();
             }
-            return isOK;
+
+            return (success, resEx);
         }
 
         #endregion
 
-        #region 数据库连接相关方法
+        #region 数据库相关
+
+        /// <summary>
+        /// 连接字符串
+        /// </summary>
+        public string ConnectionString { get; }
+
+        /// <summary>
+        /// 数据库类型
+        /// </summary>
+        public DatabaseType DbType { get; }
+
+        /// <summary>
+        /// 提交到数据库
+        /// </summary>
+        public void CommitDb()
+        {
+            _transactionHandler?.Invoke();
+            Db.SaveChanges();
+        }
+
+        /// <summary>
+        /// 提交事物
+        /// </summary>
+        public void CommitTransaction()
+        {
+            _transaction?.Commit();
+        }
+
+        /// <summary>
+        /// 回滚事物
+        /// </summary>
+        public void RollbackTransaction()
+        {
+            _transaction?.Rollback();
+        }
 
         /// <summary>
         /// 获取DbContext
@@ -215,7 +228,38 @@ namespace Coldairarrow.DataRepository
         /// <returns></returns>
         public DbContext GetDbContext()
         {
-            return Db;
+            return Db.GetDbContext();
+        }
+
+        /// <summary>
+        /// SQL日志处理方法
+        /// </summary>
+        /// <value>
+        /// The handle SQL log.
+        /// </value>
+        public Action<string> HandleSqlLog { set => EFCoreSqlLogeerProvider.HandleSqlLog = value; }
+
+        /// <summary>
+        /// 使用已存在的事物
+        /// </summary>
+        /// <param name="transaction">事物对象</param>
+        public void UseTransaction(DbTransaction transaction)
+        {
+            if (_transaction != null)
+                _transaction.Dispose();
+
+            _openedTransaction = true;
+            _transaction = transaction;
+            Db.UseTransaction(transaction);
+        }
+
+        /// <summary>
+        /// 获取事物对象
+        /// </summary>
+        /// <returns></returns>
+        public DbTransaction GetTransaction()
+        {
+            return _transaction;
         }
 
         #endregion
@@ -223,35 +267,46 @@ namespace Coldairarrow.DataRepository
         #region 增加数据
 
         /// <summary>
-        /// 插入数据
+        /// 添加单条记录
         /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="entity">实体</param>
+        /// <typeparam name="T">实体泛型</typeparam>
+        /// <param name="entity">实体对象</param>
         public void Insert<T>(T entity) where T : class, new()
         {
-            Db.Add(entity);
-            Commit();
+            Insert(new List<object> { entity });
         }
 
         /// <summary>
-        /// 插入数据列表
+        /// 添加多条记录
         /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="entities">实体列表</param>
+        /// <typeparam name="T">实体泛型</typeparam>
+        /// <param name="entities">实体对象集合</param>
         public void Insert<T>(List<T> entities) where T : class, new()
         {
-            Db.Set<T>().AddRange(entities);
-            Commit();
+            Insert(entities.CastToList<object>());
         }
 
         /// <summary>
-        /// 使用Bulk批量插入数据（适合大数据量，速度非常快）
+        /// 添加多条记录
         /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="entities">数据</param>
+        /// <param name="entities">对象集合</param>
+        public void Insert(List<object> entities)
+        {
+            PackWork(entities.Select(x => x.GetType()), () =>
+            {
+                entities.ForEach(x => Db.Entry(x).State = EntityState.Added);
+            });
+        }
+
+        /// <summary>
+        /// 使用Bulk批量导入,速度快
+        /// </summary>
+        /// <typeparam name="T">实体泛型</typeparam>
+        /// <param name="entities">实体集合</param>
+        /// <exception cref="NotImplementedException">不支持此操作!</exception>
         public virtual void BulkInsert<T>(List<T> entities) where T : class, new()
         {
-
+            throw new NotImplementedException("不支持此操作!");
         }
 
         #endregion
@@ -259,49 +314,115 @@ namespace Coldairarrow.DataRepository
         #region 删除数据
 
         /// <summary>
-        /// 删除表中所有数据
+        /// 删除所有记录
         /// </summary>
-        /// <typeparam name="T">实体</typeparam>
+        /// <typeparam name="T">实体泛型</typeparam>
         public virtual void DeleteAll<T>() where T : class, new()
         {
-            TableAttribute tableAttribute = typeof(T).GetCustomAttributes(typeof(TableAttribute), true).FirstOrDefault() as TableAttribute;
-            string tableName = tableAttribute.Name;
-            string sql = $"DELETE {tableName}";
+            DeleteAll(typeof(T));
+        }
+
+        /// <summary>
+        /// 删除所有记录
+        /// </summary>
+        /// <param name="type">实体类型</param>
+        public virtual void DeleteAll(Type type)
+        {
+            string tableName = GetDbTableName(type);
+            string sql = $"DELETE FROM {FormatFieldName(tableName)}";
             ExecuteSql(sql);
         }
 
         /// <summary>
-        /// 删除一条数据
+        /// 删除单条记录
         /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="key">主键值</param>
-        public void Delete<T>(string key) where T : class, new()
+        /// <typeparam name="T">实体泛型</typeparam>
+        /// <param name="entity">实体对象</param>
+        public void Delete<T>(T entity) where T : class, new()
         {
-            T newData = new T();
-            var theProperty = GetKeyProperty<T>();
-            if (theProperty == null)
-                throw new Exception("该实体没有主键标识！请使用[Key]标识主键！");
-            var value = Convert.ChangeType(key, theProperty.PropertyType);
-            theProperty.SetValue(newData, value);
-            Delete(newData);
+            Delete(new List<object> { entity });
         }
 
         /// <summary>
-        /// 删除多条数据
+        /// 删除多条记录
         /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="keys">主键列表</param>
+        /// <typeparam name="T">实体泛型</typeparam>
+        /// <param name="entities">实体对象集合</param>
+        public void Delete<T>(List<T> entities) where T : class, new()
+        {
+            Delete(entities.CastToList<object>());
+        }
+
+        /// <summary>
+        /// 删除多条记录
+        /// </summary>
+        /// <param name="entities">实体对象集合</param>
+        public void Delete(List<object> entities)
+        {
+            PackWork(entities.Select(x => x.GetType()), () =>
+            {
+                entities.ForEach(x => Db.Entry(x).State = EntityState.Deleted);
+            });
+        }
+
+        /// <summary>
+        /// 按条件删除记录
+        /// </summary>
+        /// <typeparam name="T">实体泛型</typeparam>
+        /// <param name="condition">筛选条件</param>
+        public void Delete<T>(Expression<Func<T, bool>> condition) where T : class, new()
+        {
+            var deleteList = GetIQueryable<T>().Where(condition).ToList();
+            Delete(deleteList);
+        }
+
+        /// <summary>
+        /// 删除单条记录
+        /// </summary>
+        /// <typeparam name="T">实体泛型</typeparam>
+        /// <param name="key">主键</param>
+        public void Delete<T>(string key) where T : class, new()
+        {
+            Delete<T>(new List<string> { key });
+        }
+
+        /// <summary>
+        /// 删除多条记录
+        /// </summary>
+        /// <typeparam name="T">实体泛型</typeparam>
+        /// <param name="keys">多条记录主键集合</param>
         public void Delete<T>(List<string> keys) where T : class, new()
         {
-            var theProperty = GetKeyProperty<T>();
+            Delete(typeof(T), keys);
+        }
+
+        /// <summary>
+        /// 删除单条记录
+        /// </summary>
+        /// <param name="type">实体类型</param>
+        /// <param name="key">主键</param>
+        public void Delete(Type type, string key)
+        {
+            Delete(type, new List<string> { key });
+        }
+
+        /// <summary>
+        /// 删除多条记录
+        /// </summary>
+        /// <param name="type">实体类型</param>
+        /// <param name="keys">多条记录主键集合</param>
+        /// <exception cref="Exception">该实体没有主键标识！请使用[Key]标识主键！</exception>
+        public void Delete(Type type, List<string> keys)
+        {
+            var theProperty = GetKeyProperty(type);
             if (theProperty == null)
                 throw new Exception("该实体没有主键标识！请使用[Key]标识主键！");
 
-            List<T> deleteList = new List<T>();
+            List<object> deleteList = new List<object>();
             keys.ForEach(aKey =>
             {
-                T newData = new T();
-                var value = Convert.ChangeType(aKey, theProperty.PropertyType);
+                object newData = Activator.CreateInstance(type);
+                var value = aKey.ChangeType(theProperty.PropertyType);
                 theProperty.SetValue(newData, value);
                 deleteList.Add(newData);
             });
@@ -310,41 +431,32 @@ namespace Coldairarrow.DataRepository
         }
 
         /// <summary>
-        /// 删除一条数据
+        /// 使用SQL语句按照条件删除数据
+        /// 用法:Delete_Sql"Base_User"(x=&gt;x.Id == "Admin")
+        /// 注：生成的SQL类似于DELETE FROM [Base_User] WHERE [Name] = 'xxx' WHERE [Id] = 'Admin'
         /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="entity">实体对象</param>
-        public void Delete<T>(T entity) where T : class, new()
+        /// <typeparam name="T">实体泛型</typeparam>
+        /// <param name="where">条件</param>
+        /// <returns>
+        /// 影响条数
+        /// </returns>
+        public int Delete_Sql<T>(Expression<Func<T, bool>> where) where T : class, new()
         {
-            Db.Set<T>().Attach(entity);
-            Db.Set<T>().Remove(entity);
-            Commit();
-        }
-
-        /// <summary>
-        /// 删除多条数据
-        /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="entities">数据列表</param>
-        public void Delete<T>(List<T> entities) where T : class, new()
-        {
-            foreach (var entity in entities)
+            string tableName = typeof(T).Name;
+            DbProviderFactory dbProviderFactory = DbProviderFactoryHelper.GetDbProviderFactory(DbType);
+            var whereSql = GetWhereSql(GetIQueryable<T>().Where(where));
+            var paramters = whereSql.paramters.Select(x =>
             {
-                Db.Set<T>().Attach(entity);
-                Db.Set<T>().Remove(entity);
-            }
-            Commit();
-        }
+                var newParamter = dbProviderFactory.CreateParameter();
+                newParamter.ParameterName = x.Key;
+                newParamter.Value = x.Value;
 
-        /// <summary>
-        /// 通过条件删除数据
-        /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="condition">条件</param>
-        public virtual void Delete<T>(Expression<Func<T, bool>> condition) where T : class, new()
-        {
-            var deleteList = GetIQueryable<T>().Where(condition).ToList();
-            Delete(deleteList);
+                return newParamter;
+            }).ToList();
+
+            string sql = $"DELETE FROM {FormatFieldName(tableName)} WHERE {whereSql.sql}";
+
+            return ExecuteSql(sql, paramters);
         }
 
         #endregion
@@ -352,74 +464,86 @@ namespace Coldairarrow.DataRepository
         #region 更新数据
 
         /// <summary>
-        /// 默认更新一个实体，所有字段
+        /// 更新单条记录
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="entity"></param>
+        /// <typeparam name="T">实体泛型</typeparam>
+        /// <param name="entity">实体对象</param>
         public void Update<T>(T entity) where T : class, new()
         {
-            Db.Entry(entity).State = EntityState.Modified;
-
-            Commit();
+            Update(new List<object> { entity });
         }
 
         /// <summary>
-        /// 默认更新实体列表，所有字段
+        /// 更新多条记录
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="entities"></param>
+        /// <typeparam name="T">实体泛型</typeparam>
+        /// <param name="entities">实体对象集合</param>
         public void Update<T>(List<T> entities) where T : class, new()
         {
-            entities.ForEach(aEntity =>
-            {
-                Db.Entry(aEntity).State = EntityState.Modified;
-            });
-
-            Commit();
+            Update(entities.CastToList<object>());
         }
 
         /// <summary>
-        /// 更新一条数据,某些属性
+        /// 更新多条记录
         /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="entities">实体对象集合</param>
+        public void Update(List<object> entities)
+        {
+            PackWork(entities.Select(x => x.GetType()), () =>
+            {
+                entities.ForEach(x => Db.Entry(x).State = EntityState.Modified);
+            });
+        }
+
+        /// <summary>
+        /// 更新单条记录的某些属性
+        /// </summary>
+        /// <typeparam name="T">实体泛型</typeparam>
         /// <param name="entity">实体对象</param>
-        /// <param name="properties">需要更新的字段</param>
+        /// <param name="properties">属性</param>
         public void UpdateAny<T>(T entity, List<string> properties) where T : class, new()
         {
-            Db.Set<T>().Attach(entity);
-            properties.ForEach(aProperty =>
-            {
-                Db.Entry(entity).Property(aProperty).IsModified = true;
-            });
-            Commit();
+            UpdateAny(new List<object> { entity }, properties);
         }
 
         /// <summary>
-        /// 更新多条数据,某些属性
+        /// 更新多条记录的某些属性
         /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="entities">数据列表</param>
-        /// <param name="properties">需要更新的字段</param>
+        /// <typeparam name="T">实体泛型</typeparam>
+        /// <param name="entities">实体对象集合</param>
+        /// <param name="properties">属性</param>
         public void UpdateAny<T>(List<T> entities, List<string> properties) where T : class, new()
         {
-            entities.ForEach(aEntity =>
-            {
-                Db.Set<T>().Attach(aEntity);
-                properties.ForEach(aProperty =>
-                {
-                    Db.Entry(aEntity).Property(aProperty).IsModified = true;
-                });
-            });
-
-            Commit();
+            UpdateAny(entities.CastToList<object>(), properties);
         }
 
         /// <summary>
-        /// 指定条件更新
+        /// 更新多条记录的某些属性
         /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="whereExpre">筛选表达式</param>
-        /// <param name="set">更改属性回调</param>
+        /// <param name="entities">实体对象集合</param>
+        /// <param name="properties">属性</param>
+        public void UpdateAny(List<object> entities, List<string> properties)
+        {
+            PackWork(entities.Select(x => x.GetType()), () =>
+            {
+                entities.ForEach(aEntity =>
+                {
+                    var targetObj = aEntity.ChangeType(Db.CheckEntityType(aEntity.GetType()));
+                    Db.Attach(targetObj);
+                    properties.ForEach(aProperty =>
+                    {
+                        Db.Entry(targetObj).Property(aProperty).IsModified = true;
+                    });
+                });
+            });
+        }
+
+        /// <summary>
+        /// 按照条件更新记录
+        /// </summary>
+        /// <typeparam name="T">实体泛型</typeparam>
+        /// <param name="whereExpre">筛选条件</param>
+        /// <param name="set">更新操作</param>
         public void UpdateWhere<T>(Expression<Func<T, bool>> whereExpre, Action<T> set) where T : class, new()
         {
             var list = GetIQueryable<T>().Where(whereExpre).ToList();
@@ -427,85 +551,133 @@ namespace Coldairarrow.DataRepository
             Update(list);
         }
 
+        /// <summary>
+        /// 使用SQL语句按照条件更新
+        /// 用法:UpdateWhere_Sql"Base_User"(x=&gt;x.Id == "Admin",("Name","小明"))
+        /// 注：生成的SQL类似于UPDATE [TABLE] SET [Name] = 'xxx' WHERE [Id] = 'Admin'
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="where">筛选条件</param>
+        /// <param name="values">字段值设置</param>
+        /// <returns>
+        /// 影响条数
+        /// </returns>
+        public int UpdateWhere_Sql<T>(Expression<Func<T, bool>> where, params (string field, object value)[] values) where T : class, new()
+        {
+            string tableName = typeof(T).Name;
+            DbProviderFactory dbProviderFactory = DbProviderFactoryHelper.GetDbProviderFactory(DbType);
+
+            List<KeyValuePair<string, object>> parameterList = new List<KeyValuePair<string, object>>();
+            var whereSql = GetWhereSql(GetIQueryable<T>().Where(where));
+
+            parameterList.AddRange(whereSql.paramters.ToArray());
+
+            List<string> propertySetStr = new List<string>();
+
+            values.ToList().ForEach(aProperty =>
+            {
+                var paramterName = FormatParamterName($"_p_{aProperty.field}");
+                parameterList.Add(new KeyValuePair<string, object>(paramterName, aProperty.value));
+                propertySetStr.Add($" {FormatFieldName(aProperty.field)} = {paramterName} ");
+            });
+
+            var paramters = parameterList.Select(x =>
+            {
+                var newParamter = dbProviderFactory.CreateParameter();
+                newParamter.ParameterName = x.Key;
+                newParamter.Value = x.Value;
+
+                return newParamter;
+            }).ToList();
+
+            string sql = $"UPDATE {FormatFieldName(tableName)} SET {string.Join(",", propertySetStr)} WHERE {whereSql.sql}";
+
+            return ExecuteSql(sql, paramters);
+        }
+
         #endregion
 
         #region 查询数据
 
         /// <summary>
-        /// 获取实体
+        /// 获取单条记录
         /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
+        /// <typeparam name="T">实体泛型</typeparam>
         /// <param name="keyValue">主键</param>
         /// <returns></returns>
         public T GetEntity<T>(params object[] keyValue) where T : class, new()
         {
-            return Db.Set<T>().Find(keyValue);
+            var obj = Db.Set<T>().Find(keyValue);
+            if (!obj.IsNullOrEmpty())
+                Db.Entry(obj).State = EntityState.Detached;
+
+            return obj;
         }
 
         /// <summary>
-        /// 获取表的所有数据，当数据量很大时不要使用！
+        /// 获取所有数据
         /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
+        /// <typeparam name="T">实体泛型</typeparam>
         /// <returns></returns>
         public List<T> GetList<T>() where T : class, new()
         {
-            return Db.Set<T>().AsNoTracking().ToList();
+            return GetIQueryable<T>().ToList();
         }
 
         /// <summary>
-        /// 获取实体对应的表，延迟加载，主要用于支持Linq查询操作
-        /// 注意：无缓存
+        /// 获取列表
         /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="type">实体类型</param>
+        /// <returns></returns>
+        public List<object> GetList(Type type)
+        {
+            return GetIQueryable(type).CastToList<object>();
+        }
+
+        /// <summary>
+        /// 获取IQueryable
+        /// 注:默认取消实体追踪
+        /// </summary>
+        /// <typeparam name="T">实体泛型</typeparam>
         /// <returns></returns>
         public IQueryable<T> GetIQueryable<T>() where T : class, new()
         {
-            return Db.Set<T>().AsNoTracking();
+            return GetIQueryable(typeof(T)) as IQueryable<T>;
         }
 
         /// <summary>
-        /// 通过Sql语句获取DataTable
+        /// 获取IQueryable
+        /// 注:默认取消实体追踪
         /// </summary>
-        /// <param name="sql">Sql语句</param>
+        /// <param name="type">实体泛型</param>
+        /// <returns></returns>
+        public IQueryable GetIQueryable(Type type)
+        {
+            return Db.GetIQueryable(type);
+        }
+
+        /// <summary>
+        /// 通过SQL获取DataTable
+        /// </summary>
+        /// <param name="sql">SQL语句</param>
         /// <returns></returns>
         public DataTable GetDataTableWithSql(string sql)
         {
-            DbProviderFactory dbProviderFactory = DbProviderFactoryHelper.GetDbProviderFactory(_dbType);
-            using (DbConnection conn = dbProviderFactory.CreateConnection())
-            {
-                conn.ConnectionString = _connectionString;
-                if (conn.State != ConnectionState.Open)
-                {
-                    conn.Open();
-                }
-
-                using (DbCommand cmd = conn.CreateCommand())
-                {
-                    cmd.Connection = conn;
-                    cmd.CommandText = sql;
-
-                    DbDataAdapter adapter = dbProviderFactory.CreateDataAdapter();
-                    adapter.SelectCommand = cmd;
-                    DataSet table = new DataSet();
-                    adapter.Fill(table);
-
-                    return table.Tables[0];
-                }
-            }
+            return GetDataTableWithSql(sql, null);
         }
 
         /// <summary>
-        /// 通过Sql参数查询返回DataTable
+        /// 通过SQL获取DataTable
         /// </summary>
-        /// <param name="sql">Sql语句</param>
-        /// <param name="parameters">查询参数</param>
+        /// <param name="sql">SQL语句</param>
+        /// <param name="parameters">SQL参数</param>
         /// <returns></returns>
         public DataTable GetDataTableWithSql(string sql, List<DbParameter> parameters)
         {
-            DbProviderFactory dbProviderFactory = DbProviderFactoryHelper.GetDbProviderFactory(_dbType);
+            DbProviderFactory dbProviderFactory = DbProviderFactoryHelper.GetDbProviderFactory(DbType);
             using (DbConnection conn = dbProviderFactory.CreateConnection())
             {
-                conn.ConnectionString = _connectionString;
+                conn.ConnectionString = ConnectionString;
                 if (conn.State != ConnectionState.Open)
                 {
                     conn.Open();
@@ -515,14 +687,10 @@ namespace Coldairarrow.DataRepository
                 {
                     cmd.Connection = conn;
                     cmd.CommandText = sql;
+                    cmd.CommandTimeout = 5 * 60;
 
-                    if (parameters != null && parameters.Count > 0)
-                    {
-                        foreach (var item in parameters)
-                        {
-                            cmd.Parameters.Add(item);
-                        }
-                    }
+                    if (parameters != null && parameters?.Count > 0)
+                        cmd.Parameters.AddRange(parameters.ToArray());
 
                     DbDataAdapter adapter = dbProviderFactory.CreateDataAdapter();
                     adapter.SelectCommand = cmd;
@@ -536,26 +704,26 @@ namespace Coldairarrow.DataRepository
         }
 
         /// <summary>
-        /// 通过sql返回List
+        /// 通过SQL获取List
         /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="sqlStr">sql语句</param>
+        /// <typeparam name="T">实体泛型</typeparam>
+        /// <param name="sqlStr">SQL语句</param>
         /// <returns></returns>
         public List<T> GetListBySql<T>(string sqlStr) where T : class, new()
         {
-            return GetDataTableWithSql(sqlStr).ToList<T>();
+            return GetListBySql<T>(sqlStr, new List<DbParameter>());
         }
 
         /// <summary>
-        /// 通过sql返回list
+        /// 通过SQL获取List
         /// </summary>
-        /// <typeparam name="T">实体类</typeparam>
-        /// <param name="sqlStr">sql语句</param>
-        /// <param name="parameters">参数</param>
+        /// <typeparam name="T">实体泛型</typeparam>
+        /// <param name="sqlStr">SQL语句</param>
+        /// <param name="parameters">SQL参数</param>
         /// <returns></returns>
         public List<T> GetListBySql<T>(string sqlStr, List<DbParameter> parameters) where T : class, new()
         {
-            return GetDataTableWithSql(sqlStr, parameters).ToList<T>();
+            return Db.Set<T>().FromSql(sqlStr, parameters.ToArray()).ToList();
         }
 
         #endregion
@@ -563,43 +731,67 @@ namespace Coldairarrow.DataRepository
         #region 执行Sql语句
 
         /// <summary>
-        /// 执行Sql语句
+        /// 执行SQL语句
         /// </summary>
-        /// <param name="sql">Sql语句</param>
-        public void ExecuteSql(string sql)
+        /// <param name="sql">SQL语句</param>
+        public int ExecuteSql(string sql)
         {
+            int count = Db.Database.ExecuteSqlCommand(sql);
+
             if (!_openedTransaction)
-            {
-                Db.Database.ExecuteSqlCommand(sql);
                 Dispose();
-            }
-            else
-            {
-                _sqlTransaction += new Action(() =>
-                {
-                    Db.Database.ExecuteSqlCommand(sql);
-                });
-            }
+
+            return count;
         }
 
         /// <summary>
-        /// 通过参数执行Sql语句
+        /// 执行SQL语句
         /// </summary>
-        /// <param name="sql">Sql语句</param>
-        public void ExecuteSql(string sql, List<DbParameter> parameters)
+        /// <param name="sql">SQL语句</param>
+        /// <param name="parameters">SQL参数</param>
+        public int ExecuteSql(string sql, List<DbParameter> parameters)
         {
+            int count = Db.Database.ExecuteSqlCommand(sql, parameters.ToArray());
+
             if (!_openedTransaction)
-            {
-                Db.Database.ExecuteSqlCommand(sql, parameters.ToArray());
                 Dispose();
-            }
-            else
+
+            return count;
+        }
+
+        #endregion
+
+        #region Dispose
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
+
+            if (disposing)
             {
-                _sqlTransaction += new Action(() =>
-                {
-                    Db.Database.ExecuteSqlCommand(sql, parameters.ToArray());
-                });
+                _transaction?.Dispose();
+                Db?.Dispose();
             }
+
+            _openedTransaction = false;
+            _transactionHandler = null;
+
+            _disposed = true;
+        }
+
+        ~DbRepository()
+        {
+            Dispose(false);
+        }
+
+        /// <summary>
+        /// 执行与释放或重置非托管资源关联的应用程序定义的任务。
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            //GC.SuppressFinalize(this);
         }
 
         #endregion

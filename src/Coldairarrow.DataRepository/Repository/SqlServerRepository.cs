@@ -1,5 +1,4 @@
 ﻿using Coldairarrow.Util;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
@@ -16,7 +15,7 @@ namespace Coldairarrow.DataRepository
         /// 构造函数
         /// </summary>
         public SqlServerRepository()
-            : base(null, DatabaseType.SqlServer, null)
+            : base(null, DatabaseType.SqlServer)
         {
         }
 
@@ -25,27 +24,17 @@ namespace Coldairarrow.DataRepository
         /// </summary>
         /// <param name="conStr">数据库连接名</param>
         public SqlServerRepository(string conStr)
-            : base(conStr, DatabaseType.SqlServer, null)
+            : base(conStr, DatabaseType.SqlServer)
         {
         }
 
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="conStr">数据库连接名</param>
-        /// <param name="entityNamespace">实体命名空间</param>
-        public SqlServerRepository(string conStr, string entityNamespace)
-            : base(conStr, DatabaseType.SqlServer, entityNamespace)
-        {
-        }
+        #endregion
 
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="dbContext">数据库连接上下文</param>
-        public SqlServerRepository(DbContext dbContext)
-            : base(dbContext, DatabaseType.SqlServer, null)
+        #region 私有成员
+
+        protected override string FormatFieldName(string name)
         {
+            return $"[{name}]";
         }
 
         #endregion
@@ -61,7 +50,7 @@ namespace Coldairarrow.DataRepository
         {
             using (SqlConnection conn = new SqlConnection())
             {
-                conn.ConnectionString = _connectionString;
+                conn.ConnectionString = ConnectionString;
                 if (conn.State != ConnectionState.Open)
                 {
                     conn.Open();

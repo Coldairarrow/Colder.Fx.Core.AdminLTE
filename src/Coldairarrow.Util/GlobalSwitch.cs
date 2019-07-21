@@ -43,7 +43,7 @@ namespace Coldairarrow.Util
         /// <summary>
         /// 网站文件根路径
         /// </summary>
-        public static string WebRootPath { get => AutofacHelper.GetService<IHostingEnvironment>().WebRootPath; }
+        public static string WebRootPath { get => AutofacHelper.GetScopeService<IHostingEnvironment>().WebRootPath; }
 
         #endregion
 
@@ -71,7 +71,7 @@ namespace Coldairarrow.Util
         /// <summary>
         /// Redis配置字符串
         /// </summary>
-        public static string RedisConfig { get; } = null /*"localhost:6379,password=123456"*/;
+        public static string RedisConfig { get; } = null /*"61.153.17.101:6379"*/;
 
         #endregion
 
@@ -79,6 +79,7 @@ namespace Coldairarrow.Util
 
         /// <summary>
         /// 日志记录方式
+        /// 注:可用位运算,LoggerType.RDBMS | LoggerType.File表示同时记录到数据库和文件
         /// </summary>
         public static LoggerType LoggerType { get; set; } = LoggerType.RDBMS;
 
@@ -86,6 +87,13 @@ namespace Coldairarrow.Util
         /// ElasticSearch服务器配置
         /// </summary>
         public static Uri[] ElasticSearchNodes { get; set; } = new Uri[] { new Uri("http://localhost:9200/") };
+
+        #endregion
+
+        #region 雪花Id配置
+
+        public static long DatacenterId { get => ConfigHelper.GetValue("DatacenterId").ToString().ToLong(); }
+        public static long WorkerId { get => ConfigHelper.GetValue("WorkerId").ToString().ToLong(); }
 
         #endregion
     }

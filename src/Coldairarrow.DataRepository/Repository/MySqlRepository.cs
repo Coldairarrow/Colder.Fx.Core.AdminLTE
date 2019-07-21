@@ -1,5 +1,4 @@
 ﻿using Coldairarrow.Util;
-using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
@@ -19,7 +18,7 @@ namespace Coldairarrow.DataRepository
         /// 构造函数
         /// </summary>
         public MySqlRepository()
-            : base(null, DatabaseType.MySql, null)
+            : base(null, DatabaseType.MySql)
         {
         }
 
@@ -28,30 +27,21 @@ namespace Coldairarrow.DataRepository
         /// </summary>
         /// <param name="conStr">数据库连接名</param>
         public MySqlRepository(string conStr)
-            : base(conStr, DatabaseType.MySql, null)
-        {
-        }
-
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="conStr">数据库连接名</param>
-        /// <param name="entityNamespace">实体命名空间</param>
-        public MySqlRepository(string conStr, string entityNamespace)
-            : base(conStr, DatabaseType.MySql, entityNamespace)
-        {
-        }
-
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="dbContext">数据库连接上下文</param>
-        public MySqlRepository(DbContext dbContext)
-            : base(dbContext, DatabaseType.MySql, null)
+            : base(conStr, DatabaseType.MySql)
         {
         }
 
         #endregion
+
+        #region 私有成员
+
+        protected override string FormatFieldName(string name)
+        {
+            return $"`{name}`";
+        }
+
+        #endregion
+
 
         #region 插入数据
 
@@ -65,7 +55,7 @@ namespace Coldairarrow.DataRepository
             DataTable dt = entities.ToDataTable();
             using (MySqlConnection conn=new MySqlConnection())
             {
-                conn.ConnectionString = _connectionString;
+                conn.ConnectionString = ConnectionString;
                 if (conn.State != ConnectionState.Open)
                 {
                     conn.Open();

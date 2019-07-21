@@ -20,6 +20,11 @@ namespace Coldairarrow.Entity.Base_SysManage
         public String Id { get; set; }
 
         /// <summary>
+        /// 日志级别
+        /// </summary>
+        public string Level { get; set; }
+
+        /// <summary>
         /// 日志类型
         /// </summary>
         [Keyword]
@@ -43,5 +48,9 @@ namespace Coldairarrow.Entity.Base_SysManage
         [Keyword]
         public DateTime? OpTime { get; set; }
 
+        /// <summary>
+        /// 数据备份（转为JSON字符串）
+        /// </summary>
+        public string Data { get; set; }
     }
 }

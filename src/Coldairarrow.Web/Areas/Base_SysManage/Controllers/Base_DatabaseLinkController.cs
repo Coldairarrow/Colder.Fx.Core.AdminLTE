@@ -2,14 +2,21 @@ using Coldairarrow.Business.Base_SysManage;
 using Coldairarrow.Entity.Base_SysManage;
 using Coldairarrow.Util;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
-namespace Coldairarrow.Web
+namespace Coldairarrow.Web.Areas.Base_SysManage.Controllers
 {
     [Area("Base_SysManage")]
     public class Base_DatabaseLinkController : BaseMvcController
     {
-        Base_DatabaseLinkBusiness _base_DatabaseLinkBusiness = new Base_DatabaseLinkBusiness();
+        #region DI
+
+        public Base_DatabaseLinkController(IBase_DatabaseLinkBusiness dbLinkBus)
+        {
+            _dbLinkBus = dbLinkBus;
+        }
+        IBase_DatabaseLinkBusiness _dbLinkBus { get; }
+
+        #endregion
 
         #region 视图功能
 
@@ -20,7 +27,7 @@ namespace Coldairarrow.Web
 
         public ActionResult Form(string id)
         {
-            var theData = id.IsNullOrEmpty() ? new Base_DatabaseLink() : _base_DatabaseLinkBusiness.GetTheData(id);
+            var theData = id.IsNullOrEmpty() ? new Base_DatabaseLink() : _dbLinkBus.GetTheData(id);
 
             return View(theData);
         }
@@ -29,17 +36,12 @@ namespace Coldairarrow.Web
 
         #region 获取数据
 
-        /// <summary>
-        /// 获取数据列表
-        /// </summary>
-        /// <param name="condition">查询类型</param>
-        /// <param name="keyword">关键字</param>
-        /// <returns></returns>
-        public ActionResult GetDataList(string condition, string keyword, Pagination pagination)
+        public ActionResult GetDataList()
         {
-            var dataList = _base_DatabaseLinkBusiness.GetDataList(condition, keyword, pagination);
+            Pagination pagination = new Pagination();
+            var dataList = _dbLinkBus.GetDataList(pagination);
 
-            return Content(pagination.BuildTableResult_DataGrid(dataList).ToJson());
+            return DataTable_Bootstrap(dataList, pagination);
         }
 
         #endregion
@@ -52,18 +54,19 @@ namespace Coldairarrow.Web
         /// <param name="theData">保存的数据</param>
         public ActionResult SaveData(Base_DatabaseLink theData)
         {
-            if(theData.Id.IsNullOrEmpty())
+            AjaxResult res;
+            if (theData.Id.IsNullOrEmpty())
             {
-                theData.Id = Guid.NewGuid().ToSequentialGuid();
+                theData.Id = IdHelper.GetId();
 
-                _base_DatabaseLinkBusiness.AddData(theData);
+                res = _dbLinkBus.AddData(theData);
             }
             else
             {
-                _base_DatabaseLinkBusiness.UpdateData(theData);
+                res = _dbLinkBus.UpdateData(theData);
             }
 
-            return Success();
+            return JsonContent(res.ToJson());
         }
 
         /// <summary>
@@ -72,9 +75,9 @@ namespace Coldairarrow.Web
         /// <param name="theData">删除的数据</param>
         public ActionResult DeleteData(string ids)
         {
-            _base_DatabaseLinkBusiness.DeleteData(ids.ToList<string>());
+            var res = _dbLinkBus.DeleteData(ids.ToList<string>());
 
-            return Success("删除成功！");
+            return JsonContent(res.ToJson());
         }
 
         #endregion

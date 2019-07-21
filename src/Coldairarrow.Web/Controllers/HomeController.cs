@@ -1,5 +1,5 @@
-﻿using Coldairarrow.Business.Base_SysManage;
-using Coldairarrow.Business.Common;
+﻿using Coldairarrow.Business;
+using Coldairarrow.Business.Base_SysManage;
 using Coldairarrow.Util;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,12 +7,14 @@ namespace Coldairarrow.Web
 {
     public class HomeController : BaseMvcController
     {
-        public HomeController(IHomebusiness homebus )
+        public HomeController(IHomeBusiness homeBus, IOperator @operator)
         {
-            _homeBus = homebus;
+            _homeBus = homeBus;
+            _operator = @operator;
         }
 
-        private IHomebusiness _homeBus { get; }
+        IHomeBusiness _homeBus { get; }
+        IOperator _operator { get; }
 
         #region 视图功能
 
@@ -24,24 +26,21 @@ namespace Coldairarrow.Web
         [IgnoreLogin]
         public ActionResult Login()
         {
-            if (Operator.Logged())
+            if (_operator.Logged())
             {
-
                 string loginUrl = Url.Content("~/");
-                string script = $@"    
-<html>
-    <script>
-        top.location.href = '{loginUrl}';
-    </script>
-</html>
-";
-                return Content(script, "text/html");
+                return Redirect(loginUrl);
             }
 
             return View();
         }
 
         public ActionResult Desktop()
+        {
+            return View();
+        }
+
+        public ActionResult Test()
         {
             return View();
         }
@@ -67,7 +66,7 @@ namespace Coldairarrow.Web
         /// </summary>
         public ActionResult Logout()
         {
-            Operator.Logout();
+            _operator.Logout();
 
             return Success("注销成功！");
         }

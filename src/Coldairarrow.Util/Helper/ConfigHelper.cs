@@ -10,7 +10,15 @@ namespace Coldairarrow.Util
     {
         static ConfigHelper()
         {
-            IConfiguration config = AutofacHelper.GetService<IConfiguration>();
+            IConfiguration config = null;
+            try
+            {
+                config = AutofacHelper.GetScopeService<IConfiguration>();
+            }
+            catch
+            {
+
+            }
             if (config == null)
             {
                 var builder = new ConfigurationBuilder()

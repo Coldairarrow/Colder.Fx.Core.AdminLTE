@@ -8,20 +8,14 @@ namespace Coldairarrow.Entity.Base_SysManage
     /// 系统，用户表
     /// </summary>
     [Table("Base_User")]
-    [Serializable]
     public class Base_User
     {
 
         /// <summary>
-        /// 代理主键
+        /// 用户Id
         /// </summary>
-        [Key]
+        [Key, Column(Order = 1)]
         public String Id { get; set; }
-
-        /// <summary>
-        /// 用户Id,逻辑主键
-        /// </summary>
-        public String UserId { get; set; }
 
         /// <summary>
         /// 用户名
@@ -47,5 +41,10 @@ namespace Coldairarrow.Entity.Base_SysManage
         /// 出生日期
         /// </summary>
         public DateTime? Birthday { get; set; }
+
+        /// <summary>
+        /// 所属部门Id
+        /// </summary>
+        public string DepartmentId { get; set; }
     }
 }

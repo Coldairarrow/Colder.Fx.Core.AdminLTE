@@ -1,105 +1,211 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
+﻿using Coldairarrow.Util;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
 using System.Linq;
-using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Coldairarrow.DataRepository
 {
     /// <summary>
     /// 数据库分布式事务,跨库事务
     /// </summary>
-    public class DistributedTransaction
+    public class DistributedTransaction : ITransaction, IDisposable
     {
         #region 构造函数
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="one">第一个数据仓储</param>
-        /// <param name="two">第二个数据仓储</param>
-        /// <param name="others">其它数据仓储</param>
-        public DistributedTransaction(IRepository one, IRepository two, params IRepository[] others)
+        /// <param name="repositories">其它数据仓储</param>
+        public DistributedTransaction(params IRepository[] repositories)
         {
-            if (one == null || two == null)
-                throw new Exception("参数不能为null!");
+            if (repositories == null)
+                throw new Exception("repositories不能为NULL");
 
-            _repositorys = others.Concat(new IRepository[] { one, two }).Distinct().ToList();
+            if (repositories.Length > 0)
+            {
+                repositories.ForEach(aRepository =>
+                {
+                    if (!_repositorys.Contains(aRepository))
+                        _repositorys.Add(aRepository);
+                });
+            }
         }
 
         #endregion
 
         #region 内部成员
 
-        private Dictionary<IRepository, bool?> _successDic { get; } = new Dictionary<IRepository, bool?>();
-        private List<IRepository> _repositorys { get; }
-        private void SetProperty(object obj, string propertyName, object value)
+        private IsolationLevel? _isolationLevel { get; set; }
+        private ConcurrentDictionary<string, DbTransaction> _transactionMap { get; } 
+            = new ConcurrentDictionary<string, DbTransaction>();
+        private string GetRepositoryId(IRepository repository)
         {
-            obj.GetType().GetProperty(propertyName, BindingFlags.NonPublic | BindingFlags.Instance).SetValue(obj, value);
+            return $"{repository.DbType.ToString()}{repository.ConnectionString}";
         }
-        private object GetProperty(object obj, string propertyName)
+        private SynchronizedCollection<IRepository> _repositorys { get; set; } 
+            = new SynchronizedCollection<IRepository>();
+        private object _lock { get; } = new object();
+        private void _BeginTransaction(params IRepository[] repositorys)
         {
-            return obj.GetType().GetProperty(propertyName, BindingFlags.NonPublic | BindingFlags.Instance).GetValue(obj);
+            List<Task> tasks = new List<Task>();
+
+            repositorys.ForEach(x =>
+            {
+                Begin(x);
+            });
+
+            void Begin(IRepository db)
+            {
+                lock (_lock)
+                {
+                    //同一个数据库共享同一个事物
+                    string id = GetRepositoryId(db);
+                    if (_transactionMap.ContainsKey(id))
+                        db.UseTransaction(_transactionMap[id]);
+                    else
+                    {
+                        if (_isolationLevel == null)
+                            db.BeginTransaction();
+                        else
+                            db.BeginTransaction(_isolationLevel.Value);
+
+                        _transactionMap[id] = db.GetTransaction();
+                    }
+                }
+            }
         }
 
         #endregion
 
         #region 外部接口
 
-        /// <summary>
-        /// 开始事务
-        /// </summary>
-        public void BeginTransaction()
+        public void AddRepository(params IRepository[] repositories)
         {
-            _repositorys.ForEach(aRepository =>
+            List<IRepository> needBeginList = new List<IRepository>();
+            if (repositories.Length > 0)
             {
-                _successDic.Add(aRepository, null);
-                (aRepository as DbRepository).BeginTransaction();
-                SetProperty(aRepository, "_openedTransaction", true);
-            });
+                repositories.ForEach(aRepository =>
+                {
+                    if (!_repositorys.Contains(aRepository))
+                    {
+                        _repositorys.Add(aRepository);
+                        needBeginList.Add(aRepository);
+                    }
+                });
+            }
+
+            _BeginTransaction(needBeginList.ToArray());
         }
 
         /// <summary>
-        /// 结束事务
+        /// 开始事物
         /// </summary>
-        /// <returns>是否成功完成</returns>
-        public bool EndTransaction()
+        public ITransaction BeginTransaction()
         {
+            _BeginTransaction(_repositorys.ToArray());
+
+            return this;
+        }
+
+        /// <summary>
+        /// 开始事物
+        /// 注:自定义事物级别
+        /// </summary>
+        /// <param name="isolationLevel">事物级别</param>
+        public ITransaction BeginTransaction(IsolationLevel isolationLevel)
+        {
+            _isolationLevel = isolationLevel;
+            _BeginTransaction(_repositorys.ToArray());
+
+            return this;
+        }
+
+        /// <summary>
+        /// 结束事物
+        /// </summary>
+        /// <returns></returns>
+        public (bool Success, Exception ex) EndTransaction()
+        {
+            if (_repositorys.Count == 0)
+                throw new Exception("IRepository数量不能为0");
+
             bool isOK = true;
-            foreach (var aRepository in _repositorys)
+            Exception resEx = null;
+            try
             {
-                try
-                {
-                    aRepository.GetDbContext().SaveChanges();
-                    Action _sqlTransaction = GetProperty(aRepository, "_sqlTransaction") as Action;
-                    _sqlTransaction?.Invoke();
-                    _successDic[aRepository] = true;
-                }
-                catch
-                {
-                    _successDic[aRepository] = false;
-                    isOK = false;
-                    break;
-                }
+                CommitDb();
+                CommitTransaction();
+            }
+            catch (Exception ex)
+            {
+                RollbackTransaction();
+                isOK = false;
+                resEx = ex;
+            }
+            finally
+            {
+                Dispose();
             }
 
-            _repositorys.ForEach(aRepository =>
+            return (isOK, resEx);
+        }
+
+        public void CommitDb()
+        {
+            _repositorys.ForEach(x => x.CommitDb());
+        }
+
+        /// <summary>
+        /// 提交事物
+        /// </summary>
+        public void CommitTransaction()
+        {
+            _transactionMap.Values.ForEach(x => x.Commit());
+        }
+
+        /// <summary>
+        /// 回滚事物
+        /// </summary>
+        public void RollbackTransaction()
+        {
+            _transactionMap.Values.ForEach(x => x.Rollback());
+        }
+
+        #endregion
+
+        #region Dispose
+
+        public bool Disposed { get; set; } = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (Disposed)
+                return;
+
+            if (disposing)
             {
-                var transaction = GetProperty(aRepository, "Transaction") as IDbContextTransaction;
-                bool? success = _successDic[aRepository];
-                if (isOK)
-                    transaction.Commit();
-                else
-                {
-                    if (success != null)
-                        transaction.Rollback();
-                }
+                _repositorys.ForEach(x => x.Dispose());
+            }
 
-                //释放初始化
-                aRepository.GetType().GetMethod("Dispose", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(aRepository, null);
-            });
+            Disposed = true;
+        }
 
-            return isOK;
+        ~DistributedTransaction()
+        {
+            Dispose(false);
+        }
+
+        /// <summary>
+        /// 执行与释放或重置非托管资源关联的应用程序定义的任务。
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         #endregion

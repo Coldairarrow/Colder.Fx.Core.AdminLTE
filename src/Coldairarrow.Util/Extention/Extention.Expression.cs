@@ -290,6 +290,25 @@ namespace Coldairarrow.Util
 
         #endregion
 
+        /// <summary>
+        /// 获取表达式中的固定值
+        /// </summary>
+        /// <param name="expression">表达式</param>
+        /// <returns></returns>
+        public static object GetConstantValue(this Expression expression)
+        {
+            var visitor = new GetConstantValueVisitor();
+            visitor.Visit(expression);
+            return visitor.ConstantValue;
+        }
+
+        public static object GetMemberValue(this Expression expression)
+        {
+            var visitor = new GetMemberValueVisitor();
+            visitor.Visit(expression);
+            return visitor.Value;
+        }
+
         #region 私有成员
 
         private static Expression<TDelegate> GetExtendSelectExpre<TBase, TResult, TDelegate>(Expression<TDelegate> expression)
@@ -352,6 +371,43 @@ namespace Coldairarrow.Util
         protected override Expression VisitParameter(ParameterExpression p)
         {
             return Parameter;
+        }
+    }
+
+    class GetConstantValueVisitor : ExpressionVisitor
+    {
+        public object ConstantValue { get; set; }
+        protected override Expression VisitConstant(ConstantExpression node)
+        {
+            ConstantValue = node.Value;
+
+            return base.VisitConstant(node);
+        }
+    }
+
+    class GetMemberValueVisitor : ExpressionVisitor
+    {
+        public object Value { get; set; }
+        protected override Expression VisitMember(MemberExpression node)
+        {
+            //静态成员
+            if (node.Expression == null)
+            {
+                if (node.Member.MemberType == MemberTypes.Property)
+                    Value = node.Type.GetProperty(node.Member.Name, BindingFlags.Static | BindingFlags.Public)?.GetValue(null);
+                else if (node.Member.MemberType == MemberTypes.Field)
+                    Value = node.Type.GetField(node.Member.Name, BindingFlags.Static | BindingFlags.Public)?.GetValue(null);
+            }
+            else//对象成员
+            {
+                var obj = (node.Expression as ConstantExpression).Value;
+                if (obj.ContainsField(node.Member.Name))
+                    Value = obj.GetGetFieldValue(node.Member.Name);
+                else if (obj.ContainsProperty(node.Member.Name))
+                    Value = obj.GetPropertyValue(node.Member.Name);
+            }
+
+            return base.VisitMember(node);
         }
     }
 }
