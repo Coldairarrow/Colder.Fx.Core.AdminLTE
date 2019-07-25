@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata.Conventions;
+using Oracle.EntityFrameworkCore.Metadata.Conventions;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -108,6 +109,7 @@ namespace Coldairarrow.DataRepository
                     case DatabaseType.SqlServer: conventionSet = SqlServerConventionSetBuilder.Build(); break;
                     case DatabaseType.MySql: conventionSet = MySqlConventionSetBuilder.Build(); break;
                     case DatabaseType.PostgreSql: conventionSet = NpgsqlConventionSetBuilder.Build(); break;
+                    case DatabaseType.Oracle: conventionSet = OracleConventionSetBuilder.Build(); break;
                     default: throw new Exception("暂不支持该数据库!");
                 }
                 ModelBuilder modelBuilder = new ModelBuilder(conventionSet);

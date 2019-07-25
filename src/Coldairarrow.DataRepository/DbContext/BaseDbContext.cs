@@ -27,6 +27,7 @@ namespace Coldairarrow.DataRepository
                 case DatabaseType.SqlServer: optionsBuilder.UseSqlServer(_dbConnection, x => x.UseRowNumberForPaging()); break;
                 case DatabaseType.MySql: optionsBuilder.UseMySql(_dbConnection); break;
                 case DatabaseType.PostgreSql: optionsBuilder.UseNpgsql(_dbConnection); break;
+                case DatabaseType.Oracle: optionsBuilder.UseOracle(_dbConnection, x => x.UseOracleSQLCompatibility("11")); break;
                 default: throw new Exception("暂不支持该数据库！");
             }
             optionsBuilder.EnableSensitiveDataLogging();

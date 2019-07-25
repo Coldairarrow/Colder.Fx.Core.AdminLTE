@@ -1,10 +1,10 @@
 ﻿using MySql.Data.MySqlClient;
+using Npgsql;
+using Oracle.ManagedDataAccess.Client;
 using System;
-using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
-using Npgsql;
 
 namespace Coldairarrow.Util
 {
@@ -13,24 +13,6 @@ namespace Coldairarrow.Util
     /// </summary>
     public class DbProviderFactoryHelper
     {
-        #region 构造函数
-
-        static DbProviderFactoryHelper()
-        {
-            _invariantNames.Add(DatabaseType.SqlServer, "System.Data.SqlClient");
-            _invariantNames.Add(DatabaseType.MySql, "MySql.Data.MySqlClient");
-            _invariantNames.Add(DatabaseType.Oracle, "Oracle.DataAccess.Client");
-            _invariantNames.Add(DatabaseType.PostgreSql, "Npgsql");
-        }
-
-        #endregion
-
-        #region 私有成员
-
-        private static Dictionary<DatabaseType, string> _invariantNames { get; } = new Dictionary<DatabaseType, string>();
-
-        #endregion
-
         #region 外部接口
 
         /// <summary>
@@ -46,7 +28,8 @@ namespace Coldairarrow.Util
                 case DatabaseType.SqlServer: factory = SqlClientFactory.Instance; break;
                 case DatabaseType.MySql: factory = MySqlClientFactory.Instance; break;
                 case DatabaseType.PostgreSql: factory = NpgsqlFactory.Instance; break;
-                case DatabaseType.Oracle: throw new Exception("暂不支持Oracle数据库");
+                case DatabaseType.Oracle: factory = OracleClientFactory.Instance; break;
+
                 default: throw new Exception("请传入有效的数据库！");
             }
 

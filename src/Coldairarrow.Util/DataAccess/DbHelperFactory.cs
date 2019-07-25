@@ -12,6 +12,7 @@
             _container.RegisterType<DbHelper, SqlServerHelper>(DatabaseType.SqlServer.ToString());
             _container.RegisterType<DbHelper, MySqlHelper>(DatabaseType.MySql.ToString());
             _container.RegisterType<DbHelper, PostgreSqlHelper>(DatabaseType.PostgreSql.ToString());
+            _container.RegisterType<DbHelper, OracleHelper>(DatabaseType.Oracle.ToString());
         }
 
         private static IocHelper _container { get; }

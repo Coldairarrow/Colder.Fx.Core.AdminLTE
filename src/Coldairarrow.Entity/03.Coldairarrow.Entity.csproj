@@ -25,6 +25,7 @@
     <PackageReference Include="NEST" Version="6.5.0" />
     <PackageReference Include="Npgsql" Version="4.0.7" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.2.4" />
+    <PackageReference Include="Oracle.EntityFrameworkCore" Version="2.19.30" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.2.0" />
   </ItemGroup>
 

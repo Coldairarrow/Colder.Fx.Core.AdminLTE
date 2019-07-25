@@ -57,6 +57,10 @@ namespace Coldairarrow.Console1
             var db = DbFactory.GetRepository();
             db.HandleSqlLog = Console.WriteLine;
 
+            var dbHelper = DbHelperFactory.GetDbHelper(DatabaseType.Oracle, "BaseDb");
+
+            var list = dbHelper.GetDbTableInfo("Dev_Project");
+
             Console.WriteLine("完成");
             Console.ReadLine();
         }
