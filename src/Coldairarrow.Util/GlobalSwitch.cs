@@ -29,7 +29,7 @@ namespace Coldairarrow.Util
         /// <summary>
         /// 网站根地址
         /// </summary>
-        public static string WebRootUrl { get; set; } = "http://localhost:51126";
+        public static string WebRootUrl { get; set; } = "http://localhost:50000";
 
         #endregion
 
@@ -52,7 +52,7 @@ namespace Coldairarrow.Util
         /// <summary>
         /// 默认数据库类型
         /// </summary>
-        public static DatabaseType DatabaseType { get; } = DatabaseType.Oracle;
+        public static DatabaseType DatabaseType { get; } = DatabaseType.SqlServer;
 
         /// <summary>
         /// 默认数据库连接名

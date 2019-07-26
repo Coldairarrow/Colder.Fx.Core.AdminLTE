@@ -2,16 +2,16 @@
 Navicat Oracle Data Transfer
 Oracle Client Version : 10.2.0.5.0
 
-Source Server         : .Oracle
+Source Server         : .@SYSTEM
 Source Server Version : 110200
 Source Host           : 127.0.0.1:1521
-Source Schema         : Colder.Fx.Net.AdminLTE
+Source Schema         : COLDER.FX.CORE.ADMINLTE
 
 Target Server Type    : ORACLE
 Target Server Version : 110200
 File Encoding         : 65001
 
-Date: 2019-06-15 21:34:12
+Date: 2019-07-26 10:17:32
 */
 
 
@@ -65,6 +65,7 @@ COMMENT ON COLUMN "Base_DatabaseLink"."SortNum" IS '排序编号';
 -- ----------------------------
 -- Records of Base_DatabaseLink
 -- ----------------------------
+INSERT INTO "Base_DatabaseLink" VALUES ('1154570454057488384', 'Oracle', 'Data Source=127.0.0.1/XE;User ID=COLDER.FX.CORE.ADMINLTE;Password=123456;Connect Timeout=3', 'Oracle', 'aa');
 INSERT INTO "Base_DatabaseLink" VALUES ('039e900bc6bbb-a0070d5c-1fc7-4cf0-a177-e3aebc4633c5', 'SqlServer', 'Data Source=.;Initial Catalog=Colder.Fx.Net.AdminLTE;Integrated Security=True', 'SqlServer', 'aa');
 
 -- ----------------------------
@@ -135,11 +136,16 @@ COMMENT ON COLUMN "Base_PermissionRole"."PermissionValue" IS '权限值';
 -- ----------------------------
 -- Records of Base_PermissionRole
 -- ----------------------------
-INSERT INTO "Base_PermissionRole" VALUES ('1139819691020259328', '1133011663516209152', 'sysuser.search');
-INSERT INTO "Base_PermissionRole" VALUES ('1139819691020259329', '1133011663516209152', 'sysrole.search');
-INSERT INTO "Base_PermissionRole" VALUES ('1139819691020259330', '1133011663516209152', 'department.search');
-INSERT INTO "Base_PermissionRole" VALUES ('1139819691020259331', '1133011663516209152', 'appsecret.search');
-INSERT INTO "Base_PermissionRole" VALUES ('1139819691020259332', '1133011663516209152', 'sysLog.search');
+INSERT INTO "Base_PermissionRole" VALUES ('1150651336300302336', '1133011663516209152', 'sysuser.search');
+INSERT INTO "Base_PermissionRole" VALUES ('1150651336300302337', '1133011663516209152', 'sysuser.manage');
+INSERT INTO "Base_PermissionRole" VALUES ('1150651336300302338', '1133011663516209152', 'sysuser.manageSysPermission');
+INSERT INTO "Base_PermissionRole" VALUES ('1150651336300302339', '1133011663516209152', 'sysrole.search');
+INSERT INTO "Base_PermissionRole" VALUES ('1150651336300302340', '1133011663516209152', 'department.search');
+INSERT INTO "Base_PermissionRole" VALUES ('1150651336300302341', '1133011663516209152', 'appsecret.search');
+INSERT INTO "Base_PermissionRole" VALUES ('1150651336300302342', '1133011663516209152', 'sysLog.search');
+INSERT INTO "Base_PermissionRole" VALUES ('1150666398465396736', '1150666215103008768', 'sysuser.search');
+INSERT INTO "Base_PermissionRole" VALUES ('1150666398465396737', '1150666215103008768', 'sysuser.manage');
+INSERT INTO "Base_PermissionRole" VALUES ('1150666398465396738', '1150666215103008768', 'sysuser.manageSysPermission');
 
 -- ----------------------------
 -- Table structure for Base_PermissionUser
@@ -169,12 +175,12 @@ INSERT INTO "Base_PermissionUser" VALUES ('1133345814723301376', '11333455457467
 -- ----------------------------
 CREATE TABLE "Base_SysLog" (
 "Id" VARCHAR2(50 CHAR) NOT NULL ,
-"LogType" VARCHAR2(255 CHAR) NULL ,
+"Level" VARCHAR2(200 CHAR) NULL ,
+"LogType" VARCHAR2(50 CHAR) NULL ,
 "LogContent" CLOB NULL ,
-"OpUserName" VARCHAR2(255 CHAR) NULL ,
+"OpUserName" VARCHAR2(50 CHAR) NULL ,
 "OpTime" DATE NULL ,
-"Data" CLOB NULL ,
-"Level" VARCHAR2(50 CHAR) NULL ,
+"Data" NCLOB NULL 
 )
 LOGGING
 NOCOMPRESS
@@ -182,13 +188,13 @@ NOCACHE
 
 ;
 COMMENT ON TABLE "Base_SysLog" IS '系统日志表';
-COMMENT ON COLUMN "Base_SysLog"."Id" IS '代理主键';
+COMMENT ON COLUMN "Base_SysLog"."Id" IS '自然主键';
+COMMENT ON COLUMN "Base_SysLog"."Level" IS '日志级别';
 COMMENT ON COLUMN "Base_SysLog"."LogType" IS '日志类型';
 COMMENT ON COLUMN "Base_SysLog"."LogContent" IS '日志内容';
 COMMENT ON COLUMN "Base_SysLog"."OpUserName" IS '操作员用户名';
 COMMENT ON COLUMN "Base_SysLog"."OpTime" IS '日志记录时间';
-COMMENT ON COLUMN "Base_SysLog"."Data" IS '数据备份';
-COMMENT ON COLUMN "Base_SysLog"."Level" IS '日志级别';
+COMMENT ON COLUMN "Base_SysLog"."Data" IS '数据备份（转为JSON字符串）';
 
 -- ----------------------------
 -- Records of Base_SysLog
@@ -215,6 +221,7 @@ COMMENT ON COLUMN "Base_SysRole"."RoleName" IS '角色名';
 -- ----------------------------
 INSERT INTO "Base_SysRole" VALUES ('1133011623854870528', '超级管理员');
 INSERT INTO "Base_SysRole" VALUES ('1133011663516209152', '部门管理员');
+INSERT INTO "Base_SysRole" VALUES ('1150666215103008768', '编辑部');
 
 -- ----------------------------
 -- Table structure for Base_UnitTest
@@ -236,9 +243,6 @@ COMMENT ON COLUMN "Base_UnitTest"."Id" IS '代理主键';
 -- ----------------------------
 -- Records of Base_UnitTest
 -- ----------------------------
-INSERT INTO "Base_UnitTest" VALUES ('10', null, null, null);
-INSERT INTO "Base_UnitTest" VALUES ('1139855817357529088', '1139855817357529089', '超级管理员', '22');
-INSERT INTO "Base_UnitTest" VALUES ('6a1230b5-43fa-4d4c-8c3e-59f8e10d89a1', 'Admin', '超级管理员', '22');
 
 -- ----------------------------
 -- Table structure for Base_User
@@ -269,8 +273,8 @@ COMMENT ON COLUMN "Base_User"."DepartmentId" IS '所属部门Id';
 -- ----------------------------
 -- Records of Base_User
 -- ----------------------------
-INSERT INTO "Base_User" VALUES ('1133345545746780160', 'xiaoming', 'e10adc3949ba59abbe56e057f20f883e', 'xiaoming', '1', null, '1139811435694657536');
-INSERT INTO "Base_User" VALUES ('Admin', 'Admin', 'e10adc3949ba59abbe56e057f20f883e', '超级管理员', '1', TO_DATE('2017-12-15 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), '1139811378824089600');
+INSERT INTO "Base_User" VALUES ('1133345545746780160', '小王', 'e10adc3949ba59abbe56e057f20f883e', 'xiaoming', '1', TO_DATE('2019-07-04 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), '1139811435694657536');
+INSERT INTO "Base_User" VALUES ('Admin', 'Admin', 'e10adc3949ba59abbe56e057f20f883e', '超级管理员', '100', TO_DATE('2017-12-15 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), '1139811378824089600');
 
 -- ----------------------------
 -- Table structure for Base_UserRoleMap
@@ -296,8 +300,8 @@ INSERT INTO "Base_UserRoleMap" VALUES ('1139822682855051264', '11333455457467801
 -- ----------------------------
 CREATE TABLE "Dev_Project" (
 "Id" VARCHAR2(50 CHAR) NOT NULL ,
-"ProjectId" VARCHAR2(50 CHAR) NOT NULL ,
-"ProjectName" VARCHAR2(255 CHAR) NOT NULL ,
+"ProjectId" VARCHAR2(50 CHAR) NULL ,
+"ProjectName" VARCHAR2(255 CHAR) NULL ,
 "ProjectTypeId" VARCHAR2(50 CHAR) NULL ,
 "ProjectManagerId" VARCHAR2(50 CHAR) NULL 
 )
@@ -316,7 +320,6 @@ COMMENT ON COLUMN "Dev_Project"."ProjectManagerId" IS '项目经理Id';
 -- ----------------------------
 -- Records of Dev_Project
 -- ----------------------------
-INSERT INTO "Dev_Project" VALUES ('039e943dea9f4-30e0e19b-828e-4938-98b6-da3941987925', 'asdsa', '厉害了', '5645646', 'zxzx');
 
 -- ----------------------------
 -- Table structure for Dev_ProjectType
@@ -349,7 +352,6 @@ INSERT INTO "Dev_ProjectType" VALUES ('1133722179070988288', 'sadsa', 'sdsadasds
 -- Checks structure for table Base_AppSecret
 -- ----------------------------
 ALTER TABLE "Base_AppSecret" ADD CHECK ("Id" IS NOT NULL);
-ALTER TABLE "Base_AppSecret" ADD CHECK ("Id" IS NOT NULL);
 
 -- ----------------------------
 -- Primary Key structure for table Base_AppSecret
@@ -363,7 +365,6 @@ ALTER TABLE "Base_AppSecret" ADD PRIMARY KEY ("Id");
 -- ----------------------------
 -- Checks structure for table Base_DatabaseLink
 -- ----------------------------
-ALTER TABLE "Base_DatabaseLink" ADD CHECK ("Id" IS NOT NULL);
 ALTER TABLE "Base_DatabaseLink" ADD CHECK ("Id" IS NOT NULL);
 
 -- ----------------------------
@@ -379,7 +380,6 @@ ALTER TABLE "Base_DatabaseLink" ADD PRIMARY KEY ("Id");
 -- Checks structure for table Base_Department
 -- ----------------------------
 ALTER TABLE "Base_Department" ADD CHECK ("Id" IS NOT NULL);
-ALTER TABLE "Base_Department" ADD CHECK ("Id" IS NOT NULL);
 
 -- ----------------------------
 -- Primary Key structure for table Base_Department
@@ -393,7 +393,6 @@ ALTER TABLE "Base_Department" ADD PRIMARY KEY ("Id");
 -- ----------------------------
 -- Checks structure for table Base_PermissionAppId
 -- ----------------------------
-ALTER TABLE "Base_PermissionAppId" ADD CHECK ("Id" IS NOT NULL);
 ALTER TABLE "Base_PermissionAppId" ADD CHECK ("Id" IS NOT NULL);
 
 -- ----------------------------
@@ -409,7 +408,6 @@ ALTER TABLE "Base_PermissionAppId" ADD PRIMARY KEY ("Id");
 -- Checks structure for table Base_PermissionRole
 -- ----------------------------
 ALTER TABLE "Base_PermissionRole" ADD CHECK ("Id" IS NOT NULL);
-ALTER TABLE "Base_PermissionRole" ADD CHECK ("Id" IS NOT NULL);
 
 -- ----------------------------
 -- Primary Key structure for table Base_PermissionRole
@@ -423,7 +421,6 @@ ALTER TABLE "Base_PermissionRole" ADD PRIMARY KEY ("Id");
 -- ----------------------------
 -- Checks structure for table Base_PermissionUser
 -- ----------------------------
-ALTER TABLE "Base_PermissionUser" ADD CHECK ("Id" IS NOT NULL);
 ALTER TABLE "Base_PermissionUser" ADD CHECK ("Id" IS NOT NULL);
 
 -- ----------------------------
@@ -439,7 +436,6 @@ ALTER TABLE "Base_PermissionUser" ADD PRIMARY KEY ("Id");
 -- Checks structure for table Base_SysLog
 -- ----------------------------
 ALTER TABLE "Base_SysLog" ADD CHECK ("Id" IS NOT NULL);
-ALTER TABLE "Base_SysLog" ADD CHECK ("Id" IS NOT NULL);
 
 -- ----------------------------
 -- Primary Key structure for table Base_SysLog
@@ -453,7 +449,6 @@ ALTER TABLE "Base_SysLog" ADD PRIMARY KEY ("Id");
 -- ----------------------------
 -- Checks structure for table Base_SysRole
 -- ----------------------------
-ALTER TABLE "Base_SysRole" ADD CHECK ("Id" IS NOT NULL);
 ALTER TABLE "Base_SysRole" ADD CHECK ("Id" IS NOT NULL);
 
 -- ----------------------------
@@ -474,7 +469,6 @@ ALTER TABLE "Base_UnitTest" ADD UNIQUE ("UserId");
 -- Checks structure for table Base_UnitTest
 -- ----------------------------
 ALTER TABLE "Base_UnitTest" ADD CHECK ("Id" IS NOT NULL);
-ALTER TABLE "Base_UnitTest" ADD CHECK ("Id" IS NOT NULL);
 
 -- ----------------------------
 -- Primary Key structure for table Base_UnitTest
@@ -488,7 +482,6 @@ ALTER TABLE "Base_UnitTest" ADD PRIMARY KEY ("Id");
 -- ----------------------------
 -- Checks structure for table Base_User
 -- ----------------------------
-ALTER TABLE "Base_User" ADD CHECK ("Id" IS NOT NULL);
 ALTER TABLE "Base_User" ADD CHECK ("Id" IS NOT NULL);
 
 -- ----------------------------
@@ -504,7 +497,6 @@ ALTER TABLE "Base_User" ADD PRIMARY KEY ("Id");
 -- Checks structure for table Base_UserRoleMap
 -- ----------------------------
 ALTER TABLE "Base_UserRoleMap" ADD CHECK ("Id" IS NOT NULL);
-ALTER TABLE "Base_UserRoleMap" ADD CHECK ("Id" IS NOT NULL);
 
 -- ----------------------------
 -- Primary Key structure for table Base_UserRoleMap
@@ -519,11 +511,6 @@ ALTER TABLE "Base_UserRoleMap" ADD PRIMARY KEY ("Id");
 -- Checks structure for table Dev_Project
 -- ----------------------------
 ALTER TABLE "Dev_Project" ADD CHECK ("Id" IS NOT NULL);
-ALTER TABLE "Dev_Project" ADD CHECK ("ProjectId" IS NOT NULL);
-ALTER TABLE "Dev_Project" ADD CHECK ("ProjectName" IS NOT NULL);
-ALTER TABLE "Dev_Project" ADD CHECK ("Id" IS NOT NULL);
-ALTER TABLE "Dev_Project" ADD CHECK ("ProjectId" IS NOT NULL);
-ALTER TABLE "Dev_Project" ADD CHECK ("ProjectName" IS NOT NULL);
 
 -- ----------------------------
 -- Primary Key structure for table Dev_Project
@@ -537,7 +524,6 @@ ALTER TABLE "Dev_Project" ADD PRIMARY KEY ("Id");
 -- ----------------------------
 -- Checks structure for table Dev_ProjectType
 -- ----------------------------
-ALTER TABLE "Dev_ProjectType" ADD CHECK ("Id" IS NOT NULL);
 ALTER TABLE "Dev_ProjectType" ADD CHECK ("Id" IS NOT NULL);
 
 -- ----------------------------
