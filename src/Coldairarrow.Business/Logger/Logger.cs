@@ -1,5 +1,6 @@
 ﻿using Coldairarrow.Util;
 using System;
+using System.IO;
 
 namespace Coldairarrow.Business
 {
@@ -30,7 +31,7 @@ namespace Coldairarrow.Business
                 {
                     Name = LoggerConfig.LoggerName,
                     Layout = layout,
-                    FileName= $"${{basedir}}/A_logs/{DateTime.Now.ToString("yyyy-MM")}/{DateTime.Now.ToString("yyyy-MM-dd")}.txt"
+                    FileName = Path.Combine(Directory.GetCurrentDirectory(), "logs", DateTime.Now.ToString("yyyy-MM"), $"{DateTime.Now.ToString("yyyy-MM-dd")}.txt")
                 });
             }
 
