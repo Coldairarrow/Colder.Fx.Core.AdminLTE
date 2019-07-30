@@ -62,19 +62,10 @@ namespace Coldairarrow.Util
         /// <returns></returns>
         public override List<DbTableInfo> GetDbAllTables(string schemaName = null)
         {
-            DbProviderFactory dbProviderFactory = DbProviderFactoryHelper.GetDbProviderFactory(_dbType);
-            string dbName = string.Empty;
-            OracleConnectionStringBuilder builder = new OracleConnectionStringBuilder(_conStr);
-            dbName = builder.UserID;
-            if (schemaName.IsNullOrEmpty())
-                schemaName = dbName;
-
-            string sql = @"select 
-	TABLE_NAME as ""TableName"",
-	COMMENTS as ""Description""
-from all_tab_comments 
-where owner =:schemaName";
-            return GetListBySql<DbTableInfo>(sql, new List<DbParameter> { new OracleParameter("schemaName", schemaName) });
+            string sql = @"SELECT A.TABLE_NAME AS TABLENAME, B.comments AS DESCRIPTION
+  FROM USER_TABLES A, USER_TAB_COMMENTS B
+ WHERE A.table_name = B.table_name(+)";
+            return GetListBySql<DbTableInfo>(sql);
         }
 
         /// <summary>
@@ -84,23 +75,22 @@ where owner =:schemaName";
         /// <returns></returns>
         public override List<TableInfo> GetDbTableInfo(string tableName)
         {
-            string sql = @"select
-       a.COLUMN_NAME as ""Name"",
-       a.DATA_TYPE as ""Type"",
-       case when a.nullable = 'N' then  0 else 1 end as ""IsNullable"",
-       b.comments as ""Description"", 
-       case
-          when (select count(*) from all_cons_columns c 
-            where c.table_name=a.TABLE_NAME and c.column_name=a.COLUMN_NAME and c.constraint_name=
-                (select d.constraint_name from all_constraints d where d.table_name=c.table_name and d.constraint_type   ='P')
-                 )>0 then 1 else 0 end as ""IsKey""
-            
-  from All_TAB_COLS a,
-       all_col_comments b
- where a.table_name = b.table_name      
-       and b.COLUMN_NAME = a.COLUMN_NAME   and a.table_name = :tableName
-       order by a.TABLE_NAME, a.COLUMN_ID";
-            return GetListBySql<TableInfo>(sql, new List<DbParameter> { new OracleParameter("table_name", tableName) });
+            string sql = @"
+SELECT A.COLUMN_NAME AS NAME,
+       A.DATA_TYPE   AS TYPE,
+       NVL2(D.CONSTRAINT_TYPE,1,0) AS ISKEY,
+       DECODE(A.NULLABLE,'Y',1,0) AS ISNULLABLE,
+       B.COMMENTS AS DESCRIPTION
+  FROM USER_TAB_COLUMNS A, USER_COL_COMMENTS B, USER_IND_COLUMNS C, USER_CONSTRAINTS D
+ WHERE A.TABLE_NAME = B.TABLE_NAME(+)
+   AND A.COLUMN_NAME = B.COLUMN_NAME(+)
+   AND A.TABLE_NAME = C.TABLE_NAME(+)
+   AND A.COLUMN_NAME = C.COLUMN_NAME(+)
+   AND C.INDEX_NAME = D.INDEX_NAME(+)
+   AND 'P' = D.CONSTRAINT_TYPE(+)
+   AND A.TABLE_NAME= :tableName
+ ORDER BY A.COLUMN_ID";
+            return GetListBySql<TableInfo>(sql, new List<DbParameter> { new OracleParameter(":table_name", tableName) });
         }
 
         /// <summary>
