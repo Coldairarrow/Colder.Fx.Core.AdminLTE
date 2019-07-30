@@ -1,2 +1,4 @@
-nssm stop AService
-nssm remove AService confirm
+cd /d %~dp0
+set serviceName="AService"
+nssm stop %serviceName%
+nssm remove %serviceName% confirm
