@@ -1,50 +1,62 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Coldairarrow.Util.DotNettySockets
 {
     class TcpServer : ITcpServer
     {
+        #region 私有成员
+
+        ConcurrentDictionary<string, ITcpConnection> _connections { get; }
+            = new ConcurrentDictionary<string, ITcpConnection>();
+
+        #endregion
+
+        #region 外部接口
+
         public int Port => throw new NotImplementedException();
 
         public void AddConnection(ITcpConnection theConnection)
         {
-            throw new NotImplementedException();
+            _connections[theConnection.ConnectionName] = theConnection;
         }
 
         public void CloseConnection(ITcpConnection theConnection)
         {
-            throw new NotImplementedException();
+            theConnection.Stop();
         }
 
         public List<string> GetAllConnectionIds()
         {
-            throw new NotImplementedException();
+            return _connections.Keys.ToList();
         }
 
         public List<ITcpConnection> GetAllConnections()
         {
-            throw new NotImplementedException();
+            return _connections.Values.ToList();
         }
 
         public ITcpConnection GetConnection(string connectionId)
         {
-            throw new NotImplementedException();
+            return _connections[connectionId];
         }
 
         public int GetConnectionCount()
         {
-            throw new NotImplementedException();
+            return _connections.Count;
         }
 
         public void RemoveConnection(ITcpConnection theConnection)
         {
-            throw new NotImplementedException();
+            _connections.TryRemove(theConnection.ConnectionName, out _);
         }
 
-        public void SetConnectionId(ITcpConnection theConnection, string newConnectionId)
+        public void SetConnectionName(ITcpConnection theConnection, string oldConnectionId, string newConnectionId)
         {
-            throw new NotImplementedException();
+            _connections.TryRemove(oldConnectionId, out _);
+            _connections[newConnectionId] = theConnection;
         }
 
         public void Start()
@@ -56,5 +68,7 @@ namespace Coldairarrow.Util.DotNettySockets
         {
             throw new NotImplementedException();
         }
+
+        #endregion
     }
 }

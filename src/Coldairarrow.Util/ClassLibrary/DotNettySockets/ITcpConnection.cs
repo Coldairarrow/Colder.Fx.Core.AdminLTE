@@ -2,6 +2,7 @@
 {
     public interface ITcpConnection : IStop, ISend
     {
-        string ConnectionId { get; set; }
+        string ConnectionId { get; }
+        string ConnectionName { get; set; }
     }
 }

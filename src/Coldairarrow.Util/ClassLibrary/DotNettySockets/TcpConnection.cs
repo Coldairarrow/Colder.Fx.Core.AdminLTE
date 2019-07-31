@@ -1,5 +1,6 @@
 ﻿using DotNetty.Buffers;
 using DotNetty.Transport.Channels;
+using System;
 using System.Text;
 
 namespace Coldairarrow.Util.DotNettySockets
@@ -20,23 +21,15 @@ namespace Coldairarrow.Util.DotNettySockets
 
         private ITcpServer _tcpServer { get; }
         private IChannel _channel { get; }
-        private string _connectionId { get; set; }
+        private string _connectionName { get; set; }
 
         #endregion
 
         #region 外部接口
 
-        public string ConnectionId
-        {
-            get
-            {
-                return _connectionId;
-            }
-            set
-            {
-                _tcpServer.SetConnectionId(this, value);
-            }
-        }
+        public string ConnectionId => _channel.Id.AsLongText();
+
+        public string ConnectionName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public void Send(byte[] bytes)
         {
