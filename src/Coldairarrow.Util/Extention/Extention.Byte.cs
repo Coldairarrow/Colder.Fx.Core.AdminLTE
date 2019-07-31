@@ -180,5 +180,18 @@ namespace Coldairarrow.Util
         {
             return (T)ToObject(bytes);
         }
+
+        /// <summary>
+        /// 将字节数组保存为文件
+        /// </summary>
+        /// <param name="bytes">字节数组</param>
+        /// <param name="path">文件完成路径</param>
+        public static void ToFile(this byte[] bytes, string path)
+        {
+            using (var fs = File.OpenWrite(path))
+            {
+                fs.Write(bytes, 0, bytes.Length);
+            }
+        }
     }
 }
