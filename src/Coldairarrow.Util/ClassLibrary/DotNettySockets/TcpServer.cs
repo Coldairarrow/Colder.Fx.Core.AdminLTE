@@ -1,72 +1,88 @@
-﻿using System;
+﻿using DotNetty.Transport.Channels;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Coldairarrow.Util.DotNettySockets
 {
     class TcpServer : ITcpServer
     {
+        public TcpServer(int port)
+        {
+            Port = port;
+        }
+
         #region 私有成员
 
-        ConcurrentDictionary<string, ITcpConnection> _connections { get; }
+        ConcurrentDictionary<string, ITcpConnection> _idMapConnections { get; }
             = new ConcurrentDictionary<string, ITcpConnection>();
+        ConcurrentDictionary<string, string> _nameMapId { get; }
+            = new ConcurrentDictionary<string, string>();
+        private IChannel _channel { get; set; }
 
         #endregion
 
         #region 外部接口
+        public ServerEventHandle EventHandle { get; } = new ServerEventHandle();
+        public void SetChannel(IChannel channel)
+        {
+            _channel = channel;
+        }
 
-        public int Port => throw new NotImplementedException();
+        public int Port { get; }
 
         public void AddConnection(ITcpConnection theConnection)
         {
-            _connections[theConnection.ConnectionName] = theConnection;
+            _idMapConnections[theConnection.ConnectionId] = theConnection;
+            _nameMapId[theConnection.ConnectionName] = theConnection.ConnectionId;
         }
 
         public void CloseConnection(ITcpConnection theConnection)
         {
-            theConnection.Stop();
-        }
-
-        public List<string> GetAllConnectionIds()
-        {
-            return _connections.Keys.ToList();
+            theConnection.StopAsync();
         }
 
         public List<ITcpConnection> GetAllConnections()
         {
-            return _connections.Values.ToList();
+            return _idMapConnections.Values.ToList();
         }
 
-        public ITcpConnection GetConnection(string connectionId)
+        public ITcpConnection GetConnectionById(string connectionId)
         {
-            return _connections[connectionId];
+            return _idMapConnections[connectionId];
+        }
+
+        public ITcpConnection GetConnectionByName(string connectionName)
+        {
+            return _idMapConnections[_nameMapId[connectionName]];
+        }
+
+        public List<string> GetAllConnectionNames()
+        {
+            return _nameMapId.Keys.ToList();
         }
 
         public int GetConnectionCount()
         {
-            return _connections.Count;
+            return _idMapConnections.Count;
         }
 
         public void RemoveConnection(ITcpConnection theConnection)
         {
-            _connections.TryRemove(theConnection.ConnectionName, out _);
+            _idMapConnections.TryRemove(theConnection.ConnectionId, out _);
+            _nameMapId.TryRemove(theConnection.ConnectionName, out _);
         }
 
-        public void SetConnectionName(ITcpConnection theConnection, string oldConnectionId, string newConnectionId)
+        public async Task StopAsync()
         {
-            _connections.TryRemove(oldConnectionId, out _);
-            _connections[newConnectionId] = theConnection;
+            await _channel.CloseAsync();
         }
 
-        public void Start()
+        public void SetConnectionName(ITcpConnection theConnection, string oldConnectionName, string newConnectionName)
         {
-            throw new NotImplementedException();
-        }
-
-        public void Stop()
-        {
-            throw new NotImplementedException();
+            _nameMapId.TryRemove(oldConnectionName, out _);
+            _nameMapId[newConnectionName] = theConnection.ConnectionId;
         }
 
         #endregion

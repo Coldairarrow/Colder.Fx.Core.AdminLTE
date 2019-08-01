@@ -2,6 +2,7 @@
 using DotNetty.Transport.Channels;
 using System;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Coldairarrow.Util.DotNettySockets
 {
@@ -21,7 +22,7 @@ namespace Coldairarrow.Util.DotNettySockets
 
         private ITcpServer _tcpServer { get; }
         private IChannel _channel { get; }
-        private string _connectionName { get; set; }
+        private string _connectionName { get; set; } = Guid.NewGuid().ToString();
 
         #endregion
 
@@ -29,7 +30,19 @@ namespace Coldairarrow.Util.DotNettySockets
 
         public string ConnectionId => _channel.Id.AsLongText();
 
-        public string ConnectionName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string ConnectionName
+        {
+            get
+            {
+                return _connectionName;
+            }
+            set
+            {
+                string oldName = _connectionName;
+                string newName = value;
+                _tcpServer.SetConnectionName(this, oldName, newName);
+            }
+        }
 
         public void Send(byte[] bytes)
         {
@@ -46,9 +59,11 @@ namespace Coldairarrow.Util.DotNettySockets
             Send(encoding.GetBytes(msgStr));
         }
 
-        public void Stop()
+        public async Task StopAsync()
         {
-            _channel.CloseAsync();
+            _tcpServer.RemoveConnection(this);
+
+            await _channel.CloseAsync();
         }
 
         #endregion

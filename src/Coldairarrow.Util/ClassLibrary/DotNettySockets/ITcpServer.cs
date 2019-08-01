@@ -2,15 +2,16 @@
 
 namespace Coldairarrow.Util.DotNettySockets
 {
-    public interface ITcpServer : IStart, IStop
+    public interface ITcpServer : IStop
     {
         int Port { get; }
         void SetConnectionName(ITcpConnection theConnection, string oldConnectionName, string newConnectionName);
         void CloseConnection(ITcpConnection theConnection);
         void AddConnection(ITcpConnection theConnection);
         void RemoveConnection(ITcpConnection theConnection);
-        ITcpConnection GetConnection(string connectionId);
-        List<string> GetAllConnectionIds();
+        ITcpConnection GetConnectionById(string connectionId);
+        ITcpConnection GetConnectionByName(string connectionName);
+        List<string> GetAllConnectionNames();
         List<ITcpConnection> GetAllConnections();
         int GetConnectionCount();
     }

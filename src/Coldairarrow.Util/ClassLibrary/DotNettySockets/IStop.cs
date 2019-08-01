@@ -1,7 +1,9 @@
-﻿namespace Coldairarrow.Util.DotNettySockets
+﻿using System.Threading.Tasks;
+
+namespace Coldairarrow.Util.DotNettySockets
 {
     public interface IStop
     {
-        void Stop();
+        Task StopAsync();
     }
 }
