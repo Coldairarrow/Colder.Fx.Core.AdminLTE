@@ -60,11 +60,12 @@ namespace Coldairarrow.Business
                 config.AddRuleForAllLevels(target);
             }
         }
-        private NLog.Logger _nLogger { get; } = NLog.LogManager.GetLogger("sysLogger");
         private IOperator _operator { get; } = AutofacHelper.GetScopeService<IOperator>();
 
         public void Log(LogLevel logLevel, LogType logType, string msg, string data)
         {
+            NLog.Logger _nLogger = NLog.LogManager.GetLogger("sysLogger");
+
             NLog.LogEventInfo log = new NLog.LogEventInfo(NLog.LogLevel.FromString(logLevel.ToString()), "sysLogger", msg);
             log.Properties[LoggerConfig.Data] = data;
             log.Properties[LoggerConfig.LogType] = logType.ToString();
