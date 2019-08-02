@@ -31,7 +31,7 @@ namespace Coldairarrow.Business
                 {
                     Name = LoggerConfig.LoggerName,
                     Layout = layout,
-                    FileName = Path.Combine(Directory.GetCurrentDirectory(), "logs", DateTime.Now.ToString("yyyy-MM"), $"{DateTime.Now.ToString("yyyy-MM-dd")}.txt")
+                    FileName = Path.Combine(Directory.GetCurrentDirectory(), "logs", "${date:format=yyyy-MM-dd}.txt")
                 });
             }
 
