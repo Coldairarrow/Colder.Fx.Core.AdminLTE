@@ -1,7 +1,7 @@
 ﻿namespace Coldairarrow.Util.DotNettySockets
 {
-    public interface ITcpClient : IStop, ISend
+    public interface IClose
     {
-
+        void Close();
     }
 }

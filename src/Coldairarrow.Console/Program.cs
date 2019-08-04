@@ -12,6 +12,12 @@ using Coldairarrow.Util;
 using System.Data;
 using Autofac;
 using Autofac.Extras.DynamicProxy;
+using System.Threading.Tasks;
+using Coldairarrow.Util.DotNettySockets;
+using Coldairarrow.Util.Sockets;
+using System.Threading;
+using System.Collections.Concurrent;
+using System.Text;
 
 namespace Coldairarrow.Console1
 {
@@ -52,16 +58,83 @@ namespace Coldairarrow.Console1
             AutofacHelper.Container = builder.Build();
         }
 
-        static void Main(string[] args)
+        static async Task RunServerAsync()
         {
-            var db = DbFactory.GetRepository();
-            db.HandleSqlLog = Console.WriteLine;
+            Dictionary<string, DateTime> startTime = new Dictionary<string, DateTime>();
+            Dictionary<string, TimeSpan> timeSpan = new Dictionary<string, TimeSpan>();
 
-            var dbHelper = DbHelperFactory.GetDbHelper(DatabaseType.Oracle, "BaseDb");
+            var theServer = await new TcpSocketServerBuilder(6001)
+                .SetLengthFieldEncoder(2)
+                .SetLengthFieldDecoder(ushort.MaxValue, 0, 2, 0, 2)
+                .OnConnectionClose((server, connection) =>
+                {
+                    Console.WriteLine($"连接关闭,连接名[{connection.ConnectionName}]");
+                })
+                .OnException(ex =>
+                {
+                    Console.WriteLine($"服务端异常:{ExceptionHelper.GetExceptionAllMsg(ex)}");
+                })
+                .OnNewConnection((server, connection) =>
+                {
+                    //connection.ConnectionName = $"名字{connection.ConnectionId}";
+                    Console.WriteLine($"新的连接:{connection.ConnectionName}");
+                })
+                .OnRecieve((server, connection, bytes) =>
+                {
+                    string key = bytes.ToString(Encoding.UTF8);
+                    timeSpan[key] = DateTime.Now - startTime[key];
+                    //Console.WriteLine($"服务端:收到16进制数据{bytes.To0XString().ToUpper()}");
+                })
+                .OnSend((server, connection, bytes) =>
+                {
+                    Console.WriteLine($"向连接名[{connection.ConnectionName}]发送16进制数据:{bytes.To0XString().ToUpper()}");
+                })
+                .OnServerStarted(server =>
+                {
+                    Console.WriteLine($"服务启动");
+                }).BuildAsync();
 
-            var list = dbHelper.GetDbTableInfo("Dev_Project");
+            var theClient = await new TcpSocketClientBuilder("127.0.0.1", 6001)
+                .SetLengthFieldEncoder(2)
+                .SetLengthFieldDecoder(ushort.MaxValue, 0, 2, 0, 2)
+                .OnClientStarted(client =>
+                {
+                    Console.WriteLine($"客户端启动");
+                })
+                .OnClientClose(client =>
+                {
+                    Console.WriteLine($"客户端关闭");
+                })
+                .OnException(ex =>
+                {
+                    Console.WriteLine($"异常");
+                })
+                .OnRecieve((client, bytes) =>
+                {
+                    Console.WriteLine($"客户端:收到16进制数据{bytes.To0XString().ToUpper()}");
+                })
+                .OnSend((client, bytes) =>
+                {
+                    string key = bytes.ToString(Encoding.UTF8);
+                    startTime[key] = DateTime.Now;
+                    //Console.WriteLine($"客户端:发送16进制数据{bytes.To0XString().ToUpper()}");
+                })
+                .BuildAsync();
+            for (int i = 0; i < 10000; i++)
+            {
+                string key = Guid.NewGuid().ToString();
+                key = key.PadRight(10000, 'X');
 
-            Console.WriteLine("完成");
+                await theClient.Send(key);
+                //Thread.Sleep(100);
+            }
+
+            Console.WriteLine($"平均每次耗时:{timeSpan.Average(x => x.Value.Ticks / 10000)}ms");
+        }
+        static async Task Main(string[] args)
+        {
+            await RunServerAsync();
+
             Console.ReadLine();
         }
     }

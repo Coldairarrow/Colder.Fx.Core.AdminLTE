@@ -2,8 +2,8 @@
 
 namespace Coldairarrow.Util.DotNettySockets
 {
-    public interface IStop
+    public interface ISendBytes
     {
-        Task StopAsync();
+        Task Send(byte[] bytes);
     }
 }

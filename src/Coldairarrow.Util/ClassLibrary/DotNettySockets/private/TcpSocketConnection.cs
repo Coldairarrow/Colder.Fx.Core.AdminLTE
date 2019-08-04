@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Coldairarrow.Util.DotNettySockets
 {
-    class TcpConnection : ITcpConnection
+    class TcpSocketConnection : ITcpSocketConnection
     {
         #region 构造函数
 
-        public TcpConnection(ITcpServer tcpServer, IChannel channel)
+        public TcpSocketConnection(TcpSocketServer tcpServer, IChannel channel)
         {
             _tcpServer = tcpServer;
             _channel = channel;
@@ -20,7 +20,7 @@ namespace Coldairarrow.Util.DotNettySockets
 
         #region 私有成员
 
-        private ITcpServer _tcpServer { get; }
+        private TcpSocketServer _tcpServer { get; }
         private IChannel _channel { get; }
         private string _connectionName { get; set; } = Guid.NewGuid().ToString();
 
@@ -41,29 +41,31 @@ namespace Coldairarrow.Util.DotNettySockets
                 string oldName = _connectionName;
                 string newName = value;
                 _tcpServer.SetConnectionName(this, oldName, newName);
+                _connectionName = newName;
             }
         }
 
-        public void Send(byte[] bytes)
+        public async Task Send(byte[] bytes)
         {
-            _channel.WriteAndFlushAsync(Unpooled.WrappedBuffer(bytes));
+            await _channel.WriteAndFlushAsync(Unpooled.WrappedBuffer(bytes));
+            _tcpServer.EventHandle.OnSend(_tcpServer, this, bytes);
         }
 
-        public void Send(string msgStr)
+        public async Task Send(string msgStr)
         {
-            Send(msgStr, Encoding.UTF8);
+            await Send(msgStr, Encoding.UTF8);
         }
 
-        public void Send(string msgStr, Encoding encoding)
+        public async Task Send(string msgStr, Encoding encoding)
         {
-            Send(encoding.GetBytes(msgStr));
+            await Send(encoding.GetBytes(msgStr));
         }
 
-        public async Task StopAsync()
+        public void Close()
         {
             _tcpServer.RemoveConnection(this);
 
-            await _channel.CloseAsync();
+            _channel.CloseAsync();
         }
 
         #endregion
