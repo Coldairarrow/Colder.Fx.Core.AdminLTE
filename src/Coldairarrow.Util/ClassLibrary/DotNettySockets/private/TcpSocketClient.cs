@@ -44,8 +44,11 @@ namespace Coldairarrow.Util.DotNettySockets
 
         public async Task Send(byte[] bytes)
         {
-            _clientEvent.OnSend?.Invoke(this, bytes);
             await _channel.WriteAndFlushAsync(Unpooled.WrappedBuffer(bytes));
+            await Task.Run(() =>
+            {
+                _clientEvent.OnSend?.Invoke(this, bytes);
+            });
         }
 
         public async Task Send(string msgStr)

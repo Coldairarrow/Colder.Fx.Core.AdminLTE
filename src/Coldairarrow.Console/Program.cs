@@ -115,16 +115,16 @@ namespace Coldairarrow.Console1
                 })
                 .OnSend((client, bytes) =>
                 {
-                    string key = bytes.ToString(Encoding.UTF8);
-                    startTime[key] = DateTime.Now;
+                    //string key = bytes.ToString(Encoding.UTF8);
+                    //startTime[key] = DateTime.Now;
                     //Console.WriteLine($"客户端:发送16进制数据{bytes.To0XString().ToUpper()}");
                 })
                 .BuildAsync();
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < 100000; i++)
             {
                 string key = Guid.NewGuid().ToString();
-                key = key.PadRight(10000, 'X');
-
+                key = key.PadRight(10, 'X');
+                startTime[key] = DateTime.Now;
                 await theClient.Send(key);
                 //Thread.Sleep(100);
             }

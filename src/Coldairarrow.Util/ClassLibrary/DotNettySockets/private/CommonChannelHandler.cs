@@ -3,7 +3,7 @@ using System;
 
 namespace Coldairarrow.Util.DotNettySockets
 {
-    class CommonChannelHandler : ChannelHandlerAdapter
+    class CommonChannelHandler : SimpleChannelInboundHandler<object>
     {
         public CommonChannelHandler(IChannelEvent channelEvent)
         {
@@ -11,14 +11,14 @@ namespace Coldairarrow.Util.DotNettySockets
         }
         IChannelEvent _channelEvent { get; }
 
+        protected override void ChannelRead0(IChannelHandlerContext ctx, object msg)
+        {
+            _channelEvent.OnChannelReceive(ctx.Channel, msg);
+        }
+
         public override void ChannelActive(IChannelHandlerContext context)
         {
             _channelEvent.OnChannelActive(context.Channel);
-        }
-
-        public override void ChannelRead(IChannelHandlerContext context, object message)
-        {
-            _channelEvent.OnChannelReceive(context.Channel, message);
         }
 
         public override void ChannelReadComplete(IChannelHandlerContext context)
