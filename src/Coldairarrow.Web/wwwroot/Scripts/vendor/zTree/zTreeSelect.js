@@ -42,7 +42,7 @@ $('#CategoryId').zTreeSelect('reload');
                 multiple: false,
                 data: [],
                 _firstLoad: true,
-                chkboxType: { "Y": "", "N": "" }//[Y:勾选,N:取消勾选]父子关联关系:[p:关联父,s:关联子]
+                chkboxType: { "Y": "ps", "N": "ps" }//[Y:勾选,N:取消勾选]父子关联关系:[p:关联父,s:关联子]
             };
 
             var _option = $.extend({}, defaults, options);
