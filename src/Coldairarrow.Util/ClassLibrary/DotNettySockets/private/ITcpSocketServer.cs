@@ -2,5 +2,6 @@
 {
     public interface ITcpSocketServer : IBaseTcpSocketServer<ITcpSocketConnection>
     {
+
     }
 }

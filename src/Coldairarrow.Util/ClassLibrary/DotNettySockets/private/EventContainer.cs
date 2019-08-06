@@ -2,7 +2,7 @@
 
 namespace Coldairarrow.Util.DotNettySockets
 {
-    class EventContainer : ITcpServerEvent, ITcpClientEvent
+    class EventContainer : ITcpSocketServerEvent, ITcpClientEvent
     {
         public Action<ITcpSocketServer> OnServerStarted { get; set; }
         public Action<ITcpSocketServer, ITcpSocketConnection> OnNewConnection { get; set; }

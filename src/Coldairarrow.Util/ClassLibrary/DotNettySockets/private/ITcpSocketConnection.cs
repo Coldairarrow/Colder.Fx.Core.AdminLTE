@@ -1,6 +1,6 @@
 ﻿namespace Coldairarrow.Util.DotNettySockets
 {
-    public interface ITcpSocketConnection : ISocketConnection, ISendBytes, ISendString
+    public interface ITcpSocketConnection : IBaseSocketConnection, ISendBytes, ISendString
     {
 
     }

@@ -53,12 +53,7 @@ namespace Coldairarrow.Util.DotNettySockets
 
         public async Task Send(string msgStr)
         {
-            await Send(msgStr, Encoding.UTF8);
-        }
-
-        public async Task Send(string msgStr, Encoding encoding)
-        {
-            await Send(encoding.GetBytes(msgStr));
+            await Send(Encoding.UTF8.GetBytes(msgStr));
         }
 
         public void OnChannelActive(IChannel channel)
