@@ -1,8 +1,7 @@
 ﻿namespace Coldairarrow.Util.DotNettySockets
 {
-    public interface ITcpSocketClient : IClose, ISendBytes, ISendString
+    public interface ITcpSocketClient : IBaseTcpSocketClient, ISendBytes, ISendString
     {
-        string Ip { get; }
-        int Port { get; }
+
     }
 }

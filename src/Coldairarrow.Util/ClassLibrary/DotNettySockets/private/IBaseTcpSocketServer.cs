@@ -2,7 +2,8 @@
 
 namespace Coldairarrow.Util.DotNettySockets
 {
-    public interface IBaseTcpSocketServer<SocketConnection> : IClose where SocketConnection : IBaseSocketConnection
+    public interface IBaseTcpSocketServer<SocketConnection> : IClose
+        where SocketConnection : IBaseSocketConnection
     {
         int Port { get; }
         void SetConnectionName(SocketConnection theConnection, string oldConnectionName, string newConnectionName);

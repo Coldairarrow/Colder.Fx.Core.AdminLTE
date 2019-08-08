@@ -1,5 +1,4 @@
-﻿using DotNetty.Buffers;
-using DotNetty.Transport.Channels;
+﻿using DotNetty.Transport.Channels;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -8,7 +7,8 @@ using System.Linq;
 namespace Coldairarrow.Util.DotNettySockets
 {
     abstract class BaseTcpSocketServer<TSocketServer, TConnection, TData> : IBaseTcpSocketServer<TConnection>, IChannelEvent
-        where TConnection : IBaseSocketConnection
+        where TConnection : class, IBaseSocketConnection
+        where TSocketServer : class, IBaseTcpSocketServer<TConnection>
     {
         public BaseTcpSocketServer(int port, IBaseTcpSocketServerEvent<TSocketServer, TConnection, TData> eventHandle)
         {
@@ -18,30 +18,21 @@ namespace Coldairarrow.Util.DotNettySockets
 
         #region 私有成员
 
-        ConcurrentDictionary<string, TcpSocketConnection> _idMapConnections { get; }
-            = new ConcurrentDictionary<string, TcpSocketConnection>();
+        ConcurrentDictionary<string, TConnection> _idMapConnections { get; }
+            = new ConcurrentDictionary<string, TConnection>();
         ConcurrentDictionary<string, string> _nameMapId { get; }
             = new ConcurrentDictionary<string, string>();
-        private IChannel _serverChannel { get; set; }
-
-        private void AddConnection(TcpSocketConnection theConnection)
+        protected IChannel _serverChannel { get; set; }
+        protected void AddConnection(TConnection theConnection)
         {
             _idMapConnections[theConnection.ConnectionId] = theConnection;
             _nameMapId[theConnection.ConnectionName] = theConnection.ConnectionId;
         }
-
-        public void CloseConnection(TcpSocketConnection theConnection)
-        {
-            RemoveConnection(theConnection);
-            theConnection.Close();
-        }
-
-        private TcpSocketConnection GetConnection(IChannel clientChannel)
+        protected TConnection GetConnection(IChannel clientChannel)
         {
             return _idMapConnections[clientChannel.Id.AsLongText()];
         }
-
-        private void PackException(Action action)
+        protected void PackException(Action action)
         {
             try
             {
@@ -52,29 +43,21 @@ namespace Coldairarrow.Util.DotNettySockets
                 _eventHandle.OnException?.Invoke(ex);
             }
         }
+        protected IBaseTcpSocketServerEvent<TSocketServer, TConnection, TData> _eventHandle { get; }
+        protected abstract TConnection BuildConnection(IChannel clientChannel);
 
         #endregion
 
         #region 外部接口
 
-        protected IBaseTcpSocketServerEvent<TSocketServer, TConnection, TData> _eventHandle { get; }
-
         public void OnChannelActive(IChannel clientChannel)
         {
-            var theConnection = new TcpSocketConnection(this, clientChannel);
+            var theConnection = BuildConnection(clientChannel);
             AddConnection(theConnection);
-            _eventHandle.OnNewConnection?.Invoke(this, theConnection);
+            _eventHandle.OnNewConnection?.Invoke(this as TSocketServer, theConnection);
         }
 
-        public void OnChannelReceive(IChannel clientChannel, object msg)
-        {
-            var bytes = (msg as IByteBuffer).ToArray();
-            PackException(() =>
-            {
-                var theConnection = GetConnection(clientChannel);
-                _eventHandle.OnRecieve?.Invoke(this, theConnection, bytes);
-            });
-        }
+        public abstract void OnChannelReceive(IChannel clientChannel, object msg);
 
         public void OnException(IChannel clientChannel, Exception ex)
         {
@@ -91,7 +74,7 @@ namespace Coldairarrow.Util.DotNettySockets
             PackException(() =>
             {
                 var theConnection = GetConnection(clientChannel);
-                _eventHandle.OnConnectionClose(this, theConnection);
+                _eventHandle.OnConnectionClose(this as TSocketServer, theConnection);
             });
         }
 
@@ -102,17 +85,17 @@ namespace Coldairarrow.Util.DotNettySockets
 
         public int Port { get; }
 
-        public List<ITcpSocketConnection> GetAllConnections()
+        public List<TConnection> GetAllConnections()
         {
-            return _idMapConnections.Values.Select(x => x as ITcpSocketConnection).ToList();
+            return _idMapConnections.Values.Select(x => x as TConnection).ToList();
         }
 
-        public ITcpSocketConnection GetConnectionById(string connectionId)
+        public TConnection GetConnectionById(string connectionId)
         {
             return _idMapConnections[connectionId];
         }
 
-        public ITcpSocketConnection GetConnectionByName(string connectionName)
+        public TConnection GetConnectionByName(string connectionName)
         {
             return _idMapConnections[_nameMapId[connectionName]];
         }
@@ -127,46 +110,27 @@ namespace Coldairarrow.Util.DotNettySockets
             return _idMapConnections.Count;
         }
 
-        public void RemoveConnection(ITcpSocketConnection theConnection)
+        public void RemoveConnection(TConnection theConnection)
         {
             _idMapConnections.TryRemove(theConnection.ConnectionId, out _);
             _nameMapId.TryRemove(theConnection.ConnectionName, out _);
         }
 
-        public void SetConnectionName(ITcpSocketConnection theConnection, string oldConnectionName, string newConnectionName)
+        public void SetConnectionName(TConnection theConnection, string oldConnectionName, string newConnectionName)
         {
             _nameMapId.TryRemove(oldConnectionName, out _);
             _nameMapId[newConnectionName] = theConnection.ConnectionId;
         }
 
+        public void CloseConnection(TConnection theConnection)
+        {
+            RemoveConnection(theConnection);
+            theConnection.Close();
+        }
+
         public void Close()
         {
             _serverChannel.CloseAsync();
-        }
-
-        public void SetConnectionName(TConnection theConnection, string oldConnectionName, string newConnectionName)
-        {
-            throw new NotImplementedException();
-        }
-
-        TConnection IBaseTcpSocketServer<TConnection>.GetConnectionById(string connectionId)
-        {
-            throw new NotImplementedException();
-        }
-
-        TConnection IBaseTcpSocketServer<TConnection>.GetConnectionByName(string connectionName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void RemoveConnection(TConnection theConnection)
-        {
-            throw new NotImplementedException();
-        }
-
-        List<TConnection> IBaseTcpSocketServer<TConnection>.GetAllConnections()
-        {
-            throw new NotImplementedException();
         }
 
         #endregion
