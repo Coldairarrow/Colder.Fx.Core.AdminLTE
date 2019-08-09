@@ -10,7 +10,7 @@ namespace Coldairarrow.Util.DotNettySockets
         where TConnection : class, IBaseSocketConnection
         where TSocketServer : class, IBaseTcpSocketServer<TConnection>
     {
-        public BaseTcpSocketServer(int port, IBaseTcpSocketServerEvent<TSocketServer, TConnection, TData> eventHandle)
+        public BaseTcpSocketServer(int port, TcpSocketServerEvent<TSocketServer, TConnection, TData> eventHandle)
         {
             Port = port;
             _eventHandle = eventHandle;
@@ -30,7 +30,7 @@ namespace Coldairarrow.Util.DotNettySockets
         }
         protected TConnection GetConnection(IChannel clientChannel)
         {
-            return _idMapConnections[clientChannel.Id.AsLongText()];
+            return _idMapConnections[clientChannel.Id.AsShortText()];
         }
         protected void PackException(Action action)
         {
@@ -43,7 +43,7 @@ namespace Coldairarrow.Util.DotNettySockets
                 _eventHandle.OnException?.Invoke(ex);
             }
         }
-        protected IBaseTcpSocketServerEvent<TSocketServer, TConnection, TData> _eventHandle { get; }
+        protected TcpSocketServerEvent<TSocketServer, TConnection, TData> _eventHandle { get; }
         protected abstract TConnection BuildConnection(IChannel clientChannel);
 
         #endregion

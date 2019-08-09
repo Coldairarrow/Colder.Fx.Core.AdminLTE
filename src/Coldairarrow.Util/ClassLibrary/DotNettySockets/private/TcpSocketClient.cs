@@ -7,7 +7,7 @@ namespace Coldairarrow.Util.DotNettySockets
 {
     class TcpSocketClient : BaseTcpSocketClient<ITcpSocketClient, byte[]>, ITcpSocketClient
     {
-        public TcpSocketClient(string ip, int port, IBaseTcpSocketCientEvent<ITcpSocketClient, byte[]> clientEvent)
+        public TcpSocketClient(string ip, int port, TcpSocketCientEvent<ITcpSocketClient, byte[]> clientEvent)
             : base(ip, port, clientEvent)
         {
         }

@@ -2,7 +2,7 @@
 
 namespace Coldairarrow.Util.DotNettySockets
 {
-    public interface IBaseTcpSocketClientBuilder<TBuilder, TSocketClient, TData> : IBaseBuilder<TBuilder>
+    public interface IBaseTcpSocketClientBuilder<TBuilder, TSocketClient, TData> : IBaseBuilder<TBuilder, TSocketClient>
     {
         TBuilder OnClientStarted(Action<TSocketClient> action);
 

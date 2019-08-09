@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace Coldairarrow.Util.DotNettySockets
 {
-    class TcpSocketConnection : BaseTcpSocketConnection<ITcpSocketServer, ITcpSocketConnection, ITcpSocketServerEvent, byte[]>, ITcpSocketConnection
+    class TcpSocketConnection : BaseTcpSocketConnection<ITcpSocketServer, ITcpSocketConnection, byte[]>, ITcpSocketConnection
     {
         #region 构造函数
 
-        public TcpSocketConnection(ITcpSocketServer server, IChannel channel, IBaseTcpSocketServerEvent<ITcpSocketServer, ITcpSocketConnection, byte[]> serverEvent)
+        public TcpSocketConnection(ITcpSocketServer server, IChannel channel, TcpSocketServerEvent<ITcpSocketServer, ITcpSocketConnection, byte[]> serverEvent)
             : base(server, channel, serverEvent)
         {
 

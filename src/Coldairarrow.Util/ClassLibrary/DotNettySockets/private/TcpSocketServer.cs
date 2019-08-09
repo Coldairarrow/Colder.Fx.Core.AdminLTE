@@ -5,7 +5,7 @@ namespace Coldairarrow.Util.DotNettySockets
 {
     class TcpSocketServer : BaseTcpSocketServer<ITcpSocketServer, ITcpSocketConnection, byte[]>, ITcpSocketServer
     {
-        public TcpSocketServer(int port, IBaseTcpSocketServerEvent<ITcpSocketServer, ITcpSocketConnection, byte[]> eventHandle)
+        public TcpSocketServer(int port, TcpSocketServerEvent<ITcpSocketServer, ITcpSocketConnection, byte[]> eventHandle)
             : base(port, eventHandle)
         {
         }

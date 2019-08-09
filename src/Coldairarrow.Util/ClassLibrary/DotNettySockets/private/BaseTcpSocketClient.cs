@@ -6,13 +6,13 @@ namespace Coldairarrow.Util.DotNettySockets
     abstract class BaseTcpSocketClient<TSocketClient, TData> : IBaseTcpSocketClient, IChannelEvent
         where TSocketClient : class, IBaseTcpSocketClient
     {
-        public BaseTcpSocketClient(string ip, int port, IBaseTcpSocketCientEvent<TSocketClient, TData> clientEvent)
+        public BaseTcpSocketClient(string ip, int port, TcpSocketCientEvent<TSocketClient, TData> clientEvent)
         {
             Ip = ip;
             Port = port;
             _clientEvent = clientEvent;
         }
-        protected IBaseTcpSocketCientEvent<TSocketClient, TData> _clientEvent { get; }
+        protected TcpSocketCientEvent<TSocketClient, TData> _clientEvent { get; }
         protected IChannel _channel { get; set; }
         protected void PackException(Action action)
         {

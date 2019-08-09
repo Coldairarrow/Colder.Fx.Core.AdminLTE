@@ -3,7 +3,7 @@ using System;
 
 namespace Coldairarrow.Util.DotNettySockets
 {
-    abstract class BaseTcpSocketConnection<TTcpSocketServer, TConnection, TTcpSocketServerEvent, TData>
+    abstract class BaseTcpSocketConnection<TTcpSocketServer, TConnection, TData>
         : IBaseSocketConnection
         where TConnection : class, IBaseSocketConnection
         where TTcpSocketServer : IBaseTcpSocketServer<TConnection>
@@ -13,7 +13,7 @@ namespace Coldairarrow.Util.DotNettySockets
         public BaseTcpSocketConnection(
             TTcpSocketServer server,
             IChannel channel,
-            IBaseTcpSocketServerEvent<TTcpSocketServer, TConnection, TData> serverEvent)
+            TcpSocketServerEvent<TTcpSocketServer, TConnection, TData> serverEvent)
         {
             _server = server;
             _channel = channel;
@@ -26,14 +26,14 @@ namespace Coldairarrow.Util.DotNettySockets
 
         protected TTcpSocketServer _server { get; }
         protected IChannel _channel { get; }
-        protected IBaseTcpSocketServerEvent<TTcpSocketServer, TConnection, TData> _serverEvent { get; }
+        protected TcpSocketServerEvent<TTcpSocketServer, TConnection, TData> _serverEvent { get; }
         private string _connectionName { get; set; } = Guid.NewGuid().ToString();
 
         #endregion
 
         #region 外部接口
 
-        public string ConnectionId => _channel.Id.AsLongText();
+        public string ConnectionId => _channel.Id.AsShortText();
 
         public string ConnectionName
         {
