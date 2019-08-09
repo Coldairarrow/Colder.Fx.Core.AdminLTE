@@ -42,7 +42,7 @@ $('#CategoryId').zTreeSelect('reload');
                 multiple: false,
                 data: [],
                 _firstLoad: true,
-                onSelect: function () { }
+                chkboxType: { "Y": "ps", "N": "ps" }//[Y:勾选,N:取消勾选]父子关联关系:[p:关联父,s:关联子]
             };
 
             var _option = $.extend({}, defaults, options);
@@ -159,7 +159,7 @@ $('#CategoryId').zTreeSelect('reload');
                 check: {
                     enable: option.multiple,
                     autoCheckTrigger: true,
-                    chkboxType: { "Y": "", "N": "" }
+                    chkboxType: option.chkboxType
                 },
                 data: {
                     simpleData: {
@@ -182,9 +182,6 @@ $('#CategoryId').zTreeSelect('reload');
 
                         $('#' + _inputId).val(v.join(','));
                         $(_this).val(values);
-
-                        //绑定选择事件
-                        option.onSelect(treeNode.id);
                     },
                     onCheck: function (e, treeId, treeNode) {
                         var zTree = $.fn.zTree.getZTreeObj(_treeId),

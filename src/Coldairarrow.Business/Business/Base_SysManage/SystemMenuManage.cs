@@ -131,6 +131,18 @@ namespace Coldairarrow.Business.Base_SysManage
                     icon = "fa fa-circle-o",
                     url = GetUrl("~/Demo/ApiSignDemo")
                 });
+                developMenu.children.Add(new Menu
+                {
+                    text = "Tab页",
+                    icon = "fa fa-circle-o",
+                    url = GetUrl("~/Demo/Tab")
+                });
+                developMenu.children.Add(new Menu
+                {
+                    text = "详情页",
+                    icon = "fa fa-circle-o",
+                    url = GetUrl("~/Demo/Details")
+                });
             }
 
             _allMenu = menus;

@@ -60,10 +60,17 @@ namespace Coldairarrow.Web
                 context.Request.EnableRewind();
 
                 return next(context);
-            });
-            app.UseDeveloperExceptionPage();
-            app.UseStaticFiles();
-            app.UseMvc(routes =>
+            })
+            //¿çÓò
+            .UseCors(builder => builder
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials()
+            )
+            .UseDeveloperExceptionPage()
+            .UseStaticFiles()
+            .UseMvc(routes =>
             {
                 //Ä¬ÈÏÂ·ÓÉ
                 routes.MapRoute(

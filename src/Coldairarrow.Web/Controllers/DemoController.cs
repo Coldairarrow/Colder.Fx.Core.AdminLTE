@@ -51,6 +51,16 @@ namespace Coldairarrow.Web.Controllers
             return View();
         }
 
+        public IActionResult Tab()
+        {
+            return View();
+        }
+
+        public IActionResult Details()
+        {
+            return View();
+        }
+
         #endregion
 
         #region 接口

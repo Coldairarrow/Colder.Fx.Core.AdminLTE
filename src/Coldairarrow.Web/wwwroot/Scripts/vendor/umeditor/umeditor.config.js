@@ -184,7 +184,7 @@
 
         //,autoClearEmptyNode : true //getContent时，是否删除空的inlineElement节点（包括嵌套的情况）
 
-        //,fullscreen : false //是否开启初始化时即全屏，默认关闭
+        , fullscreen: true //是否开启初始化时即全屏，默认关闭
 
         //,readonly : false //编辑器初始化结束后,编辑区域是否是只读的，默认是false
 
