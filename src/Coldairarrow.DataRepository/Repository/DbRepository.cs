@@ -126,6 +126,10 @@ namespace Coldairarrow.DataRepository
         {
             var querySql = query.ToSql();
             string theQSql = querySql.sql.Replace("\r\n", "\n").Replace("\n", " ");
+            //无筛选
+            if (!theQSql.Contains("WHERE"))
+                return (" 1=1 ", new Dictionary<string, object>());
+
             string pattern = "^SELECT.*?FROM.*? AS (.*?) WHERE .*?$";
             var match = Regex.Match(theQSql, pattern);
             string asTmp = match.Groups[1]?.ToString();
