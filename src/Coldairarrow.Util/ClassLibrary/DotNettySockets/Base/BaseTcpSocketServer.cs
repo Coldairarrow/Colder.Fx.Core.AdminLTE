@@ -50,14 +50,12 @@ namespace Coldairarrow.Util.DotNettySockets
 
         #region 外部接口
 
-        public void OnChannelActive(IChannel clientChannel)
+        public void OnChannelActive(IChannelHandlerContext ctx)
         {
-            var theConnection = BuildConnection(clientChannel);
+            var theConnection = BuildConnection(ctx.Channel);
             AddConnection(theConnection);
             _eventHandle.OnNewConnection?.Invoke(this as TSocketServer, theConnection);
         }
-
-        public abstract void OnChannelReceive(IChannel clientChannel, object msg);
 
         public void OnException(IChannel clientChannel, Exception ex)
         {
@@ -132,6 +130,8 @@ namespace Coldairarrow.Util.DotNettySockets
         {
             _serverChannel.CloseAsync();
         }
+
+        public abstract void OnChannelReceive(IChannelHandlerContext ctx, object msg);
 
         #endregion
     }

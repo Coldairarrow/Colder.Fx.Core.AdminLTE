@@ -13,12 +13,12 @@ namespace Coldairarrow.Util.DotNettySockets
 
         protected override void ChannelRead0(IChannelHandlerContext ctx, object msg)
         {
-            _channelEvent.OnChannelReceive(ctx.Channel.Parent, msg);
+            _channelEvent.OnChannelReceive(ctx, msg);
         }
 
         public override void ChannelActive(IChannelHandlerContext context)
         {
-            _channelEvent.OnChannelActive(context.Channel);
+            _channelEvent.OnChannelActive(context);
         }
 
         public override void ChannelReadComplete(IChannelHandlerContext context)

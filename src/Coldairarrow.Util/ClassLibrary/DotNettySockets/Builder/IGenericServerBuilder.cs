@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Hosting.Server;
-using System;
+﻿using System;
 
 namespace Coldairarrow.Util.DotNettySockets
 {
-    public interface IBaseTcpSocketServerBuilder<TBuilder, TTarget, IConnection, TData> : IBaseBuilder<TBuilder, TTarget>
+    public interface IGenericServerBuilder<TBuilder, TTarget, IConnection, TData> : IBuilder<TBuilder, TTarget>
     {
         TBuilder OnServerStarted(Action<TTarget> action);
 

@@ -5,8 +5,8 @@ namespace Coldairarrow.Util.DotNettySockets
 {
     interface IChannelEvent
     {
-        void OnChannelActive(IChannel channel);
-        void OnChannelReceive(IChannel channel, object msg);
+        void OnChannelActive(IChannelHandlerContext ctx);
+        void OnChannelReceive(IChannelHandlerContext ctx, object msg);
         void OnChannelInactive(IChannel channel);
         void OnException(IChannel channel, Exception exception);
     }

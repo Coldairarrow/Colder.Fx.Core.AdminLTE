@@ -40,12 +40,10 @@ namespace Coldairarrow.Util.DotNettySockets
             _channel.CloseAsync();
         }
 
-        public void OnChannelActive(IChannel channel)
+        public virtual void OnChannelActive(IChannelHandlerContext ctx)
         {
             _clientEvent.OnClientStarted?.Invoke(this as TSocketClient);
         }
-
-        public abstract void OnChannelReceive(IChannel channel, object msg);
 
         public void OnChannelInactive(IChannel channel)
         {
@@ -57,5 +55,7 @@ namespace Coldairarrow.Util.DotNettySockets
             _clientEvent.OnException?.Invoke(exception);
             Close();
         }
+
+        public abstract void OnChannelReceive(IChannelHandlerContext ctx, object msg);
     }
 }

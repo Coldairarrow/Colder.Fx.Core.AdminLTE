@@ -1,9 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
-
-namespace Coldairarrow.Util.DotNettySockets
+﻿namespace Coldairarrow.Util.DotNettySockets
 {
-    public interface IBaseBuilder<TBuilder, TTarget>
+    public interface ICoderBuilder<TBuilder>
     {
         /// <summary>
         /// 设置基于长度的解码器,解决粘包与分包问题
@@ -22,9 +19,5 @@ namespace Coldairarrow.Util.DotNettySockets
         /// <param name="lengthFieldLength">长度字段占字节数</param>
         /// <returns></returns>
         TBuilder SetLengthFieldEncoder(int lengthFieldLength);
-
-        TBuilder OnException(Action<Exception> action);
-
-        Task<TTarget> BuildAsync();
     }
 }

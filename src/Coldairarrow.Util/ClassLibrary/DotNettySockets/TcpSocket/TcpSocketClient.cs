@@ -12,7 +12,7 @@ namespace Coldairarrow.Util.DotNettySockets
         {
         }
 
-        public override void OnChannelReceive(IChannel channel, object msg)
+        public override void OnChannelReceive(IChannelHandlerContext ctx, object msg)
         {
             PackException(() =>
             {

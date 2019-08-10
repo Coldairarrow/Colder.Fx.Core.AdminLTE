@@ -51,6 +51,11 @@ namespace Coldairarrow.Web.Controllers
             return View();
         }
 
+        public IActionResult WebSocketDemo()
+        {
+            return View();
+        }
+
         #endregion
 
         #region 接口
