@@ -29,12 +29,8 @@
     <div class="fx-wrapper">
         <form class="form-inline" id="searchForm">
             <div class="form-group">
-                <label>查询类别</label>
-                <select class="selectpicker" name="condition" data-style="btn-default btn-sm" data-width="100px">
-                    <option value="">请选择</option>
-                    <option value="RoleName">角色名</option>
-                </select>
-                <input type="text" class="form-control input-sm" name="keyword" placeholder="请输入关键字">
+                <label>角色名</label>
+                <input type="text" class="form-control input-sm" name="roleName" placeholder="请输入角色名">
             </div>
             <div class="form-group">
                 <button type="button" class="btn btn-default btn-sm" onclick="javascript: $('#dataTable').bootstrapTable('refresh', { silent: true });">
