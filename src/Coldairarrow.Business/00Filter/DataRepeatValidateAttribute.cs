@@ -10,7 +10,7 @@ namespace Coldairarrow.Business
 {
     public class DataRepeatValidateAttribute : BaseFilterAttribute
     {
-        public DataRepeatValidateAttribute(string[] validateFields, string[] validateFieldNames, bool allData = false)
+        public DataRepeatValidateAttribute(string[] validateFields, string[] validateFieldNames, bool allData = false, string[] whereEqualFields = null)
         {
             if (validateFields.Length != validateFieldNames.Length)
                 throw new Exception("校验列与列描述信息不对应!");
@@ -20,10 +20,11 @@ namespace Coldairarrow.Business
             {
                 _validateFields.Add(validateFields[i], validateFieldNames[i]);
             }
+            _whereEqualFields = whereEqualFields;
         }
         private bool _allData { get; }
         private Dictionary<string, string> _validateFields { get; } = new Dictionary<string, string>();
-
+        private string[] _whereEqualFields { get; }
         public override void OnActionExecuting(IInvocation invocation)
         {
             Type entityType = invocation.Arguments[0].GetType();
@@ -45,6 +46,10 @@ namespace Coldairarrow.Business
             else
                 q = invocation.InvocationTarget.GetType().GetMethod("GetIQueryable").Invoke(invocation.InvocationTarget, new object[] { }) as IQueryable;
             q = q.Where("Id != @0", data.GetPropertyValue("Id"));
+            _whereEqualFields?.ForEach(aField =>
+            {
+                q = q.Where($"{aField} = @0", data.GetPropertyValue(aField));
+            });
             q = q.Where(
                 string.Join("||", whereList),
                 properties.Select(x => data.GetPropertyValue(x.Key)).ToArray());
