@@ -42,7 +42,7 @@ using System.Net.NetworkInformation;
             { "int4", typeof(int) },
             { "int8", typeof(long) },
             { "float4", typeof(float) },
-            { "float8", typeof(decimal) },
+            { "float8", typeof(double) },
             { "numeric", typeof(decimal) },
             { "money", typeof(decimal) },
             { "text", typeof(string) },
