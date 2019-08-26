@@ -85,10 +85,16 @@ $('#roleList').selectpicker({
                 var type = getType(value);
                 switch (type) {
                     case 'array': newValues = value; break;
+                    case 'string': newValues = value.split(','); break;
                     case 'null':
                     case 'undefined': break;
                     default: newValues.push(value.toString());
                 }
+
+                //转为字符串
+                $.each(newValues, function (index, item) {
+                    newValues[index] = item.toString();
+                });
 
                 return newValues;
             }

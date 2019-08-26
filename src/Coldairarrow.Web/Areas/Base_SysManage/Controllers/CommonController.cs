@@ -29,7 +29,7 @@ namespace Coldairarrow.Web.Areas.Base_SysManage.Controllers
 
         public ActionResult UploadFile(string fileName, string data, string fileType)
         {
-            string fileBase64 = GetBase64String(data);
+            string fileBase64 = GetBase64String(data).Replace(" ", "+");
             byte[] bytes = fileBase64.ToBytes_FromBase64Str();
 
             string relativeDir = $"/Upload/File/{Guid.NewGuid().ToString()}";

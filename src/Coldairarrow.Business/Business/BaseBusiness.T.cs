@@ -563,7 +563,20 @@ namespace Coldairarrow.Business
         /// <param name="textFiled">文本字段</param>
         /// <param name="valueField">值字段</param>
         /// <returns></returns>
-        public List<T> BuildSelectResult(string selectedValueJson, string q, string textFiled, string valueField)
+        public virtual List<T> BuildSelectResult(string selectedValueJson, string q, string textFiled, string valueField)
+        {
+            return BuildSelectResult(selectedValueJson, q, textFiled, valueField, null);
+        }
+
+        /// <summary>
+        /// 构建前端Select远程搜索数据
+        /// </summary>
+        /// <param name="selectedValueJson">已选择的项，JSON数组</param>
+        /// <param name="q">查询关键字</param>
+        /// <param name="textFiled">文本字段</param>
+        /// <param name="valueField">值字段</param>
+        /// <returns></returns>
+        public virtual List<T> BuildSelectResult(string selectedValueJson, string q, string textFiled, string valueField, IQueryable<T> source = null)
         {
             Pagination pagination = new Pagination
             {
@@ -592,7 +605,7 @@ namespace Coldairarrow.Business
 
             IQueryable<T> GetNewQ()
             {
-                return GetIQueryable();
+                return source ?? GetIQueryable();
             }
         }
 

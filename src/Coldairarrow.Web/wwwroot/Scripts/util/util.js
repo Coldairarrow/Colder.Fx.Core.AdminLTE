@@ -541,3 +541,24 @@
         }
     }
 })();
+
+//对象转为URL查询参数形式:a=1&b=2
+(function () {
+    if (window.encodeUrlParam)
+        return;
+
+    window.encodeUrlParam = function (param, key, encode) {
+        if (param == null) return '';
+        var arr = [];
+        var t = typeof (param);
+        if (t == 'string' || t == 'number' || t == 'boolean') {
+            arr.push(key + '=' + ((encode == null || encode) ? encodeURIComponent(param) : param));
+        } else {
+            for (var i in param) {
+                var k = key == null ? i : key + (param instanceof Array ? '[' + i + ']' : '.' + i);
+                arr.push(encodeUrlParam(param[i], k, encode));
+            }
+        }
+        return arr.join("&");
+    };
+})();
