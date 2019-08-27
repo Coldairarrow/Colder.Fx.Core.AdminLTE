@@ -60,5 +60,21 @@ namespace Coldairarrow.Util
             var value = GetCache(key);
             SetCache(key, value, expire);
         }
+
+        public (bool lockSuccess, bool actionSuccess, Exception ex) UseLock(string key, TimeSpan expiry, Action action)
+        {
+            throw new NotImplementedException("不支持分布式锁,请使用RedisCache");
+        }
+
+        public (bool lockSuccess, bool actionSuccess, Exception ex) UseLock(string key, TimeSpan expiry, TimeSpan retryTnterval, int retryCount, Action action)
+        {
+            throw new NotImplementedException("不支持分布式锁,请使用RedisCache");
+        }
+
+        public (bool lockSuccess, bool actionSuccess, Exception ex) UseLock(string key, TimeSpan expiry, TimeSpan retryTnterval, TimeSpan retryTime, Action action)
+        {
+            throw new NotImplementedException("不支持分布式锁,请使用RedisCache");
+        }
+
     }
 }

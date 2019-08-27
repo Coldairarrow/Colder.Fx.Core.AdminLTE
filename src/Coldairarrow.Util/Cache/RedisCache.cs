@@ -1,5 +1,6 @@
 ﻿using StackExchange.Redis;
 using System;
+using System.Threading;
 
 namespace Coldairarrow.Util
 {
@@ -107,6 +108,73 @@ namespace Coldairarrow.Util
                 _db.StringSet(key, theValue);
             else
                 _db.StringSet(key, theValue, timeout);
+        }
+
+        public (bool lockSuccess, bool actionSuccess, Exception ex) UseLock(string key, TimeSpan expiry, Action action)
+        {
+            if (_db.LockTake(key, key, expiry))
+            {
+                try
+                {
+                    action?.Invoke();
+
+                    return (true, true, null);
+                }
+                catch (Exception ex)
+                {
+                    return (true, false, ex);
+                }
+                finally
+                {
+                    _db.LockRelease(key, key);
+                }
+            }
+            else
+            {
+                return (false, false, null);
+            }
+        }
+
+        public (bool lockSuccess, bool actionSuccess, Exception ex) UseLock(string key, TimeSpan expiry, TimeSpan retryTnterval, int retryCount, Action action)
+        {
+            for (int i = 0; i < retryCount; i++)
+            {
+                var res = UseLock(key, expiry, action);
+                //获取锁失败则重试
+                if (!res.lockSuccess)
+                {
+                    Thread.Sleep(retryTnterval);
+                    continue;
+                }
+                //业务执行成功或异常都直接返回,不重试
+                else
+                    return res;
+            }
+
+            return (false, false, null);
+        }
+
+        public (bool lockSuccess, bool actionSuccess, Exception ex) UseLock(string key, TimeSpan expiry, TimeSpan retryTnterval, TimeSpan retryTime, Action action)
+        {
+            DateTime endTime = DateTime.Now + retryTime;
+            while (true)
+            {
+                if (DateTime.Now < endTime)
+                {
+                    var res = UseLock(key, expiry, action);
+                    //获取锁失败则重试
+                    if (!res.lockSuccess)
+                    {
+                        Thread.Sleep(retryTnterval);
+                        continue;
+                    }
+                    //业务执行成功或异常都直接返回,不重试
+                    else
+                        return res;
+                }
+                else
+                    return (false, false, null);
+            }
         }
     }
 }

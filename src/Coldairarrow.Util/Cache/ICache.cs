@@ -80,6 +80,41 @@ namespace Coldairarrow.Util
         void RemoveCache(string key);
 
         #endregion
+
+        #region 分布式锁
+
+        /// <summary>
+        /// 使用分布式锁
+        /// </summary>
+        /// <param name="key">key</param>
+        /// <param name="expiry">锁失效时间</param>
+        /// <param name="action">业务操作</param>
+        /// <returns>lockSuccess:是否成功获取锁,actionSuccess:业务执行是否成功,ex:失败异常</returns>
+        (bool lockSuccess, bool actionSuccess, Exception ex) UseLock(string key, TimeSpan expiry, Action action);
+
+        /// <summary>
+        /// 使用分布式锁,指定重试次数
+        /// </summary>
+        /// <param name="key">key</param>
+        /// <param name="expiry">锁失效时间</param>
+        /// <param name="retryTnterval">重试间隔</param>
+        /// <param name="retryCount">重试次数</param>
+        /// <param name="action">业务操作</param>
+        /// <returns>lockSuccess:是否成功获取锁,actionSuccess:业务执行是否成功,ex:失败异常</returns>
+        (bool lockSuccess, bool actionSuccess, Exception ex) UseLock(string key, TimeSpan expiry, TimeSpan retryTnterval, int retryCount, Action action);
+
+        /// <summary>
+        /// 使用分布式锁,指定重试持续时间
+        /// </summary>
+        /// <param name="key">key</param>
+        /// <param name="expiry">锁失效时间</param>
+        /// <param name="retryTnterval">重试间隔</param>
+        /// <param name="retryTime">重试持续时间</param>
+        /// <param name="action">action</param>
+        /// <returns>lockSuccess:是否成功获取锁,actionSuccess:业务执行是否成功,ex:失败异常</returns>
+        (bool lockSuccess, bool actionSuccess, Exception ex) UseLock(string key, TimeSpan expiry, TimeSpan retryTnterval, TimeSpan retryTime, Action action);
+
+        #endregion
     }
 
     #region 类型定义
