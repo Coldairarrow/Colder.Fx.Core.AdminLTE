@@ -12,6 +12,9 @@ using Coldairarrow.Util;
 using System.Data;
 using Autofac;
 using Autofac.Extras.DynamicProxy;
+using System.Net;
+using System.Net.Sockets;
+using System.Net.NetworkInformation;
 
 namespace Coldairarrow.Console1
 {
@@ -51,9 +54,9 @@ namespace Coldairarrow.Console1
 
             AutofacHelper.Container = builder.Build();
         }
-
         static void Main(string[] args)
         {
+            Console.WriteLine(IpHelper.GetLocalIp());
             Console.WriteLine("完成");
             Console.ReadLine();
         }
