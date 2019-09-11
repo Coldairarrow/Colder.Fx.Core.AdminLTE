@@ -39,6 +39,8 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.2.4" />
     <PackageReference Include="Oracle.EntityFrameworkCore" Version="2.19.30" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.2.0" />
+    <PackageReference Include="ZooKeeperNetEx" Version="3.4.12.1" />
+    <PackageReference Include="ZooKeeperNetEx.Recipes" Version="3.4.12.1" />
   </ItemGroup>
 
   <ItemGroup>

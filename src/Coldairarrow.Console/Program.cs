@@ -1,20 +1,9 @@
-﻿using Coldairarrow.DataRepository;
-using Coldairarrow.Entity.Base_SysManage;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.EntityFrameworkCore.Query.Internal;
-using Microsoft.EntityFrameworkCore.Storage;
+﻿using Autofac;
+using Autofac.Extras.DynamicProxy;
+using Coldairarrow.Util;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Coldairarrow.Util;
-using System.Data;
-using Autofac;
-using Autofac.Extras.DynamicProxy;
-using System.Net;
-using System.Net.Sockets;
-using System.Net.NetworkInformation;
 
 namespace Coldairarrow.Console1
 {
@@ -56,7 +45,6 @@ namespace Coldairarrow.Console1
         }
         static void Main(string[] args)
         {
-            Console.WriteLine(IpHelper.GetLocalIp());
             Console.WriteLine("完成");
             Console.ReadLine();
         }

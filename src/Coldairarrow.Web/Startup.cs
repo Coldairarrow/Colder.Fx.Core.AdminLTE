@@ -87,6 +87,7 @@ namespace Coldairarrow.Web
             });
 
             InitAutoMapper();
+            InitId();
         }
 
         private ContainerBuilder InitAutofac()
@@ -120,7 +121,7 @@ namespace Coldairarrow.Web
 
             //◊¢≤·Controller
             builder.RegisterAssemblyTypes(typeof(Startup).GetTypeInfo().Assembly)
-                .Where(t =>typeof(Controller).IsAssignableFrom(t) &&t.Name.EndsWith("Controller", StringComparison.Ordinal))
+                .Where(t => typeof(Controller).IsAssignableFrom(t) && t.Name.EndsWith("Controller", StringComparison.Ordinal))
                 .PropertiesAutowired();
 
             //AOP
@@ -144,6 +145,16 @@ namespace Coldairarrow.Web
                 cfg.CreateMap<Base_User, Base_UserDTO>();
                 cfg.CreateMap<Base_SysRole, Base_SysRoleDTO>();
             });
+        }
+
+        private void InitId()
+        {
+            new IdHelperBootstrapper()
+                //…Ë÷√WorkerId
+                .SetWorkderId(ConfigHelper.GetValue("WorkerId").ToLong())
+                // π”√Zookeeper
+                //.UseZookeeper("127.0.0.1:2181", 200, GlobalSwitch.ProjectName)
+                .Boot();
         }
     }
 }

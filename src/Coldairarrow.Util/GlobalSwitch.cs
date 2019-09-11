@@ -92,9 +92,6 @@ namespace Coldairarrow.Util
 
         #region 雪花Id配置
 
-        public static long DatacenterId { get => ConfigHelper.GetValue("DatacenterId").ToString().ToLong(); }
-        public static long WorkerId { get => ConfigHelper.GetValue("WorkerId").ToString().ToLong(); }
-
         #endregion
     }
 
