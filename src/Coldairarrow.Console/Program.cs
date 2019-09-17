@@ -1,9 +1,17 @@
 ﻿using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using Autofac.Extras.DynamicProxy;
 using Coldairarrow.Util;
+using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Coldairarrow.Console1
 {
@@ -11,6 +19,9 @@ namespace Coldairarrow.Console1
     {
         static Program()
         {
+            //var httpClientFactory = services.GetService<IHttpClientFactory>();
+
+            //var client = httpClientFactory.CreateClient();
             var builder = new ContainerBuilder();
 
             var baseType = typeof(IDependency);
@@ -41,11 +52,19 @@ namespace Coldairarrow.Console1
             //AOP
             builder.RegisterType<Interceptor>();
 
+            //自带DI
+            var services = new ServiceCollection()
+                .AddHttpClient();
+
+            builder.Populate(services);
+
             AutofacHelper.Container = builder.Build();
         }
+
         static void Main(string[] args)
         {
-            Console.WriteLine("完成");
+
+            Console.WriteLine($"完成");
             Console.ReadLine();
         }
     }

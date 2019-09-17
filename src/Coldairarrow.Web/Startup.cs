@@ -34,12 +34,14 @@ namespace Coldairarrow.Web
             services.AddMvc(options =>
             {
                 options.Filters.Add<GlobalExceptionFilter>();
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+            })
+            .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
             .AddControllersAsServices();
             services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<IActionContextAccessor, ActionContextAccessor>();
             services.AddSingleton(Configuration);
             services.AddLogging();
+            services.AddHttpClient();
 
             //使用Autofac替换自带IOC
             var builder = InitAutofac();
