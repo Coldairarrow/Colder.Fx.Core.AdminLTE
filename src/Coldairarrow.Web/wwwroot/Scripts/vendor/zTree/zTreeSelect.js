@@ -1,7 +1,11 @@
 ﻿/*
  * 单选使用[节点选中],多选使用[checkbox勾选]
 $('#CategoryId').zTreeSelect({
-    url: '/ScmManage/Scm_ScmProduct/GetPlatformProductCategory?SourceType=1'
+    url: '/ScmManage/Scm_ScmProduct/GetPlatformProductCategory?SourceType=1'//远程地址
+    value: null,//初始化值
+    multiple: false,//是否多选
+    onSelect: function () { },//选择事件
+    autoClose: true//点击自动关闭下拉
 });
 
 $('#CategoryId').zTreeSelect('setOption',{});
@@ -42,7 +46,8 @@ $('#CategoryId').zTreeSelect('reload');
                 multiple: false,
                 data: [],
                 _firstLoad: true,
-                chkboxType: { "Y": "ps", "N": "ps" }//[Y:勾选,N:取消勾选]父子关联关系:[p:关联父,s:关联子]
+                onSelect: function () { },
+                autoClose: true
             };
 
             var _option = $.extend({}, defaults, options);
@@ -159,7 +164,7 @@ $('#CategoryId').zTreeSelect('reload');
                 check: {
                     enable: option.multiple,
                     autoCheckTrigger: true,
-                    chkboxType: option.chkboxType
+                    chkboxType: { "Y": "", "N": "" }
                 },
                 data: {
                     simpleData: {
@@ -182,6 +187,15 @@ $('#CategoryId').zTreeSelect('reload');
 
                         $('#' + _inputId).val(v.join(','));
                         $(_this).val(values);
+
+                        //触发onSelect事件
+                        if (option.onSelect) {
+                            option.onSelect(treeNode.id);
+
+                            if (option.autoClose && !option.multiple) {
+                                hideMenu();
+                            }
+                        }
                     },
                     onCheck: function (e, treeId, treeNode) {
                         var zTree = $.fn.zTree.getZTreeObj(_treeId),
