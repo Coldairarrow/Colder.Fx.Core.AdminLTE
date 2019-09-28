@@ -4,14 +4,8 @@ using Autofac.Extras.DynamicProxy;
 using Coldairarrow.Util;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Coldairarrow.Console1
 {
@@ -63,7 +57,10 @@ namespace Coldairarrow.Console1
 
         static void Main(string[] args)
         {
-
+            JobHelper.SetDailyJob(() =>
+            {
+                Console.WriteLine("111");
+            }, 16, 54, 30);
             Console.WriteLine($"完成");
             Console.ReadLine();
         }
