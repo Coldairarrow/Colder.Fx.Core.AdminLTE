@@ -13,7 +13,7 @@ namespace Coldairarrow.Util
             IConfiguration config = null;
             try
             {
-                config = AutofacHelper.GetScopeService<IConfiguration>();
+                config = AutofacHelper.GetService<IConfiguration>();
             }
             catch
             {
