@@ -16,8 +16,8 @@ namespace Coldairarrow.Util
 
         static JobHelper()
         {
-            _scheduler = StdSchedulerFactory.GetDefaultScheduler().GetAwaiter().GetResult();
-            _scheduler.Start().GetAwaiter().GetResult();
+            _scheduler = TaskHelper.RunSync(() => StdSchedulerFactory.GetDefaultScheduler());
+            TaskHelper.RunSync(() => _scheduler.Start());
         }
 
         private static ConcurrentDictionary<string, object> _store { get; }
@@ -69,7 +69,7 @@ namespace Coldairarrow.Util
                 .StartNow()
                 .WithCronSchedule($"{s} {m} {h} * * ?")//每天定时
                 .Build();
-            _scheduler.ScheduleJob(job, trigger).GetAwaiter().GetResult();
+            TaskHelper.RunSync(() => _scheduler.ScheduleJob(job, trigger));
         }
 
         #endregion
