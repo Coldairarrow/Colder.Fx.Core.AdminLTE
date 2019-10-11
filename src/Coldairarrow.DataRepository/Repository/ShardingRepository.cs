@@ -357,7 +357,7 @@ namespace Coldairarrow.DataRepository
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
+            //GC.SuppressFinalize(this);
         }
 
         #endregion

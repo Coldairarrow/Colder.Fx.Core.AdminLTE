@@ -19,22 +19,22 @@ namespace Coldairarrow.Web
             return View();
         }
 
-        public IActionResult Test()
+        //[CheckSign]
+        public ActionResult RequestTest()
         {
+            //var bus = AutofacHelper.GetService<IBase_UserBusiness>();
             var db = DbFactory.GetRepository();
-            Base_UnitTest base_UnitTest = new Base_UnitTest
+            Base_User data = new Base_User
             {
-                Id = IdHelper.GetId(),
-                Age = int.MaxValue,
-                UserId = IdHelper.GetId(),
-                UserName = IdHelper.GetId()
+                Id = IdHelper.GetId()
             };
-            db.Insert(base_UnitTest);
-            db.GetIQueryable<Base_UnitTest>().GetPagination(new Pagination()).ToList();
-            db.Update(base_UnitTest);
-            db.Delete(base_UnitTest);
+            db.Insert(data);
+            db.Update(data);
+            db.GetIQueryable<Base_User>().FirstOrDefault();
+            db.Delete(data);
+            db.Dispose();
 
-            return Success();
+            return Success("");
         }
     }
 }
