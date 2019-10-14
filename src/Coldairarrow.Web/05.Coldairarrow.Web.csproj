@@ -156,6 +156,7 @@
 
   <ItemGroup>
     <Folder Include="Properties\" />
+    <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
 
 </Project>
