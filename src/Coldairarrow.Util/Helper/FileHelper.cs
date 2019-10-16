@@ -131,9 +131,9 @@ namespace Coldairarrow.Util
         /// <param name="path">日志文件位置（默认为D:\测试\a.log）</param>
         public static void WriteLog(string msg, string path = @"Log.txt")
         {
-            string content = $"{DateTime.Now.ToCstTime().ToString("yyyy-MM-dd HH:mm:ss")}:{msg}";
+            string content = $"{DateTime.Now.ToCstTime().ToString("yyyy-MM-dd HH:mm:ss")}:{msg}\r\n";
 
-            WriteTxt(content, $"{GetCurrentDir()}{content}");
+            WriteTxt(content, $"{GetCurrentDir()}{path}", Encoding.UTF8, FileMode.Append);
         }
 
         /// <summary>
