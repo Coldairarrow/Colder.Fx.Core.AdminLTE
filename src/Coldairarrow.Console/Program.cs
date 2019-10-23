@@ -1,10 +1,14 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Autofac.Extras.DynamicProxy;
+using Coldairarrow.Business.Base_SysManage;
+using Coldairarrow.DataRepository;
+using Coldairarrow.Entity.Base_SysManage;
 using Coldairarrow.Util;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace Coldairarrow.Console1
@@ -57,10 +61,24 @@ namespace Coldairarrow.Console1
 
         static void Main(string[] args)
         {
-            JobHelper.SetDailyJob(() =>
+            var db = DbFactory.GetRepository();
+            db.HandleSqlLog = Console.WriteLine;
+
+            Expression<Func<Base_User, Base_Department, Base_UserDTO>> select = (a, b) => new Base_UserDTO
             {
-                Console.WriteLine("111");
-            }, 16, 54, 30);
+                DepartmentName = b.Name
+            };
+            select = select.BuildExtendSelectExpre();
+            var q = from a in db.GetIQueryable<Base_User>().AsExpandable()
+                    join b in db.GetIQueryable<Base_Department>() on a.DepartmentId equals b.Id into ab
+                    from b in ab.DefaultIfEmpty()
+                    select @select.Invoke(a, b);
+            var where = LinqHelper.True<Base_UserDTO>();
+            where = where.And(x => x.DepartmentName.Contains("xxx"));
+            q.Where(where).GetPagination(new Pagination()).ToList();
+
+            //db.GetList<Base_User>();
+
             Console.WriteLine($"完成");
             Console.ReadLine();
         }
