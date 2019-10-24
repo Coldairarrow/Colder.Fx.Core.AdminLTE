@@ -46,7 +46,8 @@ namespace Coldairarrow.Util
             { "varchar",typeof(string)},
             { "text",typeof(string)},
             { "longtext",typeof(string)},
-            { "time",typeof(TimeSpan)}
+            { "time",typeof(TimeSpan)},
+            { "decimal",typeof(decimal)}
         };
 
         #endregion
