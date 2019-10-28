@@ -1,6 +1,7 @@
 ﻿using Coldairarrow.Util;
 using System;
 using System.IO;
+using System.Text;
 
 namespace Coldairarrow.Business
 {
@@ -19,7 +20,7 @@ namespace Coldairarrow.Business
             {
                 AddTarget(new NLog.Targets.ColoredConsoleTarget
                 {
-                    Name= LoggerConfig.LoggerName,
+                    Name = LoggerConfig.LoggerName,
                     Layout = layout
                 });
             }
@@ -31,7 +32,8 @@ namespace Coldairarrow.Business
                 {
                     Name = LoggerConfig.LoggerName,
                     Layout = layout,
-                    FileName = Path.Combine(Directory.GetCurrentDirectory(), "logs", "${date:format=yyyy-MM-dd}.txt")
+                    FileName = Path.Combine(Directory.GetCurrentDirectory(), "logs", "${date:format=yyyy-MM-dd}.txt"),
+                    Encoding = Encoding.UTF8
                 });
             }
 
