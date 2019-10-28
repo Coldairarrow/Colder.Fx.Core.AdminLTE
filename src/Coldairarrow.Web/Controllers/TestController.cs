@@ -3,6 +3,7 @@ using Coldairarrow.DataRepository;
 using Coldairarrow.Entity.Base_SysManage;
 using Coldairarrow.Util;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Linq;
 
 namespace Coldairarrow.Web
@@ -19,20 +20,25 @@ namespace Coldairarrow.Web
             return View();
         }
 
-        //[CheckSign]
-        public ActionResult RequestTest()
+        /// <summary>
+        /// 压力测试
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult PressTest()
         {
-            //var bus = AutofacHelper.GetService<IBase_UserBusiness>();
+            var bus = AutofacHelper.GetService<IBase_UserBusiness>();
             var db = DbFactory.GetRepository();
-            Base_User data = new Base_User
+            Base_UnitTest data = new Base_UnitTest
             {
-                Id = IdHelper.GetId()
+                Id = Guid.NewGuid().ToString(),
+                UserId = Guid.NewGuid().ToString(),
+                Age = 10,
+                UserName = Guid.NewGuid().ToString()
             };
             db.Insert(data);
             db.Update(data);
-            db.GetIQueryable<Base_User>().FirstOrDefault();
+            db.GetIQueryable<Base_UnitTest>().FirstOrDefault();
             db.Delete(data);
-            db.Dispose();
 
             return Success("");
         }
