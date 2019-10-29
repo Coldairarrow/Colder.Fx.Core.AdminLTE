@@ -26,7 +26,7 @@ namespace Coldairarrow.Web
         /// <returns></returns>
         public ActionResult PressTest()
         {
-            var bus = AutofacHelper.GetService<IBase_UserBusiness>();
+            var bus = AutofacHelper.GetScopeService<IBase_UserBusiness>();
             var db = DbFactory.GetRepository();
             Base_UnitTest data = new Base_UnitTest
             {
