@@ -56,8 +56,8 @@ namespace Coldairarrow.Util
             get
             {
                 int pages = _recordCount / _pageRows;
-                int pageCount = _recordCount % _pageRows == 0 ? pages : pages + 1;
-                return pages;
+
+                return _recordCount % _pageRows == 0 ? pages : pages + 1;
             }
         }
 
