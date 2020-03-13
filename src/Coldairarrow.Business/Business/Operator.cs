@@ -1,5 +1,6 @@
 ﻿using Coldairarrow.Business.Base_SysManage;
 using Coldairarrow.Util;
+using Microsoft.AspNetCore.Http;
 using static Coldairarrow.Entity.Base_SysManage.EnumType;
 
 namespace Coldairarrow.Business
@@ -10,6 +11,7 @@ namespace Coldairarrow.Business
     public class Operator : IOperator, ICircleDependency
     {
         public IBase_UserBusiness _sysUserBus { get; set; }
+        private const string USERID = "UserId";
 
         /// <summary>
         /// 当前操作者UserId
@@ -21,7 +23,7 @@ namespace Coldairarrow.Business
                 if (GlobalSwitch.RunModel == RunModel.LocalTest)
                     return "Admin";
                 else
-                    return SessionHelper.Session["UserId"]?.ToString();
+                    return HttpContextCore.Current.Session.GetString(USERID);
             }
         }
 
@@ -44,7 +46,7 @@ namespace Coldairarrow.Business
         /// <param name="userId">用户逻辑主键Id</param>
         public void Login(string userId)
         {
-            SessionHelper.Session["UserId"] = userId;
+            HttpContextCore.Current.Session.SetString(USERID, userId);
         }
 
         /// <summary>
@@ -52,8 +54,7 @@ namespace Coldairarrow.Business
         /// </summary>
         public void Logout()
         {
-            SessionHelper.Session["UserId"] = null;
-            SessionHelper.RemoveSessionCookie();
+            HttpContextCore.Current.Session.Remove(USERID);
         }
 
         /// <summary>

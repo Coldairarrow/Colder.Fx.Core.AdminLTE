@@ -31,13 +31,14 @@ namespace Coldairarrow.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            services.AddMemoryCache().AddSession();
             services.AddMvc(options =>
             {
                 options.Filters.Add<GlobalExceptionFilter>();
             })
             .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
             .AddControllersAsServices();
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddHttpContextAccessor();
             services.AddTransient<IActionContextAccessor, ActionContextAccessor>();
             services.AddSingleton(Configuration);
             services.AddLogging();
@@ -57,6 +58,7 @@ namespace Coldairarrow.Web
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IHttpContextAccessor accessor)
         {
             HttpContextCore.Accessor = accessor;
+            app.UseSession();
             //Request.BodyÖØÓÃ
             app.Use(next => context =>
             {
